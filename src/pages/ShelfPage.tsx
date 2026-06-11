@@ -13,11 +13,12 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function ShelfPage() {
   const { user: me } = useAuth();
-  const { data: shelf, isLoading } = useQuery({
+  const { data: shelfPage, isLoading } = useQuery({
     queryKey: ["shelf"],
     queryFn: user.shelf,
     enabled: !!me,
   });
+  const shelf = shelfPage?.items;
 
   if (!me) {
     return (
@@ -82,8 +83,8 @@ export default function ShelfPage() {
                 </span>
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {entries.map((e) => (
-                  <WorkCard key={e.work_id} work={e.work} />
+                {entries.map((e) => e.work && (
+                  <WorkCard key={e.lw_id} work={e.work} />
                 ))}
               </div>
             </div>

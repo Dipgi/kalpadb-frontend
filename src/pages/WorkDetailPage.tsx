@@ -20,9 +20,7 @@ export default function WorkDetailPage() {
 
   const shelfMutation = useMutation({
     mutationFn: ({ status }: { status: string }) =>
-      shelfStatus
-        ? user.updateShelf(work!.id, status)
-        : user.addToShelf(work!.id, status),
+      user.upsertShelf(work!.id, status),
     onSuccess: (_, { status }) => {
       setShelfStatus(status);
       qc.invalidateQueries({ queryKey: ["shelf"] });

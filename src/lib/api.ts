@@ -148,9 +148,15 @@ export interface UserOut {
 }
 
 export interface ShelfEntry {
-  work_id: number;
+  id: number;
+  lw_id: number;
   status: string;
-  work: WorkSummary;
+  date_started: string | null;
+  date_finished: string | null;
+  progress_note: string | null;
+  private: boolean;
+  updated_at: string | null;
+  work: WorkSummary | null;
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
@@ -224,9 +230,9 @@ export const news = {
 // ── User features ─────────────────────────────────────────────────────────
 
 export const user = {
-  shelf: () => request<ShelfEntry[]>("/users/me/shelf"),
-  addToShelf: (work_id: number, status: string) =>
-    request("/users/me/shelf", { method: "POST", body: JSON.stringify({ work_id, status }) }),
-  updateShelf: (work_id: number, status: string) =>
-    request(`/users/me/shelf/${work_id}`, { method: "PATCH", body: JSON.stringify({ status }) }),
+  shelf: () => request<Page<ShelfEntry>>("/shelf"),
+  upsertShelf: (lw_id: number, status: string) =>
+    request<ShelfEntry>(`/shelf/${lw_id}`, { method: "PUT", body: JSON.stringify({ status }) }),
+  removeFromShelf: (lw_id: number) =>
+    request(`/shelf/${lw_id}`, { method: "DELETE" }),
 };
