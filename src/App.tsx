@@ -26,9 +26,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
-            <main>
+            <main className="flex-1">
               <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -42,6 +42,9 @@ export default function App() {
               </Routes>
               </ErrorBoundary>
             </main>
+            <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-400">
+              &copy; 2026 Dip Ghosh. All rights reserved.
+            </footer>
           </div>
         </BrowserRouter>
       </AuthProvider>
