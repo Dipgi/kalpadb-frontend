@@ -168,7 +168,7 @@ export const auth = {
       body: JSON.stringify({ username, email, password }),
     }),
 
-  me: () => request<UserOut>("/auth/me"),
+  me: () => request<UserOut>("/users/me"),
 };
 
 // ── Works ──────────────────────────────────────────────────────────────────
