@@ -5,10 +5,11 @@ import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
 
 const STATUS_LABELS: Record<string, string> = {
-  want_to_read: "Want to Read",
-  reading: "Currently Reading",
-  read: "Read",
-  dropped: "Dropped",
+  want: "Want to Read",
+  in_progress: "Currently Reading",
+  finished: "Read",
+  abandoned: "Dropped",
+  re_reading: "Reading Again",
 };
 
 export default function ShelfPage() {
@@ -50,12 +51,13 @@ export default function ShelfPage() {
     );
   }
 
-  const grouped = Object.entries(STATUS_LABELS).reduce<
-    Record<string, typeof shelf>
-  >((acc, [status]) => {
-    acc[status] = shelf?.filter((e) => e.status === status) ?? [];
-    return acc;
-  }, {});
+  const grouped = Object.keys(STATUS_LABELS).reduce<Record<string, NonNullable<typeof shelf>>>(
+    (acc, status) => {
+      acc[status] = shelf?.filter((e) => e.status === status) ?? [];
+      return acc;
+    },
+    {}
+  );
 
   const hasAny = shelf && shelf.length > 0;
 

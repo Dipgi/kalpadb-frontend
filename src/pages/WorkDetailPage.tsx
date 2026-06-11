@@ -4,7 +4,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, user } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 
-const SHELF_STATUSES = ["want_to_read", "reading", "read", "dropped"];
+const SHELF_STATUSES: { value: string; label: string }[] = [
+  { value: "want", label: "Want to Read" },
+  { value: "in_progress", label: "Reading" },
+  { value: "finished", label: "Read" },
+  { value: "abandoned", label: "Dropped" },
+];
 
 export default function WorkDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -113,18 +118,18 @@ export default function WorkDetailPage() {
 
           {me && (
             <div className="flex flex-wrap gap-2">
-              {SHELF_STATUSES.map((s) => (
+              {SHELF_STATUSES.map(({ value, label }) => (
                 <button
-                  key={s}
+                  key={value}
                   disabled={shelfMutation.isPending}
-                  onClick={() => shelfMutation.mutate({ status: s })}
-                  className={`text-xs px-3 py-1.5 rounded-md border transition-colors capitalize ${
-                    shelfStatus === s
+                  onClick={() => shelfMutation.mutate({ status: value })}
+                  className={`text-xs px-3 py-1.5 rounded-md border transition-colors ${
+                    shelfStatus === value
                       ? "bg-violet-700 text-white border-violet-700"
                       : "border-gray-300 text-gray-600 hover:border-violet-400 hover:text-violet-700"
                   }`}
                 >
-                  {s.replace(/_/g, " ")}
+                  {label}
                 </button>
               ))}
             </div>
