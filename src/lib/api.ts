@@ -133,8 +133,10 @@ export interface NewsItem {
 }
 
 export interface SearchResult {
+  query: string;
+  total: number;
   works: WorkSummary[];
-  persons: Person[];
+  persons: { id: number; name: string; image_url: string | null; localised: Record<string, Record<string, string>> }[];
 }
 
 export interface UserOut {
@@ -204,8 +206,8 @@ export const catalogue = {
 // ── Search ────────────────────────────────────────────────────────────────
 
 export const search = {
-  query: (q: string, page = 1, size = 20) =>
-    request<Page<WorkSummary>>(`/search?q=${encodeURIComponent(q)}&page=${page}&size=${size}`),
+  query: (q: string, page = 1) =>
+    request<SearchResult>(`/search?q=${encodeURIComponent(q)}&page=${page}&page_size=25`),
 };
 
 // ── Stats & News ──────────────────────────────────────────────────────────
