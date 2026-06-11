@@ -90,16 +90,17 @@ export interface Person {
 }
 
 export interface StatsOut {
-  total_works: number;
-  total_books: number;
-  total_stories: number;
-  total_persons: number;
-  total_publishers: number;
-  total_languages: number;
-  total_users: number;
-  total_awards: number;
-  total_genres: number;
-  total_tags: number;
+  stats: {
+    total_works?: number;
+    total_authors?: number;
+    total_books?: number;
+    total_stories?: number;
+    total_publishers?: number;
+    total_languages?: number;
+    total_users?: number;
+    [key: string]: number | undefined;
+  };
+  refreshed_at: string | null;
 }
 
 export interface NewsItem {

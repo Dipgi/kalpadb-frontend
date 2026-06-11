@@ -44,13 +44,15 @@ export default function HomePage() {
       {siteStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: "Works", value: siteStats.total_works },
-            { label: "Authors", value: siteStats.total_persons },
-            { label: "Publishers", value: siteStats.total_publishers },
-            { label: "Languages", value: siteStats.total_languages },
+            { label: "Works", value: siteStats.stats.total_works },
+            { label: "Authors", value: siteStats.stats.total_authors },
+            { label: "Publishers", value: siteStats.stats.total_publishers },
+            { label: "Languages", value: siteStats.stats.total_languages },
           ].map(({ label, value }) => (
             <div key={label} className="text-center bg-violet-50 rounded-lg py-4">
-              <p className="text-2xl font-bold text-violet-700">{value.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-violet-700">
+                {value?.toLocaleString() ?? "—"}
+              </p>
               <p className="text-sm text-gray-500 mt-1">{label}</p>
             </div>
           ))}
