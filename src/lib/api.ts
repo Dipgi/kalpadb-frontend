@@ -48,30 +48,52 @@ export interface Page<T> {
 
 export interface WorkSummary {
   id: number;
+  type: string;
+  content_type: string | null;
   title: string;
-  work_type: string;
-  publication_year: number | null;
-  language_code: string;
-  cover_image_url: string | null;
-  authors: { id: number; name: string }[];
-  genres: { id: number; name: string }[];
+  language: string | null;
+  publication_date: string | null;
+  authors: { id: number; name: string; image_url: string | null }[];
+  avg_rating: number | null;
+  rating_count: number;
   localised: Record<string, Record<string, string>>;
+}
+
+export interface BookFormat {
+  format_type: string;
+  isbn: string | null;
+  page_count: number | null;
+  cover_image_url: string | null;
 }
 
 export interface WorkDetail extends WorkSummary {
   description: string | null;
-  original_language_code: string | null;
-  publishers: { id: number; name: string }[];
+  image_urls: string[] | null;
+  original_language: string | null;
+  genres: { id: number; name: string }[];
   tags: { id: number; name: string }[];
+  external_links: { id: number; url: string; link_type: string; label: string | null }[];
+  awards: {
+    id: number;
+    category: { name: string };
+    year: number;
+    result: string;
+    notes: string | null;
+  }[];
+  related_works: {
+    id: number;
+    relation_type: string;
+    work: WorkSummary;
+  }[];
   book: {
-    format: string | null;
-    page_count: number | null;
-    isbn: string | null;
+    publication_year: number | null;
+    formats: BookFormat[];
+    publishers: { id: number; name: string }[];
+    editors: { id: number; name: string }[];
+    translators: { id: number; name: string }[];
+    illustrators: { id: number; name: string }[];
   } | null;
   story: { word_count: number | null } | null;
-  external_links: { url: string; link_type: string }[];
-  awards: { award_name: string; category: string | null; year: number | null; result: string }[];
-  translations: { id: number; title: string; language_code: string }[];
 }
 
 export interface Person {
