@@ -7,7 +7,7 @@ export default function HomePage() {
   const { data: siteStats } = useQuery({ queryKey: ["stats"], queryFn: stats.get });
   const { data: recent } = useQuery({
     queryKey: ["recent-works"],
-    queryFn: () => works.list({ size: 8 }),
+    queryFn: () => works.list({ page_size: 8 }),
   });
   const { data: newsFeed } = useQuery({
     queryKey: ["news"],
