@@ -182,17 +182,19 @@ export const auth = {
 export const works = {
   list: (params: {
     type?: string;
-    language?: string;
-    genre_id?: number;
+    lang?: string;
+    genre_slug?: string;
+    sort?: string;
     page?: number;
-    size?: number;
+    page_size?: number;
   } = {}) => {
     const q = new URLSearchParams();
     if (params.type) q.set("type", params.type);
-    if (params.language) q.set("language", params.language);
-    if (params.genre_id) q.set("genre_id", String(params.genre_id));
+    if (params.lang) q.set("lang", params.lang);
+    if (params.genre_slug) q.set("genre_slug", params.genre_slug);
+    if (params.sort) q.set("sort", params.sort);
     q.set("page", String(params.page ?? 1));
-    q.set("size", String(params.size ?? 20));
+    q.set("page_size", String(params.page_size ?? 25));
     return request<Page<WorkSummary>>(`/works?${q}`);
   },
 
@@ -205,7 +207,7 @@ export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
-  genres: () => request<{ id: number; name: string }[]>("/genres"),
+  genres: () => request<{ id: number; name: string; slug: string }[]>("/genres"),
   languages: () => request<{ code: string; name: string }[]>("/languages"),
 };
 
