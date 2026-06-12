@@ -1,13 +1,23 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
+import { admin, catalogue, volunteer, works, type WorkDetail, type BookUpdateIn } from "../../lib/api";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
+
+const FORMAT_TYPES = ["paperback", "hardcover", "ebook"];
+
+const AVAILABILITY_OPTIONS = [
+  { value: "", label: "Unknown" },
+  { value: "in_print", label: "In print" },
+  { value: "out_of_print", label: "Out of print" },
+  { value: "digital_only", label: "Digital only" },
+  { value: "rare", label: "Rare" },
+];
 
 export default function AdminEditBook() {
   const { id } = useParams<{ id: string }>();
@@ -71,12 +81,49 @@ function EditForm({ work }: { work: WorkDetail }) {
   );
   const [editionLabel, setEditionLabel] = useState(work.book?.edition_label ?? "");
   const [editionNotes, setEditionNotes] = useState(work.book?.edition_notes ?? "");
+  const firstFormat = work.book?.formats?.[0] ?? null;
+  const [formatType, setFormatType] = useState(firstFormat?.format_type ?? "paperback");
+  const [isbn, setIsbn] = useState(firstFormat?.isbn ?? "");
+  const [pageCount, setPageCount] = useState(firstFormat?.page_count?.toString() ?? "");
+  const [availability, setAvailability] = useState(firstFormat?.availability ?? "");
   const [saved, setSaved] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async () => {
       const y = year ? Number(year) : null;
+
+      // Replace-semantics: edit the first format in place (preserving fields the
+      // form doesn't expose) and pass any further formats through untouched.
+      let formats: BookUpdateIn["formats"];
+      if (firstFormat || isbn.trim() || pageCount || availability) {
+        formats = [
+          {
+            format_type: formatType,
+            isbn: isbn.trim() || null,
+            page_count: pageCount ? Number(pageCount) : null,
+            availability: availability || null,
+            publication_date: firstFormat?.publication_date ?? null,
+            cover_image_url: firstFormat?.cover_image_url ?? null,
+            price: firstFormat?.price ?? null,
+            currency: firstFormat?.currency ?? null,
+            notes: firstFormat?.notes ?? null,
+          },
+          ...(work.book?.formats ?? []).slice(1).map((f) => ({
+            format_type: f.format_type,
+            isbn: f.isbn,
+            page_count: f.page_count,
+            availability: f.availability,
+            publication_date: f.publication_date,
+            cover_image_url: f.cover_image_url,
+            price: f.price,
+            currency: f.currency,
+            notes: f.notes,
+          })),
+        ];
+      }
+
       const sub = await volunteer.updateBook(work.id, {
+        formats,
         title: title.trim(),
         description: description.trim() || null,
         language,
@@ -304,6 +351,46 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
+      <div className="grid grid-cols-4 gap-4">
+        <div>
+          <label className={labelCls}>Format</label>
+          <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className={inputCls}>
+            {FORMAT_TYPES.map((f) => (
+              <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
+            ))}
+            {firstFormat && !FORMAT_TYPES.includes(firstFormat.format_type) && (
+              <option value={firstFormat.format_type}>{firstFormat.format_type}</option>
+            )}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Pages</label>
+          <input
+            type="number"
+            min={1}
+            value={pageCount}
+            onChange={(e) => setPageCount(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>ISBN</label>
+          <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Availability</label>
+          <select
+            value={availability ?? ""}
+            onChange={(e) => setAvailability(e.target.value)}
+            className={inputCls}
+          >
+            {AVAILABILITY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {(allTags ?? []).length > 0 && (
         <div>
           <label className={labelCls}>Tags</label>
@@ -332,10 +419,6 @@ function EditForm({ work }: { work: WorkDetail }) {
           </div>
         </div>
       )}
-
-      <p className="text-xs text-gray-400">
-        Formats (ISBN, pages, availability) can't be edited here yet — only set when adding a book.
-      </p>
 
       <div className="flex items-center gap-3 pt-2">
         <button

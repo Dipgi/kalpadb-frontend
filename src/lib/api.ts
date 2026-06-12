@@ -63,7 +63,12 @@ export interface BookFormat {
   format_type: string;
   isbn: string | null;
   page_count: number | null;
+  publication_date: string | null;
   cover_image_url: string | null;
+  price: string | null;
+  currency: string | null;
+  availability: string | null;
+  notes: string | null;
 }
 
 export interface WorkDetail extends WorkSummary {
@@ -418,6 +423,7 @@ export interface BookUpdateIn {
   tag_ids?: number[];
   author_ids?: number[];
   publisher_ids?: number[];
+  formats?: ({ format_type: string } & Partial<Omit<BookFormat, "format_type">>)[];
 }
 
 export const volunteer = {
