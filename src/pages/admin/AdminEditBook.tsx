@@ -58,6 +58,9 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [genreIds, setGenreIds] = useState<Set<number>>(
     new Set(work.genres.map((g) => g.id))
   );
+  const [coverUrl, setCoverUrl] = useState(
+    work.image_urls?.[0] ?? work.book?.formats?.[0]?.cover_image_url ?? ""
+  );
   const [saved, setSaved] = useState(false);
 
   const mutation = useMutation({
@@ -73,6 +76,8 @@ function EditForm({ work }: { work: WorkDetail }) {
         author_ids: authors.map((a) => a.id),
         publisher_ids: publishers.map((p) => p.id),
         genre_ids: [...genreIds],
+        // empty list clears the work-level cover (null would mean "no change")
+        image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
       });
       return admin.queue.review(sub.edit_id, true, "Direct admin edit");
     },
@@ -167,6 +172,26 @@ function EditForm({ work }: { work: WorkDetail }) {
             onChange={(e) => setYear(e.target.value)}
             className={inputCls}
           />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Cover image URL</label>
+        <div className="flex gap-3 items-start">
+          <input
+            value={coverUrl}
+            onChange={(e) => setCoverUrl(e.target.value)}
+            placeholder="https://…"
+            className={inputCls}
+          />
+          {coverUrl.trim() && (
+            <img
+              src={coverUrl.trim()}
+              alt="Cover preview"
+              className="w-12 rounded shadow shrink-0"
+              onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+            />
+          )}
         </div>
       </div>
 
