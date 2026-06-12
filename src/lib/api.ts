@@ -166,6 +166,16 @@ export interface ShelfEntry {
   work: WorkSummary | null;
 }
 
+export interface Rating {
+  id: number;
+  lw_id: number;
+  rating: number;
+  review: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  work: WorkSummary | null;
+}
+
 // ── Auth ───────────────────────────────────────────────────────────────────
 
 export const auth = {
@@ -321,4 +331,14 @@ export const user = {
     request<ShelfEntry>(`/shelf/${lw_id}`, { method: "PUT", body: JSON.stringify({ status }) }),
   removeFromShelf: (lw_id: number) =>
     request(`/shelf/${lw_id}`, { method: "DELETE" }),
+
+  ratings: (page = 1, size = 100) =>
+    request<Page<Rating>>(`/ratings?page=${page}&page_size=${size}`),
+  upsertRating: (lw_id: number, rating: number, review?: string | null) =>
+    request<Rating>(`/ratings/${lw_id}`, {
+      method: "PUT",
+      body: JSON.stringify({ rating, review: review ?? null }),
+    }),
+  deleteRating: (lw_id: number) =>
+    request(`/ratings/${lw_id}`, { method: "DELETE" }),
 };

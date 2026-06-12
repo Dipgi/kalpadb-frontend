@@ -25,6 +25,11 @@ export default function WorkCard({ work }: { work: WorkSummary }) {
           {author}{moreAuthors}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
+          {work.avg_rating != null && work.rating_count > 0 && (
+            <span className="text-xs text-amber-500 font-medium">
+              ★ {work.avg_rating.toFixed(1)}
+            </span>
+          )}
           {work.language && (
             <span className="text-xs text-gray-400 uppercase">{work.language}</span>
           )}

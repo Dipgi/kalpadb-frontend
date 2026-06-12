@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { user } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
+import { Stars } from "../components/StarRating";
 
 const STATUS_LABELS: Record<string, string> = {
   want: "Want to Read",
@@ -20,6 +21,13 @@ export default function ShelfPage() {
     enabled: !!me,
   });
   const shelf = shelfPage?.items;
+
+  const { data: ratingsPage } = useQuery({
+    queryKey: ["my-ratings"],
+    queryFn: () => user.ratings(),
+    enabled: !!me,
+  });
+  const myRatings = ratingsPage?.items ?? [];
 
   if (!me) {
     return (
@@ -92,6 +100,32 @@ export default function ShelfPage() {
             </div>
           );
         })
+      )}
+
+      {myRatings.length > 0 && (
+        <div className="mb-10">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            My Ratings
+            <span className="ml-2 text-sm font-normal text-gray-400">
+              ({myRatings.length})
+            </span>
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {myRatings.map((r) => r.work && (
+              <div key={r.id} className="flex flex-col gap-1">
+                <WorkCard work={r.work} />
+                <div className="flex items-center gap-1 px-1">
+                  <Stars value={r.rating} size="w-3.5 h-3.5" />
+                  {r.review && (
+                    <span className="text-xs text-gray-400 truncate" title={r.review}>
+                      — {r.review}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

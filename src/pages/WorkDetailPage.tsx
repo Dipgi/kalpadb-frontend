@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { works, user } from "../lib/api";
+import { works, user, type Rating } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
+import { Stars, StarPicker } from "../components/StarRating";
 
 const SHELF_STATUSES: { value: string; label: string }[] = [
   { value: "want", label: "Want to Read" },
@@ -29,6 +30,30 @@ export default function WorkDetailPage() {
     onSuccess: (_, { status }) => {
       setShelfStatus(status);
       qc.invalidateQueries({ queryKey: ["shelf"] });
+    },
+  });
+
+  const { data: myRatings } = useQuery({
+    queryKey: ["my-ratings"],
+    queryFn: () => user.ratings(),
+    enabled: !!me,
+  });
+  const myRating = myRatings?.items.find((r) => r.lw_id === Number(id)) ?? null;
+
+  const rateMutation = useMutation({
+    mutationFn: ({ rating, review }: { rating: number; review?: string | null }) =>
+      user.upsertRating(work!.id, rating, review),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-ratings"] });
+      qc.invalidateQueries({ queryKey: ["work", id] });
+    },
+  });
+
+  const unrateMutation = useMutation({
+    mutationFn: () => user.deleteRating(work!.id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["my-ratings"] });
+      qc.invalidateQueries({ queryKey: ["work", id] });
     },
   });
 
@@ -96,6 +121,16 @@ export default function WorkDetailPage() {
             {publicationYear && <span> · {publicationYear}</span>}
           </p>
 
+          {work.rating_count > 0 && work.avg_rating != null && (
+            <div className="flex items-center gap-2 mb-3">
+              <Stars value={work.avg_rating} />
+              <span className="text-sm text-gray-600 font-medium">{work.avg_rating.toFixed(1)}</span>
+              <span className="text-xs text-gray-400">
+                ({work.rating_count} rating{work.rating_count > 1 ? "s" : ""})
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="bg-violet-100 text-violet-700 text-xs px-2 py-0.5 rounded-full capitalize">
               {work.type.toLowerCase()}
@@ -133,6 +168,16 @@ export default function WorkDetailPage() {
                 </button>
               ))}
             </div>
+          )}
+
+          {me && (
+            <RatingSection
+              key={myRating?.id ?? "none"}
+              myRating={myRating}
+              isPending={rateMutation.isPending || unrateMutation.isPending}
+              onRate={(rating, review) => rateMutation.mutate({ rating, review })}
+              onClear={() => unrateMutation.mutate()}
+            />
           )}
         </div>
       </div>
@@ -214,6 +259,90 @@ export default function WorkDetailPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function RatingSection({
+  myRating,
+  isPending,
+  onRate,
+  onClear,
+}: {
+  myRating: Rating | null;
+  isPending: boolean;
+  onRate: (rating: number, review?: string | null) => void;
+  onClear: () => void;
+}) {
+  const [review, setReview] = useState(myRating?.review ?? "");
+  const [showReview, setShowReview] = useState(!!myRating?.review);
+
+  useEffect(() => {
+    setReview(myRating?.review ?? "");
+  }, [myRating?.review]);
+
+  const reviewChanged = review.trim() !== (myRating?.review ?? "");
+
+  return (
+    <div className="mt-4 pt-4 border-t border-gray-100">
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          Your rating
+        </span>
+        <StarPicker
+          value={myRating?.rating ?? null}
+          disabled={isPending}
+          onChange={(n) => onRate(n, review.trim() || null)}
+        />
+        {myRating && (
+          <button
+            onClick={onClear}
+            disabled={isPending}
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+          >
+            Clear
+          </button>
+        )}
+        {myRating && !showReview && (
+          <button
+            onClick={() => setShowReview(true)}
+            className="text-xs text-violet-600 hover:underline"
+          >
+            {myRating.review ? "Edit review" : "Add a review"}
+          </button>
+        )}
+      </div>
+
+      {showReview && myRating && (
+        <div className="mt-3">
+          <textarea
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+            rows={3}
+            maxLength={2000}
+            placeholder="Write a short review (optional)…"
+            className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-violet-400 resize-y"
+          />
+          <div className="flex gap-2 mt-1">
+            <button
+              onClick={() => onRate(myRating.rating, review.trim() || null)}
+              disabled={isPending || !reviewChanged}
+              className="text-xs px-3 py-1.5 rounded-md bg-violet-700 text-white disabled:opacity-40 hover:bg-violet-800 transition-colors"
+            >
+              Save review
+            </button>
+            <button
+              onClick={() => {
+                setShowReview(false);
+                setReview(myRating.review ?? "");
+              }}
+              className="text-xs px-3 py-1.5 rounded-md border border-gray-300 text-gray-600 hover:border-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
