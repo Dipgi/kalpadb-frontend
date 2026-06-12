@@ -78,13 +78,19 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">News</h2>
           <div className="flex flex-col gap-4">
             {newsFeed.items.map((item) => (
-              <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+              <Link
+                key={item.id}
+                to={`/news/${item.slug}`}
+                className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow block"
+              >
                 <p className="font-medium text-gray-900">{item.title}</p>
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.body}</p>
+                {item.summary && (
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.summary}</p>
+                )}
                 <p className="text-xs text-gray-400 mt-2">
-                  {new Date(item.published_at).toLocaleDateString()}
+                  {item.published_at ? new Date(item.published_at).toLocaleDateString() : ""}
                 </p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

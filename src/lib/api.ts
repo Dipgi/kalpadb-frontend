@@ -128,8 +128,15 @@ export interface StatsOut {
 export interface NewsItem {
   id: number;
   title: string;
+  slug: string;
+  summary: string | null;
+  pinned: boolean;
+  published_at: string | null;
+  author: { id: number; username: string };
+}
+
+export interface NewsItemFull extends NewsItem {
   body: string;
-  published_at: string;
 }
 
 export interface SearchResult {
@@ -226,7 +233,9 @@ export const stats = {
 
 export const news = {
   list: (page = 1, size = 5) =>
-    request<Page<NewsItem>>(`/news?page=${page}&size=${size}`),
+    request<Page<NewsItem>>(`/news?page=${page}&page_size=${size}`),
+  get: (slug: string) =>
+    request<NewsItemFull>(`/news/${slug}`),
 };
 
 // ── Admin types ───────────────────────────────────────────────────────────
