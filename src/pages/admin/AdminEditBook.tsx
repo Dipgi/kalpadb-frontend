@@ -36,10 +36,13 @@ export default function AdminEditBook() {
 function EditForm({ work }: { work: WorkDetail }) {
   const qc = useQueryClient();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
   const { data: languages } = useQuery({
     queryKey: ["all-languages"],
     queryFn: catalogue.allLanguages,
   });
+  const seriesList = seriesPage?.items ?? [];
 
   const [title, setTitle] = useState(work.title);
   const [description, setDescription] = useState(work.description ?? "");
@@ -61,6 +64,13 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [coverUrl, setCoverUrl] = useState(
     work.image_urls?.[0] ?? work.book?.formats?.[0]?.cover_image_url ?? ""
   );
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
+  const [seriesId, setSeriesId] = useState(work.book?.series_id?.toString() ?? "");
+  const [seriesPosition, setSeriesPosition] = useState(
+    work.book?.series_position?.toString() ?? ""
+  );
+  const [editionLabel, setEditionLabel] = useState(work.book?.edition_label ?? "");
+  const [editionNotes, setEditionNotes] = useState(work.book?.edition_notes ?? "");
   const [saved, setSaved] = useState(false);
 
   const mutation = useMutation({
@@ -76,6 +86,11 @@ function EditForm({ work }: { work: WorkDetail }) {
         author_ids: authors.map((a) => a.id),
         publisher_ids: publishers.map((p) => p.id),
         genre_ids: [...genreIds],
+        tag_ids: [...tagIds],
+        series_id: seriesId ? Number(seriesId) : null,
+        series_position: seriesPosition ? Number(seriesPosition) : null,
+        edition_label: editionLabel.trim() || null,
+        edition_notes: editionNotes.trim() || null,
         // empty list clears the work-level cover (null would mean "no change")
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
       });
@@ -175,6 +190,55 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Edition label</label>
+          <input
+            value={editionLabel}
+            onChange={(e) => setEditionLabel(e.target.value)}
+            placeholder="e.g. First Edition, Revised"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Edition notes</label>
+          <input
+            value={editionNotes}
+            onChange={(e) => setEditionNotes(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      {seriesList.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Series</label>
+            <select
+              value={seriesId}
+              onChange={(e) => setSeriesId(e.target.value)}
+              className={inputCls}
+            >
+              <option value="">Not part of a series</option>
+              {seriesList.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Position in series</label>
+            <input
+              type="number"
+              min={1}
+              value={seriesPosition}
+              onChange={(e) => setSeriesPosition(e.target.value)}
+              disabled={!seriesId}
+              className={inputCls}
+            />
+          </div>
+        </div>
+      )}
+
       <div>
         <label className={labelCls}>Cover image URL</label>
         <div className="flex gap-3 items-start">
@@ -240,8 +304,37 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
+      {(allTags ?? []).length > 0 && (
+        <div>
+          <label className={labelCls}>Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {(allTags ?? []).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  setTagIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  tagIds.has(t.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {t.tag_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <p className="text-xs text-gray-400">
-        Formats (ISBN, pages, cover, availability) can't be edited here yet — only set when adding a book.
+        Formats (ISBN, pages, availability) can't be edited here yet — only set when adding a book.
       </p>
 
       <div className="flex items-center gap-3 pt-2">

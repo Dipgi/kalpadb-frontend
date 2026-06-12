@@ -71,7 +71,7 @@ export interface WorkDetail extends WorkSummary {
   image_urls: string[] | null;
   original_language: string | null;
   genres: { id: number; genre_name: string }[];
-  tags: { id: number; name: string }[];
+  tags: { id: number; tag_name: string }[];
   external_links: { id: number; url: string; link_type: string; label: string | null }[];
   awards: {
     id: number;
@@ -87,6 +87,10 @@ export interface WorkDetail extends WorkSummary {
   }[];
   book: {
     publication_year: number | null;
+    series_id: number | null;
+    series_position: number | null;
+    edition_label: string | null;
+    edition_notes: string | null;
     formats: BookFormat[];
     publishers: { id: number; name: string }[];
     editors: { id: number; name: string }[];
@@ -240,6 +244,9 @@ export const catalogue = {
     ),
   genres: () => request<GenreItem[]>("/genres?in_use=true"),
   allGenres: () => request<GenreItem[]>("/genres"),
+  allTags: () =>
+    request<{ id: number; tag_name: string; slug: string }[]>("/tags?flat=true"),
+  series: () => request<Page<{ id: number; name: string }>>("/series?page_size=100"),
   languages: () => request<{ code: string; name: string }[]>("/languages"),
   allLanguages: () =>
     request<{ code: string; name: string; name_local: string | null }[]>(
@@ -403,7 +410,12 @@ export interface BookUpdateIn {
   publication_date?: string | null;
   image_urls?: string[] | null;
   publication_year?: number | null;
+  series_id?: number | null;
+  series_position?: number | null;
+  edition_label?: string | null;
+  edition_notes?: string | null;
   genre_ids?: number[];
+  tag_ids?: number[];
   author_ids?: number[];
   publisher_ids?: number[];
 }
