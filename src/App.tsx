@@ -18,6 +18,7 @@ import AdminNews from "./pages/admin/AdminNews";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTagging from "./pages/admin/AdminTagging";
 import AdminAdd from "./pages/admin/AdminAdd";
+import AdminEditBook from "./pages/admin/AdminEditBook";
 import NewsDetailPage from "./pages/NewsDetailPage";
 
 const queryClient = new QueryClient({
@@ -55,6 +56,7 @@ export default function App() {
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="tagging" element={<AdminTagging />} />
                   <Route path="add" element={<AdminAdd />} />
+                  <Route path="edit/:id" element={<AdminEditBook />} />
                 </Route>
               </Routes>
               </ErrorBoundary>

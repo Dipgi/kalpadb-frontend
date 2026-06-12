@@ -186,9 +186,15 @@ function GenreChecklist({
           <span className="text-xs text-red-500">Save failed — try again.</span>
         )}
         <Link
+          to={`/admin/edit/${workId}`}
+          className="text-xs text-violet-600 hover:underline ml-auto"
+        >
+          Edit book ✎
+        </Link>
+        <Link
           to={`/works/${workId}`}
           target="_blank"
-          className="text-xs text-violet-600 hover:underline ml-auto"
+          className="text-xs text-violet-600 hover:underline"
         >
           View work ↗
         </Link>

@@ -395,9 +395,27 @@ export interface PublisherCreateIn {
   description?: string | null;
 }
 
+export interface BookUpdateIn {
+  title?: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  image_urls?: string[] | null;
+  publication_year?: number | null;
+  genre_ids?: number[];
+  author_ids?: number[];
+  publisher_ids?: number[];
+}
+
 export const volunteer = {
   submitBook: (data: BookCreateIn) =>
     request<EditSubmission>("/works/books", { method: "POST", body: JSON.stringify(data) }),
+  updateBook: (work_id: number, data: BookUpdateIn) =>
+    request<EditSubmission>(`/works/books/${work_id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
   submitPerson: (data: PersonCreateIn) =>
     request<EditSubmission>("/persons", { method: "POST", body: JSON.stringify(data) }),
   submitPublisher: (data: PublisherCreateIn) =>

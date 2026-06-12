@@ -1,0 +1,239 @@
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
+import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import { WORLD_LANGUAGES } from "../../lib/languages";
+
+const inputCls =
+  "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
+const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
+
+export default function AdminEditBook() {
+  const { id } = useParams<{ id: string }>();
+  const { data: work, isLoading } = useQuery({
+    queryKey: ["work", id],
+    queryFn: () => works.get(Number(id)),
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return <div className="text-gray-400 py-12 text-center">Loading book…</div>;
+  }
+  if (!work) {
+    return <div className="text-gray-400 py-12 text-center">Book not found.</div>;
+  }
+  if (work.type !== "BOOK") {
+    return (
+      <div className="text-gray-400 py-12 text-center">
+        Only BOOK works can be edited here (this is {work.type}).
+      </div>
+    );
+  }
+  return <EditForm key={work.id} work={work} />;
+}
+
+function EditForm({ work }: { work: WorkDetail }) {
+  const qc = useQueryClient();
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({
+    queryKey: ["all-languages"],
+    queryFn: catalogue.allLanguages,
+  });
+
+  const [title, setTitle] = useState(work.title);
+  const [description, setDescription] = useState(work.description ?? "");
+  const [language, setLanguage] = useState(work.language ?? "bn");
+  const [originalLanguage, setOriginalLanguage] = useState(work.original_language ?? "");
+  const [year, setYear] = useState(
+    work.book?.publication_year?.toString() ??
+      (work.publication_date ? work.publication_date.slice(0, 4) : "")
+  );
+  const [authors, setAuthors] = useState<PickerItem[]>(
+    work.authors.map((a) => ({ id: a.id, name: a.name }))
+  );
+  const [publishers, setPublishers] = useState<PickerItem[]>(
+    (work.book?.publishers ?? []).map((p) => ({ id: p.id, name: p.name }))
+  );
+  const [genreIds, setGenreIds] = useState<Set<number>>(
+    new Set(work.genres.map((g) => g.id))
+  );
+  const [saved, setSaved] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const y = year ? Number(year) : null;
+      const sub = await volunteer.updateBook(work.id, {
+        title: title.trim(),
+        description: description.trim() || null,
+        language,
+        original_language: originalLanguage || null,
+        publication_year: y,
+        publication_date: y ? `${y}-01-01` : null,
+        author_ids: authors.map((a) => a.id),
+        publisher_ids: publishers.map((p) => p.id),
+        genre_ids: [...genreIds],
+      });
+      return admin.queue.review(sub.edit_id, true, "Direct admin edit");
+    },
+    onSuccess: () => {
+      setSaved(true);
+      qc.invalidateQueries({ queryKey: ["work", String(work.id)] });
+      qc.invalidateQueries({ queryKey: ["works"] });
+      qc.invalidateQueries({ queryKey: ["genres"] });
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(false);
+        if (title.trim()) mutation.mutate();
+      }}
+      className="max-w-2xl space-y-4"
+    >
+      <h1 className="text-xl font-bold text-gray-900">
+        Edit Book
+        <span className="ml-2 text-sm font-normal text-gray-400">#{work.id}</span>
+      </h1>
+
+      {saved && (
+        <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md px-4 py-3">
+          Saved.{" "}
+          <Link to={`/works/${work.id}`} className="underline font-medium">
+            View book →
+          </Link>
+        </div>
+      )}
+
+      <div>
+        <label className={labelCls}>Title *</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+      </div>
+
+      <div>
+        <label className={labelCls}>Description</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className={inputCls}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className={labelCls}>Language</label>
+          <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+            {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Original language</label>
+          <select
+            value={originalLanguage}
+            onChange={(e) => setOriginalLanguage(e.target.value)}
+            className={inputCls}
+          >
+            <option value="">Not a translation</option>
+            <optgroup label="World languages">
+              {WORLD_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>{l.name}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Indian languages">
+              {(languages ?? [])
+                .filter((l) => !WORLD_LANGUAGES.some((w) => w.code === l.code))
+                .map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                  </option>
+                ))}
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Publication year</label>
+          <input
+            type="number"
+            min={1000}
+            max={2100}
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      <EntityPicker
+        label="Authors"
+        placeholder="Search persons…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={authors}
+        onChange={setAuthors}
+      />
+
+      <EntityPicker
+        label="Publishers"
+        placeholder="Search publishers…"
+        fetchKey="picker-publishers"
+        fetcher={(q) => catalogue.publishers(q)}
+        selected={publishers}
+        onChange={setPublishers}
+      />
+
+      <div>
+        <label className={labelCls}>Genres</label>
+        <div className="flex flex-wrap gap-2">
+          {(allGenres ?? []).map((g) => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() =>
+                setGenreIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(g.id)) next.delete(g.id);
+                  else next.add(g.id);
+                  return next;
+                })
+              }
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                genreIds.has(g.id)
+                  ? "bg-violet-700 text-white border-violet-700"
+                  : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+              }`}
+            >
+              {g.genre_name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-xs text-gray-400">
+        Formats (ISBN, pages, cover, availability) can't be edited here yet — only set when adding a book.
+      </p>
+
+      <div className="flex items-center gap-3 pt-2">
+        <button
+          type="submit"
+          disabled={mutation.isPending}
+          className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
+        >
+          {mutation.isPending ? "Saving…" : "Save changes"}
+        </button>
+        <Link to={`/works/${work.id}`} className="text-sm text-gray-500 hover:text-gray-700">
+          Cancel
+        </Link>
+        {mutation.isError && (
+          <span className="text-sm text-red-500">Save failed — try again.</span>
+        )}
+      </div>
+    </form>
+  );
+}

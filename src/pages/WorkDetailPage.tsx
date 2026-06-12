@@ -110,7 +110,17 @@ export default function WorkDetailPage() {
 
         {/* Info */}
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{work.title}</h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">{work.title}</h1>
+            {me?.role.toLowerCase() === "admin" && work.type === "BOOK" && (
+              <Link
+                to={`/admin/edit/${work.id}`}
+                className="shrink-0 text-xs px-3 py-1.5 rounded-md border border-gray-300 text-gray-600 hover:border-violet-400 hover:text-violet-700 transition-colors"
+              >
+                Edit ✎
+              </Link>
+            )}
+          </div>
           <p className="text-gray-500 mb-3">
             {work.authors.map((a, i) => (
               <span key={a.id}>
