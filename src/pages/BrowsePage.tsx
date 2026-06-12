@@ -101,7 +101,7 @@ export default function BrowsePage() {
             <option value="">All genres</option>
             {genres.map((g) => (
               <option key={g.id} value={g.slug}>
-                {g.name}
+                {g.genre_name}
               </option>
             ))}
           </select>

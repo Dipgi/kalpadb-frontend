@@ -224,7 +224,7 @@ export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
-  genres: () => request<{ id: number; name: string; slug: string }[]>("/genres"),
+  genres: () => request<{ id: number; genre_name: string; slug: string }[]>("/genres?in_use=true"),
   languages: () => request<{ code: string; name: string }[]>("/languages"),
 };
 
