@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminQueue from "./pages/admin/AdminQueue";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminTagging from "./pages/admin/AdminTagging";
 import NewsDetailPage from "./pages/NewsDetailPage";
 
 const queryClient = new QueryClient({
@@ -51,6 +52,7 @@ export default function App() {
                   <Route path="queue" element={<AdminQueue />} />
                   <Route path="news" element={<AdminNews />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="tagging" element={<AdminTagging />} />
                 </Route>
               </Routes>
               </ErrorBoundary>

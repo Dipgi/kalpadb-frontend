@@ -142,7 +142,7 @@ export default function WorkDetailPage() {
             )}
             {work.genres?.map((g) => (
               <span key={g.id} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
-                {g.name}
+                {g.genre_name}
               </span>
             ))}
           </div>

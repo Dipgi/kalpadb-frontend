@@ -70,7 +70,7 @@ export interface WorkDetail extends WorkSummary {
   description: string | null;
   image_urls: string[] | null;
   original_language: string | null;
-  genres: { id: number; name: string }[];
+  genres: { id: number; genre_name: string }[];
   tags: { id: number; name: string }[];
   external_links: { id: number; url: string; link_type: string; label: string | null }[];
   awards: {
@@ -220,11 +220,18 @@ export const works = {
 
 // ── Catalogue ─────────────────────────────────────────────────────────────
 
+export interface GenreItem {
+  id: number;
+  genre_name: string;
+  slug: string;
+}
+
 export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
-  genres: () => request<{ id: number; genre_name: string; slug: string }[]>("/genres?in_use=true"),
+  genres: () => request<GenreItem[]>("/genres?in_use=true"),
+  allGenres: () => request<GenreItem[]>("/genres"),
   languages: () => request<{ code: string; name: string }[]>("/languages"),
 };
 
@@ -320,6 +327,14 @@ export const admin = {
       request<Page<AdminUser>>(`/admin/users?page=${page}&page_size=25`),
     update: (id: number, data: { role?: string; is_active?: boolean }) =>
       request<AdminUser>(`/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  },
+
+  works: {
+    setGenres: (lw_id: number, genre_ids: number[]) =>
+      request<GenreItem[]>(`/admin/works/${lw_id}/genres`, {
+        method: "PUT",
+        body: JSON.stringify({ genre_ids }),
+      }),
   },
 };
 
