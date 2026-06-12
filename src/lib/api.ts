@@ -276,6 +276,8 @@ export const admin = {
   news: {
     list: (page = 1) =>
       request<Page<NewsPost>>(`/admin/news?page=${page}&page_size=20`),
+    get: (id: number) =>
+      request<NewsPost>(`/admin/news/${id}`),
     create: (data: { title: string; body: string; summary?: string; status: string; pinned: boolean }) =>
       request<NewsPost>("/admin/news", { method: "POST", body: JSON.stringify(data) }),
     update: (id: number, data: Partial<{ title: string; body: string; summary: string; status: string; pinned: boolean }>) =>

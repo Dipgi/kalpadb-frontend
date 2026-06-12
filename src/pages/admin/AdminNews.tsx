@@ -9,6 +9,7 @@ export default function AdminNews() {
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<NewsPost | null>(null);
   const [creating, setCreating] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
   const [form, setForm] = useState(EMPTY);
 
   const { data, isLoading } = useQuery({
@@ -50,16 +51,22 @@ export default function AdminNews() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-news"] }),
   });
 
-  function openEdit(post: NewsPost) {
-    setEditing(post);
+  async function openEdit(post: NewsPost) {
+    setLoadingEdit(true);
     setCreating(false);
-    setForm({
-      title: post.title,
-      body: post.body,
-      summary: post.summary ?? "",
-      status: post.status,
-      pinned: post.pinned,
-    });
+    try {
+      const full = await admin.news.get(post.id);
+      setEditing(full);
+      setForm({
+        title: full.title,
+        body: full.body ?? "",
+        summary: full.summary ?? "",
+        status: full.status,
+        pinned: full.pinned,
+      });
+    } finally {
+      setLoadingEdit(false);
+    }
   }
 
   function openCreate() {
@@ -69,7 +76,7 @@ export default function AdminNews() {
   }
 
   const showForm = creating || !!editing;
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || loadingEdit;
 
   return (
     <div>
@@ -187,10 +194,11 @@ export default function AdminNews() {
               </div>
               <div className="flex items-center gap-2">
                 <button
+                  disabled={loadingEdit}
                   onClick={() => openEdit(post)}
-                  className="text-xs text-violet-700 hover:underline"
+                  className="text-xs text-violet-700 hover:underline disabled:opacity-50"
                 >
-                  Edit
+                  {loadingEdit ? "Loading…" : "Edit"}
                 </button>
                 <button
                   disabled={deleteMutation.isPending}
