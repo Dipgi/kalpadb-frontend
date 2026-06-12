@@ -10,6 +10,7 @@ export default function AdminNews() {
   const [editing, setEditing] = useState<NewsPost | null>(null);
   const [creating, setCreating] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(false);
+  const [editError, setEditError] = useState("");
   const [form, setForm] = useState(EMPTY);
 
   const { data, isLoading } = useQuery({
@@ -53,6 +54,7 @@ export default function AdminNews() {
 
   async function openEdit(post: NewsPost) {
     setLoadingEdit(true);
+    setEditError("");
     setCreating(false);
     try {
       const full = await admin.news.get(post.id);
@@ -64,6 +66,9 @@ export default function AdminNews() {
         status: full.status,
         pinned: full.pinned,
       });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load post";
+      setEditError(msg);
     } finally {
       setLoadingEdit(false);
     }
@@ -72,6 +77,7 @@ export default function AdminNews() {
   function openCreate() {
     setCreating(true);
     setEditing(null);
+    setEditError("");
     setForm(EMPTY);
   }
 
@@ -91,6 +97,12 @@ export default function AdminNews() {
           </button>
         )}
       </div>
+
+      {editError && (
+        <p className="text-sm text-red-600 mb-4 bg-red-50 border border-red-200 rounded-md px-4 py-2">
+          {editError}
+        </p>
+      )}
 
       {/* Form */}
       {showForm && (
