@@ -229,6 +229,79 @@ export const news = {
     request<Page<NewsItem>>(`/news?page=${page}&size=${size}`),
 };
 
+// ── Admin types ───────────────────────────────────────────────────────────
+
+export interface NewsPost {
+  id: number;
+  title: string;
+  slug: string;
+  body: string;
+  summary: string | null;
+  status: string;
+  pinned: boolean;
+  published_at: string | null;
+  created_at: string | null;
+  author: { id: number; username: string };
+}
+
+export interface EditLogEntry {
+  id: number;
+  table_name: string;
+  record_id: number | null;
+  action: string;
+  status: string;
+  payload: Record<string, unknown>;
+  reviewer_note: string | null;
+  submitted_at: string | null;
+  reviewed_at: string | null;
+  submitted_by: { id: number; username: string };
+  reviewed_by: { id: number; username: string } | null;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  created_at?: string;
+}
+
+// ── Admin API ─────────────────────────────────────────────────────────────
+
+export const admin = {
+  refreshStats: () =>
+    request("/admin/stats/refresh", { method: "POST" }),
+
+  news: {
+    list: (page = 1) =>
+      request<Page<NewsPost>>(`/admin/news?page=${page}&page_size=20`),
+    create: (data: { title: string; body: string; summary?: string; status: string; pinned: boolean }) =>
+      request<NewsPost>("/admin/news", { method: "POST", body: JSON.stringify(data) }),
+    update: (id: number, data: Partial<{ title: string; body: string; summary: string; status: string; pinned: boolean }>) =>
+      request<NewsPost>(`/admin/news/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+    delete: (id: number) =>
+      request(`/admin/news/${id}`, { method: "DELETE" }),
+  },
+
+  queue: {
+    list: (page = 1) =>
+      request<Page<EditLogEntry>>(`/admin/queue?page=${page}&page_size=20`),
+    review: (id: number, approve: boolean, reviewer_note?: string) =>
+      request<EditLogEntry>(`/admin/queue/${id}/review`, {
+        method: "POST",
+        body: JSON.stringify({ approve, reviewer_note: reviewer_note ?? null }),
+      }),
+  },
+
+  users: {
+    list: (page = 1) =>
+      request<Page<AdminUser>>(`/admin/users?page=${page}&page_size=25`),
+    update: (id: number, data: { role?: string; is_active?: boolean }) =>
+      request<AdminUser>(`/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  },
+};
+
 // ── User features ─────────────────────────────────────────────────────────
 
 export const user = {

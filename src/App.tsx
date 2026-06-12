@@ -11,6 +11,11 @@ import SearchPage from "./pages/SearchPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ShelfPage from "./pages/ShelfPage";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminQueue from "./pages/admin/AdminQueue";
+import AdminNews from "./pages/admin/AdminNews";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +44,12 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/shelf" element={<ShelfPage />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="queue" element={<AdminQueue />} />
+                  <Route path="news" element={<AdminNews />} />
+                  <Route path="users" element={<AdminUsers />} />
+                </Route>
               </Routes>
               </ErrorBoundary>
             </main>

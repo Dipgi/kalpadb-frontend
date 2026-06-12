@@ -25,6 +25,9 @@ export default function Navbar() {
           {user ? (
             <>
               <Link to="/shelf" className="hover:text-gray-900">My Shelf</Link>
+              {user.role.toLowerCase() === "admin" && (
+                <Link to="/admin" className="hover:text-gray-900 text-violet-600 font-medium">Admin</Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-gray-500 hover:text-gray-900"
@@ -68,6 +71,9 @@ export default function Navbar() {
           {user ? (
             <>
               <Link to="/shelf" onClick={() => setMenuOpen(false)}>My Shelf</Link>
+              {user.role.toLowerCase() === "admin" && (
+                <Link to="/admin" onClick={() => setMenuOpen(false)} className="text-violet-600 font-medium">Admin</Link>
+              )}
               <button onClick={handleLogout} className="text-left text-gray-500">Sign out</button>
             </>
           ) : (
