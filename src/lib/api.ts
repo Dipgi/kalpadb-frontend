@@ -230,6 +230,14 @@ export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
+  persons: (q: string, size = 10) =>
+    request<Page<{ id: number; name: string; image_url: string | null }>>(
+      `/persons?q=${encodeURIComponent(q)}&page_size=${size}`
+    ),
+  publishers: (q: string, size = 10) =>
+    request<Page<{ id: number; name: string }>>(
+      `/publishers?q=${encodeURIComponent(q)}&page_size=${size}`
+    ),
   genres: () => request<GenreItem[]>("/genres?in_use=true"),
   allGenres: () => request<GenreItem[]>("/genres"),
   languages: () => request<{ code: string; name: string }[]>("/languages"),
@@ -336,6 +344,58 @@ export const admin = {
         body: JSON.stringify({ genre_ids }),
       }),
   },
+};
+
+// ── Volunteer submissions (admin uses these + auto-approve for direct entry) ──
+
+export interface EditSubmission {
+  edit_id: number;
+  status: string;
+}
+
+export interface BookCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  publication_date?: string | null;
+  image_urls?: string[] | null;
+  genre_ids?: number[];
+  author_ids?: number[];
+  publisher_ids?: number[];
+  publication_year?: number | null;
+  formats?: {
+    format_type: string;
+    isbn?: string | null;
+    page_count?: number | null;
+    cover_image_url?: string | null;
+  }[];
+}
+
+export interface PersonCreateIn {
+  name: string;
+  bio?: string | null;
+  nationality?: string | null;
+  role_type?: string | null;
+  birth_date?: string | null;
+  image_url?: string | null;
+}
+
+export interface PublisherCreateIn {
+  name: string;
+  city?: string | null;
+  country?: string | null;
+  founded_year?: number | null;
+  website?: string | null;
+  description?: string | null;
+}
+
+export const volunteer = {
+  submitBook: (data: BookCreateIn) =>
+    request<EditSubmission>("/works/books", { method: "POST", body: JSON.stringify(data) }),
+  submitPerson: (data: PersonCreateIn) =>
+    request<EditSubmission>("/persons", { method: "POST", body: JSON.stringify(data) }),
+  submitPublisher: (data: PublisherCreateIn) =>
+    request<EditSubmission>("/publishers", { method: "POST", body: JSON.stringify(data) }),
 };
 
 // ── User features ─────────────────────────────────────────────────────────
