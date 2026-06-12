@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail, type BookUpdateIn } from "../../lib/api";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
@@ -87,6 +87,18 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [pageCount, setPageCount] = useState(firstFormat?.page_count?.toString() ?? "");
   const [availability, setAvailability] = useState(firstFormat?.availability ?? "");
   const [saved, setSaved] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const navigate = useNavigate();
+
+  const deleteMutation = useMutation({
+    mutationFn: () => admin.works.delete(work.id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["works"] });
+      qc.invalidateQueries({ queryKey: ["genres"] });
+      qc.removeQueries({ queryKey: ["work", String(work.id)] });
+      navigate("/admin/tagging");
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -433,6 +445,30 @@ function EditForm({ work }: { work: WorkDetail }) {
         </Link>
         {mutation.isError && (
           <span className="text-sm text-red-500">Save failed — try again.</span>
+        )}
+
+        <button
+          type="button"
+          disabled={deleteMutation.isPending}
+          onClick={() => {
+            if (confirmDelete) deleteMutation.mutate();
+            else setConfirmDelete(true);
+          }}
+          onBlur={() => setConfirmDelete(false)}
+          className={`ml-auto text-sm px-4 py-2 rounded-md border transition-colors disabled:opacity-40 ${
+            confirmDelete
+              ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
+              : "border-red-300 text-red-600 hover:bg-red-50"
+          }`}
+        >
+          {deleteMutation.isPending
+            ? "Deleting…"
+            : confirmDelete
+              ? "Click again to permanently delete"
+              : "Delete book"}
+        </button>
+        {deleteMutation.isError && (
+          <span className="text-sm text-red-500">Delete failed.</span>
         )}
       </div>
     </form>

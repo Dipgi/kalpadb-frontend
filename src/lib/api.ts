@@ -359,6 +359,8 @@ export const admin = {
         method: "PUT",
         body: JSON.stringify({ genre_ids }),
       }),
+    delete: (lw_id: number) =>
+      request(`/admin/works/${lw_id}`, { method: "DELETE" }),
   },
 };
 
