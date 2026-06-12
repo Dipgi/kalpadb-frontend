@@ -151,16 +151,34 @@ function SuccessBanner({ message, link, linkText }: { message: string; link?: st
 
 // ── Book form ───────────────────────────────────────────────────────────────
 
+const FORMAT_TYPES = ["paperback", "hardcover", "ebook"];
+
+const AVAILABILITY_OPTIONS = [
+  { value: "", label: "Unknown" },
+  { value: "in_print", label: "In print" },
+  { value: "out_of_print", label: "Out of print" },
+  { value: "digital_only", label: "Digital only" },
+  { value: "rare", label: "Rare" },
+];
+
 function BookForm() {
   const qc = useQueryClient();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({
+    queryKey: ["all-languages"],
+    queryFn: catalogue.allLanguages,
+  });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [language, setLanguage] = useState("bn");
+  const [originalLanguage, setOriginalLanguage] = useState("");
   const [year, setYear] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [formatType, setFormatType] = useState("paperback");
+  const [availability, setAvailability] = useState("");
   const [isbn, setIsbn] = useState("");
   const [pageCount, setPageCount] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
@@ -169,12 +187,13 @@ function BookForm() {
   const mutation = useMutation({
     mutationFn: () => {
       const y = year ? Number(year) : null;
-      const hasFormat = isbn || pageCount || coverUrl;
+      const hasFormat = isbn || pageCount || coverUrl || availability;
       return submitAndApprove(() =>
         volunteer.submitBook({
           title: title.trim(),
           description: description.trim() || null,
-          language: "bn",
+          language,
+          original_language: originalLanguage || null,
           publication_year: y,
           publication_date: y ? `${y}-01-01` : null,
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
@@ -184,10 +203,11 @@ function BookForm() {
           formats: hasFormat
             ? [
                 {
-                  format_type: "paperback",
+                  format_type: formatType,
                   isbn: isbn.trim() || null,
                   page_count: pageCount ? Number(pageCount) : null,
                   cover_image_url: coverUrl.trim() || null,
+                  availability: availability || null,
                 },
               ]
             : [],
@@ -200,10 +220,12 @@ function BookForm() {
       qc.invalidateQueries({ queryKey: ["genres"] });
       setTitle("");
       setDescription("");
+      setOriginalLanguage("");
       setYear("");
       setAuthors([]);
       setPublishers([]);
       setGenreIds(new Set());
+      setAvailability("");
       setIsbn("");
       setPageCount("");
       setCoverUrl("");
@@ -237,6 +259,34 @@ function BookForm() {
         />
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Language</label>
+          <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+            {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Original language (if translation)</label>
+          <select
+            value={originalLanguage}
+            onChange={(e) => setOriginalLanguage(e.target.value)}
+            className={inputCls}
+          >
+            <option value="">Not a translation</option>
+            {(languages ?? []).map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Publication year</label>
@@ -262,6 +312,29 @@ function BookForm() {
         <div>
           <label className={labelCls}>ISBN</label>
           <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Format</label>
+          <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className={inputCls}>
+            {FORMAT_TYPES.map((f) => (
+              <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Availability</label>
+          <select
+            value={availability}
+            onChange={(e) => setAvailability(e.target.value)}
+            className={inputCls}
+          >
+            {AVAILABILITY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
         </div>
       </div>
 

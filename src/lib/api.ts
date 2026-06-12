@@ -241,6 +241,10 @@ export const catalogue = {
   genres: () => request<GenreItem[]>("/genres?in_use=true"),
   allGenres: () => request<GenreItem[]>("/genres"),
   languages: () => request<{ code: string; name: string }[]>("/languages"),
+  allLanguages: () =>
+    request<{ code: string; name: string; name_local: string | null }[]>(
+      "/languages?active_only=false"
+    ),
 };
 
 // ── Search ────────────────────────────────────────────────────────────────
@@ -357,6 +361,7 @@ export interface BookCreateIn {
   title: string;
   description?: string | null;
   language?: string | null;
+  original_language?: string | null;
   publication_date?: string | null;
   image_urls?: string[] | null;
   genre_ids?: number[];
@@ -368,6 +373,7 @@ export interface BookCreateIn {
     isbn?: string | null;
     page_count?: number | null;
     cover_image_url?: string | null;
+    availability?: string | null;
   }[];
 }
 
