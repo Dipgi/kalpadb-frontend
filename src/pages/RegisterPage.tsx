@@ -2,28 +2,38 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { auth, ApiError } from "../lib/api";
+import Turnstile, { TURNSTILE_SITE_KEY } from "../components/Turnstile";
 
 export default function RegisterPage() {
-  const { login } = useAuth();
+  const { setSession } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [hp, setHp] = useState(""); // honeypot — real users leave this empty
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0); // bump to reset the widget
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+
+  const captchaRequired = !!TURNSTILE_SITE_KEY;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await auth.register(username, email, password);
-      // Auto-login after register
-      await login(email, password);
+      const res = await auth.register(username, email, password, {
+        turnstileToken,
+        website: hp,
+      });
+      await setSession(res.access_token);
       navigate("/");
     } catch (err) {
+      // Turnstile tokens are single-use — reset the widget after any failure.
+      setTurnstileToken(null);
+      setCaptchaKey((k) => k + 1);
       if (err instanceof ApiError && err.status === 422) {
         const m = err.message.toLowerCase();
         if (m.includes("username")) {
@@ -38,32 +48,17 @@ export default function RegisterPage() {
           setError(err.message || "Check your details and try again.");
         }
       } else if (err instanceof ApiError && err.status === 409) {
-        setError("That email is already registered.");
+        setError("That email or username is already registered.");
       } else if (err instanceof ApiError && err.status === 403) {
-        // Email verification required
-        setDone(true);
+        setError("Bot verification failed — please complete the challenge and try again.");
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError("Your submission was rejected. Please try again.");
       } else {
         setError(err instanceof ApiError ? err.message : "Registration failed");
       }
     } finally {
       setLoading(false);
     }
-  }
-
-  if (done) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4">
-        <div className="text-center max-w-sm">
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">Check your email</h1>
-          <p className="text-gray-500 text-sm">
-            We sent a verification link to <strong>{email}</strong>. Click it to activate your account.
-          </p>
-          <Link to="/login" className="mt-6 inline-block text-violet-700 hover:underline text-sm">
-            Back to sign in
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -119,11 +114,27 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Honeypot: hidden from real users; bots that fill it are rejected. */}
+          <div aria-hidden="true" className="absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden">
+            <label>
+              Website
+              <input
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={hp}
+                onChange={(e) => setHp(e.target.value)}
+              />
+            </label>
+          </div>
+
+          <Turnstile key={captchaKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken(null)} />
+
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (captchaRequired && !turnstileToken)}
             className="bg-violet-700 text-white py-2.5 rounded-md font-medium hover:bg-violet-800 disabled:opacity-60 transition-colors"
           >
             {loading ? "Creating account…" : "Create account"}

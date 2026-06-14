@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
+import Turnstile, { TURNSTILE_SITE_KEY } from "../components/Turnstile";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -11,18 +12,31 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const captchaRequired = !!TURNSTILE_SITE_KEY;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, turnstileToken);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Login failed");
+      // Turnstile tokens are single-use — reset after a failed attempt.
+      setTurnstileToken(null);
+      setCaptchaKey((k) => k + 1);
+      if (err instanceof ApiError && err.status === 403) {
+        setError("Bot verification failed — please complete the challenge and try again.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Incorrect email or password.");
+      } else {
+        setError(err instanceof ApiError ? err.message : "Login failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -62,11 +76,13 @@ export default function LoginPage() {
             />
           </div>
 
+          <Turnstile key={captchaKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken(null)} />
+
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (captchaRequired && !turnstileToken)}
             className="bg-violet-700 text-white py-2.5 rounded-md font-medium hover:bg-violet-800 disabled:opacity-60 transition-colors"
           >
             {loading ? "Signing in…" : "Sign in"}

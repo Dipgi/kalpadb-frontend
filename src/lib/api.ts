@@ -226,17 +226,27 @@ export interface Rating {
 
 // ── Auth ───────────────────────────────────────────────────────────────────
 
+/** Anti-bot fields sent with public auth forms (honeypot + Turnstile token). */
+export interface AntiBot {
+  turnstileToken?: string | null;
+  website?: string; // honeypot — kept empty by real users
+}
+
+function antiBotBody(ab?: AntiBot) {
+  return { turnstile_token: ab?.turnstileToken ?? null, website: ab?.website ?? "" };
+}
+
 export const auth = {
-  login: (email: string, password: string) =>
+  login: (email: string, password: string, ab?: AntiBot) =>
     request<{ access_token: string; token_type: string }>("/auth/login", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, ...antiBotBody(ab) }),
     }),
 
-  register: (username: string, email: string, password: string) =>
-    request<UserOut>("/auth/register", {
+  register: (username: string, email: string, password: string, ab?: AntiBot) =>
+    request<UserOut & { access_token: string }>("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify({ username, email, password, ...antiBotBody(ab) }),
     }),
 
   me: () => request<UserOut>("/users/me"),

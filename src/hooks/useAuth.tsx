@@ -4,7 +4,8 @@ import { auth, getToken, setToken, type UserOut } from "../lib/api";
 interface AuthState {
   user: UserOut | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, turnstileToken?: string | null) => Promise<void>;
+  setSession: (token: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -22,9 +23,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function login(email: string, password: string) {
-    const { access_token } = await auth.login(email, password);
-    setToken(access_token);
+  async function login(email: string, password: string, turnstileToken?: string | null) {
+    const { access_token } = await auth.login(email, password, { turnstileToken });
+    await setSession(access_token);
+  }
+
+  /** Establish a session from an existing access token (e.g. returned by register). */
+  async function setSession(token: string) {
+    setToken(token);
     const me = await auth.me();
     setUser(me);
   }
@@ -35,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, setSession, logout }}>
       {children}
     </AuthContext.Provider>
   );
