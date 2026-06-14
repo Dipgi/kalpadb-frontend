@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { works, user, type Rating } from "../lib/api";
+import { works, user, admin, type Rating, type PublicReview } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import { Stars, StarPicker } from "../components/StarRating";
 
@@ -269,7 +269,141 @@ export default function WorkDetailPage() {
           </div>
         )}
       </div>
+
+      <ReviewsSection workId={work.id} isAdmin={me?.role.toLowerCase() === "admin"} />
     </div>
+  );
+}
+
+function ReviewsSection({ workId, isAdmin }: { workId: number; isAdmin: boolean }) {
+  const qc = useQueryClient();
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["reviews", workId, page],
+    queryFn: () => works.reviews(workId, page),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => admin.reviews.delete(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["reviews", workId] });
+      qc.invalidateQueries({ queryKey: ["work", String(workId)] }); // avg may change
+    },
+  });
+
+  if (isLoading) return null;
+  const reviews = data?.items ?? [];
+  if (reviews.length === 0) return null;
+
+  return (
+    <div className="border-t border-gray-100 pt-6 mt-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        Reviews <span className="text-sm font-normal text-gray-400">({data?.total ?? 0})</span>
+      </h2>
+      <ul className="space-y-5">
+        {reviews.map((r) => (
+          <ReviewItem
+            key={r.id}
+            review={r}
+            isAdmin={isAdmin}
+            onDelete={() => deleteMutation.mutate(r.id)}
+            deleting={deleteMutation.isPending}
+          />
+        ))}
+      </ul>
+
+      {data && data.pages > 1 && (
+        <div className="flex justify-center gap-2 mt-6">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="text-sm px-3 py-1 rounded-md border border-gray-200 text-gray-600 disabled:opacity-40 hover:border-violet-400"
+          >
+            ← Newer
+          </button>
+          <span className="text-sm text-gray-400 self-center">
+            {page} / {data.pages}
+          </span>
+          <button
+            disabled={page >= data.pages}
+            onClick={() => setPage((p) => p + 1)}
+            className="text-sm px-3 py-1 rounded-md border border-gray-200 text-gray-600 disabled:opacity-40 hover:border-violet-400"
+          >
+            Older →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReviewItem({
+  review,
+  isAdmin,
+  onDelete,
+  deleting,
+}: {
+  review: PublicReview;
+  isAdmin: boolean;
+  onDelete: () => void;
+  deleting: boolean;
+}) {
+  const [confirm, setConfirm] = useState(false);
+  const date = review.updated_at ?? review.created_at;
+
+  return (
+    <li className="flex gap-3">
+      {review.user.image_url ? (
+        <img
+          src={review.user.image_url}
+          alt={review.user.username}
+          className="w-9 h-9 rounded-full object-cover shrink-0"
+        />
+      ) : (
+        <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center shrink-0 text-violet-500 text-sm font-medium">
+          {review.user.username.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-medium text-gray-900">{review.user.username}</span>
+          <Stars value={review.rating} />
+          {date && (
+            <span className="text-xs text-gray-400">
+              {new Date(date).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          )}
+          {isAdmin && (
+            <button
+              type="button"
+              disabled={deleting}
+              onClick={() => {
+                if (confirm) onDelete();
+                else setConfirm(true);
+              }}
+              onBlur={() => setConfirm(false)}
+              className={`ml-auto text-xs px-2 py-0.5 rounded border transition-colors disabled:opacity-40 ${
+                confirm
+                  ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
+                  : "border-red-200 text-red-500 hover:bg-red-50"
+              }`}
+            >
+              {deleting ? "Deleting…" : confirm ? "Confirm delete" : "Delete"}
+            </button>
+          )}
+        </div>
+        {review.review && (
+          <p className="text-sm text-gray-600 leading-relaxed mt-1 whitespace-pre-line break-words">
+            {review.review}
+          </p>
+        )}
+      </div>
+    </li>
   );
 }
 

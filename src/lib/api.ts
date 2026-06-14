@@ -291,7 +291,19 @@ export const works = {
   },
 
   get: (id: number) => request<WorkDetail>(`/works/${id}`),
+
+  reviews: (id: number, page = 1, size = 20) =>
+    request<Page<PublicReview>>(`/works/${id}/reviews?page=${page}&page_size=${size}`),
 };
+
+export interface PublicReview {
+  id: number;
+  rating: number;
+  review: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  user: { id: number; username: string; image_url: string | null };
+}
 
 // ── Catalogue ─────────────────────────────────────────────────────────────
 
@@ -480,6 +492,10 @@ export const admin = {
 
   series: {
     delete: (id: number) => request(`/admin/series/${id}`, { method: "DELETE" }),
+  },
+
+  reviews: {
+    delete: (id: number) => request(`/admin/reviews/${id}`, { method: "DELETE" }),
   },
 
   // Tags are created directly (admin endpoint), not via the volunteer queue.
