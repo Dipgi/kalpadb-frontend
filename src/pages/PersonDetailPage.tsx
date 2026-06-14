@@ -1,12 +1,15 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
+import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
 import Pagination from "../components/Pagination";
 import { useState } from "react";
 
 export default function PersonDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const isAdmin = user?.role.toLowerCase() === "admin";
   const [page, setPage] = useState(1);
 
   const { data: person, isLoading } = useQuery({
@@ -64,7 +67,17 @@ export default function PersonDetailPage() {
         )}
 
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{person.name}</h1>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">{person.name}</h1>
+            {isAdmin && (
+              <Link
+                to={`/admin/edit-person/${person.id}`}
+                className="shrink-0 text-sm px-3 py-1.5 rounded-md border border-violet-300 text-violet-700 hover:bg-violet-50 transition-colors"
+              >
+                Edit ✎
+              </Link>
+            )}
+          </div>
 
           <div className="flex flex-wrap gap-3 text-sm text-gray-500 mb-3">
             {person.nationality && <span>{person.nationality}</span>}

@@ -19,6 +19,10 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminTagging from "./pages/admin/AdminTagging";
 import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
+import AdminEditPerson from "./pages/admin/AdminEditPerson";
+import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
+import AdminCatalogue from "./pages/admin/AdminCatalogue";
+import ContributePage from "./pages/ContributePage";
 import NewsDetailPage from "./pages/NewsDetailPage";
 
 const queryClient = new QueryClient({
@@ -48,6 +52,7 @@ export default function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/shelf" element={<ShelfPage />} />
+                <Route path="/contribute" element={<ContributePage />} />
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
@@ -56,7 +61,10 @@ export default function App() {
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="tagging" element={<AdminTagging />} />
                   <Route path="add" element={<AdminAdd />} />
+                  <Route path="catalogue" element={<AdminCatalogue />} />
                   <Route path="edit/:id" element={<AdminEditBook />} />
+                  <Route path="edit-person/:id" element={<AdminEditPerson />} />
+                  <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
                 </Route>
               </Routes>
               </ErrorBoundary>

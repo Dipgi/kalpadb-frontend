@@ -22,17 +22,39 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { ...init, headers });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new ApiError(res.status, body.detail ?? res.statusText);
+    throw new ApiError(res.status, formatDetail(body.detail) ?? res.statusText, body.detail);
   }
   if (res.status === 204) return undefined as T;
   return res.json();
 }
 
+interface ValidationItem {
+  loc?: (string | number)[];
+  msg?: string;
+}
+
+/** FastAPI 422 returns detail as an array of {loc, msg}; flatten to "field: message". */
+function formatDetail(detail: unknown): string | null {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return (detail as ValidationItem[])
+      .map((d) => {
+        const field = Array.isArray(d.loc) ? d.loc[d.loc.length - 1] : null;
+        return field && field !== "body" ? `${field}: ${d.msg}` : d.msg ?? "";
+      })
+      .filter(Boolean)
+      .join("; ");
+  }
+  return null;
+}
+
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  detail: unknown;
+  constructor(status: number, message: string, detail?: unknown) {
     super(message);
     this.status = status;
+    this.detail = detail;
   }
 }
 
@@ -235,8 +257,29 @@ export interface GenreItem {
   slug: string;
 }
 
+export interface PublisherDetail {
+  id: number;
+  name: string;
+  slug: string | null;
+  city: string | null;
+  country: string | null;
+  founded_year: number | null;
+  defunct_year: number | null;
+  website: string | null;
+  description: string | null;
+  parent_publisher_id: number | null;
+}
+
+export interface TagNode {
+  id: number;
+  tag_name: string;
+  slug: string;
+  children?: TagNode[];
+}
+
 export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
+  publisher: (id: number) => request<PublisherDetail>(`/publishers/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
   persons: (q: string, size = 10) =>
@@ -362,6 +405,27 @@ export const admin = {
     delete: (lw_id: number) =>
       request(`/admin/works/${lw_id}`, { method: "DELETE" }),
   },
+
+  persons: {
+    delete: (id: number) => request(`/admin/persons/${id}`, { method: "DELETE" }),
+  },
+
+  publishers: {
+    delete: (id: number) => request(`/admin/publishers/${id}`, { method: "DELETE" }),
+  },
+
+  series: {
+    delete: (id: number) => request(`/admin/series/${id}`, { method: "DELETE" }),
+  },
+
+  // Tags are created directly (admin endpoint), not via the volunteer queue.
+  tags: {
+    create: (data: { tag_name: string; slug: string; parent_tag_id?: number | null }) =>
+      request<{ id: number; tag_name: string; slug: string }>("/tags", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+  },
 };
 
 // ── Volunteer submissions (admin uses these + auto-approve for direct entry) ──
@@ -428,6 +492,31 @@ export interface BookUpdateIn {
   formats?: ({ format_type: string } & Partial<Omit<BookFormat, "format_type">>)[];
 }
 
+export interface PersonUpdateIn {
+  name?: string;
+  bio?: string | null;
+  nationality?: string | null;
+  role_type?: string | null;
+  birth_date?: string | null;
+  image_url?: string | null;
+}
+
+export interface PublisherUpdateIn {
+  name?: string;
+  city?: string | null;
+  country?: string | null;
+  founded_year?: number | null;
+  defunct_year?: number | null;
+  website?: string | null;
+  description?: string | null;
+}
+
+export interface SeriesCreateIn {
+  name: string;
+  description?: string | null;
+  slug?: string | null;
+}
+
 export const volunteer = {
   submitBook: (data: BookCreateIn) =>
     request<EditSubmission>("/works/books", { method: "POST", body: JSON.stringify(data) }),
@@ -438,8 +527,14 @@ export const volunteer = {
     }),
   submitPerson: (data: PersonCreateIn) =>
     request<EditSubmission>("/persons", { method: "POST", body: JSON.stringify(data) }),
+  updatePerson: (id: number, data: PersonUpdateIn) =>
+    request<EditSubmission>(`/persons/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   submitPublisher: (data: PublisherCreateIn) =>
     request<EditSubmission>("/publishers", { method: "POST", body: JSON.stringify(data) }),
+  updatePublisher: (id: number, data: PublisherUpdateIn) =>
+    request<EditSubmission>(`/publishers/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  submitSeries: (data: SeriesCreateIn) =>
+    request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
 };
 
 // ── User features ─────────────────────────────────────────────────────────

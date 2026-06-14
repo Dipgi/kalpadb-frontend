@@ -25,7 +25,18 @@ export default function RegisterPage() {
       navigate("/");
     } catch (err) {
       if (err instanceof ApiError && err.status === 422) {
-        setError("Check your details — password must be at least 8 characters.");
+        const m = err.message.toLowerCase();
+        if (m.includes("username")) {
+          setError(
+            "Username must be 3–100 characters: letters, numbers, dots, hyphens and underscores only (no spaces)."
+          );
+        } else if (m.includes("password")) {
+          setError("Password must be at least 8 characters.");
+        } else if (m.includes("email")) {
+          setError("Please enter a valid email address.");
+        } else {
+          setError(err.message || "Check your details and try again.");
+        }
       } else if (err instanceof ApiError && err.status === 409) {
         setError("That email is already registered.");
       } else if (err instanceof ApiError && err.status === 403) {
@@ -72,10 +83,17 @@ export default function RegisterPage() {
             <input
               type="text"
               required
+              minLength={3}
+              maxLength={100}
+              pattern="[a-zA-Z0-9_.\-]+"
+              title="Letters, numbers, dots, hyphens and underscores only — no spaces."
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
+            <p className="text-xs text-gray-400 mt-1">
+              Letters, numbers, dots, hyphens and underscores — no spaces.
+            </p>
           </div>
 
           <div>
