@@ -249,6 +249,23 @@ export const auth = {
       body: JSON.stringify({ username, email, password, ...antiBotBody(ab) }),
     }),
 
+  verifyEmail: (token: string) =>
+    request<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`, {
+      method: "POST",
+    }),
+
+  requestPasswordReset: (email: string) =>
+    request<{ message: string }>("/auth/request-password-reset", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (token: string, newPassword: string) =>
+    request<{ message: string }>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, new_password: newPassword }),
+    }),
+
   me: () => request<UserOut>("/users/me"),
 };
 
