@@ -75,6 +75,7 @@ export interface WorkSummary {
   title: string;
   language: string | null;
   publication_date: string | null;
+  cover_image_url: string | null;
   authors: { id: number; name: string; image_url: string | null }[];
   avg_rating: number | null;
   rating_count: number;
@@ -170,11 +171,27 @@ export interface NewsItemFull extends NewsItem {
   body: string;
 }
 
+export interface PersonSummary {
+  id: number;
+  name: string;
+  image_url: string | null;
+  localised?: Record<string, Record<string, string>>;
+}
+
+export interface PublisherSummary {
+  id: number;
+  name: string;
+  slug: string | null;
+  city: string | null;
+  country: string | null;
+}
+
 export interface SearchResult {
   query: string;
   total: number;
   works: WorkSummary[];
-  persons: { id: number; name: string; image_url: string | null; localised: Record<string, Record<string, string>> }[];
+  persons: PersonSummary[];
+  publishers: PublisherSummary[];
 }
 
 export interface UserOut {
@@ -282,6 +299,8 @@ export const catalogue = {
   publisher: (id: number) => request<PublisherDetail>(`/publishers/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
+  publisherWorks: (id: number, page = 1, size = 25) =>
+    request<Page<WorkSummary>>(`/publishers/${id}/works?page=${page}&page_size=${size}`),
   persons: (q: string, size = 10) =>
     request<Page<{ id: number; name: string; image_url: string | null }>>(
       `/persons?q=${encodeURIComponent(q)}&page_size=${size}`
@@ -290,6 +309,24 @@ export const catalogue = {
     request<Page<{ id: number; name: string }>>(
       `/publishers?q=${encodeURIComponent(q)}&page_size=${size}`
     ),
+  // Browse listings (paginated, richer than the picker helpers above)
+  personsList: (params: { q?: string; role_type?: string; sort?: string; page?: number } = {}) => {
+    const p = new URLSearchParams();
+    if (params.q) p.set("q", params.q);
+    if (params.role_type) p.set("role_type", params.role_type);
+    p.set("sort", params.sort ?? "name_asc");
+    p.set("page", String(params.page ?? 1));
+    p.set("page_size", "30");
+    return request<Page<PersonSummary>>(`/persons?${p}`);
+  },
+  publishersList: (params: { q?: string; country?: string; page?: number } = {}) => {
+    const p = new URLSearchParams();
+    if (params.q) p.set("q", params.q);
+    if (params.country) p.set("country", params.country);
+    p.set("page", String(params.page ?? 1));
+    p.set("page_size", "30");
+    return request<Page<PublisherSummary>>(`/publishers?${p}`);
+  },
   genres: () => request<GenreItem[]>("/genres?in_use=true"),
   allGenres: () => request<GenreItem[]>("/genres"),
   allTags: () =>

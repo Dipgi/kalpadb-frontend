@@ -24,6 +24,7 @@ export default function SearchPage() {
 
   const hasWorks = (result?.works?.length ?? 0) > 0;
   const hasPersons = (result?.persons?.length ?? 0) > 0;
+  const hasPublishers = (result?.publishers?.length ?? 0) > 0;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -33,7 +34,7 @@ export default function SearchPage() {
         <input
           ref={inputRef}
           defaultValue={q}
-          placeholder="Search works, authors…"
+          placeholder="Search works, people, publishers…"
           className="flex-1 border border-gray-200 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
         />
         <button
@@ -97,6 +98,30 @@ export default function SearchPage() {
                         </div>
                       )}
                       <span className="text-sm text-gray-900">{p.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {hasPublishers && (
+              <div>
+                <h2 className="text-base font-semibold text-gray-700 mb-4">
+                  Publishers <span className="text-gray-400 font-normal">({result.publishers.length})</span>
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {result.publishers.map((p) => (
+                    <Link
+                      key={p.id}
+                      to={`/publishers/${p.id}`}
+                      className="border border-gray-200 rounded-lg px-4 py-3 hover:shadow-sm transition-shadow bg-white"
+                    >
+                      <span className="text-sm text-gray-900">{p.name}</span>
+                      {(p.city || p.country) && (
+                        <span className="block text-xs text-gray-400 mt-0.5">
+                          {[p.city, p.country].filter(Boolean).join(", ")}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>

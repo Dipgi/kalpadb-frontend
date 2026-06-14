@@ -7,6 +7,9 @@ import HomePage from "./pages/HomePage";
 import BrowsePage from "./pages/BrowsePage";
 import WorkDetailPage from "./pages/WorkDetailPage";
 import PersonDetailPage from "./pages/PersonDetailPage";
+import PublisherDetailPage from "./pages/PublisherDetailPage";
+import BrowsePersonsPage from "./pages/BrowsePersonsPage";
+import BrowsePublishersPage from "./pages/BrowsePublishersPage";
 import SearchPage from "./pages/SearchPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -47,7 +50,10 @@ export default function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/browse" element={<BrowsePage />} />
                 <Route path="/works/:id" element={<WorkDetailPage />} />
+                <Route path="/persons" element={<BrowsePersonsPage />} />
                 <Route path="/persons/:id" element={<PersonDetailPage />} />
+                <Route path="/publishers" element={<BrowsePublishersPage />} />
+                <Route path="/publishers/:id" element={<PublisherDetailPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />

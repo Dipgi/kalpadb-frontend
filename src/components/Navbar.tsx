@@ -21,6 +21,8 @@ export default function Navbar() {
 
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
           <Link to="/browse" className="hover:text-gray-900">Browse</Link>
+          <Link to="/persons" className="hover:text-gray-900">People</Link>
+          <Link to="/publishers" className="hover:text-gray-900">Publishers</Link>
           <Link to="/search" className="hover:text-gray-900">Search</Link>
           {user ? (
             <>
@@ -70,6 +72,8 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 px-4 py-3 flex flex-col gap-3 text-sm text-gray-700 bg-white">
           <Link to="/browse" onClick={() => setMenuOpen(false)}>Browse</Link>
+          <Link to="/persons" onClick={() => setMenuOpen(false)}>People</Link>
+          <Link to="/publishers" onClick={() => setMenuOpen(false)}>Publishers</Link>
           <Link to="/search" onClick={() => setMenuOpen(false)}>Search</Link>
           {user ? (
             <>
