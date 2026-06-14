@@ -9,6 +9,7 @@ const NAV = [
   { to: "/admin/tagging", label: "Genre Tagging" },
   { to: "/admin/add", label: "Add Records" },
   { to: "/admin/catalogue", label: "Catalogue" },
+  { to: "/admin/audit", label: "Activity Log" },
 ];
 
 export default function AdminLayout() {

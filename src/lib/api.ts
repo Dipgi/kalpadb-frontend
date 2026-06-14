@@ -436,6 +436,17 @@ export interface AdminUser {
   created_at?: string;
 }
 
+export interface AuditEntry {
+  id: number;
+  action: string;
+  target_type: string | null;
+  target_id: number | null;
+  summary: string | null;
+  detail: Record<string, unknown> | null;
+  created_at: string | null;
+  actor: { id: number; username: string } | null;
+}
+
 // ── Admin API ─────────────────────────────────────────────────────────────
 
 export const admin = {
@@ -496,6 +507,17 @@ export const admin = {
 
   reviews: {
     delete: (id: number) => request(`/admin/reviews/${id}`, { method: "DELETE" }),
+  },
+
+  audit: {
+    list: (params: { action?: string; target_type?: string; page?: number } = {}) => {
+      const p = new URLSearchParams();
+      if (params.action) p.set("action", params.action);
+      if (params.target_type) p.set("target_type", params.target_type);
+      p.set("page", String(params.page ?? 1));
+      p.set("page_size", "50");
+      return request<Page<AuditEntry>>(`/admin/audit?${p}`);
+    },
   },
 
   // Tags are created directly (admin endpoint), not via the volunteer queue.

@@ -28,6 +28,7 @@ import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditPerson from "./pages/admin/AdminEditPerson";
 import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
 import AdminCatalogue from "./pages/admin/AdminCatalogue";
+import AdminAudit from "./pages/admin/AdminAudit";
 import ContributePage from "./pages/ContributePage";
 import NewsDetailPage from "./pages/NewsDetailPage";
 
@@ -74,6 +75,7 @@ export default function App() {
                   <Route path="tagging" element={<AdminTagging />} />
                   <Route path="add" element={<AdminAdd />} />
                   <Route path="catalogue" element={<AdminCatalogue />} />
+                  <Route path="audit" element={<AdminAudit />} />
                   <Route path="edit/:id" element={<AdminEditBook />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
