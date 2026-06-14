@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
@@ -23,6 +24,7 @@ export default function BrowsePersonsPage() {
   const role = searchParams.get("role_type") ?? "";
   const sort = searchParams.get("sort") ?? "name_asc";
   const page = Number(searchParams.get("page") ?? 1);
+  const [input, setInput] = useState(q);
 
   const { data: result, isLoading } = useQuery({
     queryKey: ["persons-list", q, role, sort, page],
@@ -51,16 +53,37 @@ export default function BrowsePersonsPage() {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">People</h1>
 
-      <div className="flex flex-wrap gap-3 mb-8">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          set("q", input.trim());
+        }}
+        className="flex flex-wrap items-center gap-3 mb-8"
+      >
         <input
-          defaultValue={q}
-          key={q}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Search by name…"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") set("q", (e.target as HTMLInputElement).value.trim());
-          }}
           className="border border-gray-200 rounded-md px-3 py-1.5 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-violet-500"
         />
+        <button
+          type="submit"
+          className="bg-violet-700 text-white text-sm px-4 py-1.5 rounded-md font-medium hover:bg-violet-800 transition-colors"
+        >
+          Search
+        </button>
+        {q && (
+          <button
+            type="button"
+            onClick={() => {
+              setInput("");
+              set("q", "");
+            }}
+            className="text-sm text-gray-400 hover:text-gray-700"
+          >
+            Clear
+          </button>
+        )}
         <select
           value={role}
           onChange={(e) => set("role_type", e.target.value)}
@@ -79,7 +102,7 @@ export default function BrowsePersonsPage() {
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
-      </div>
+      </form>
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
