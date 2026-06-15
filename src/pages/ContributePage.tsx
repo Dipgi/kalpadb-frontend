@@ -122,6 +122,7 @@ function BookForm() {
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
   const seriesList = seriesPage?.items ?? [];
+  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -131,19 +132,25 @@ function BookForm() {
   const [authors, setAuthors] = useState<PickerItem[]>([]);
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [formatType, setFormatType] = useState("paperback");
   const [availability, setAvailability] = useState("");
   const [isbn, setIsbn] = useState("");
   const [pageCount, setPageCount] = useState("");
+  const [price, setPrice] = useState("");
+  const [currency, setCurrency] = useState("");
+  const [formatNotes, setFormatNotes] = useState("");
   const [seriesId, setSeriesId] = useState("");
   const [seriesPosition, setSeriesPosition] = useState("");
+  const [editionLabel, setEditionLabel] = useState("");
+  const [editionNotes, setEditionNotes] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
     mutationFn: () => {
       const y = year ? Number(year) : null;
-      const hasFormat = isbn || pageCount || coverUrl || availability;
+      const hasFormat = isbn || pageCount || coverUrl || availability || price || currency || formatNotes;
       return volunteer.submitBook({
         title: title.trim(),
         description: description.trim() || null,
@@ -153,10 +160,13 @@ function BookForm() {
         publication_date: y ? `${y}-01-01` : null,
         series_id: seriesId ? Number(seriesId) : null,
         series_position: seriesPosition ? Number(seriesPosition) : null,
+        edition_label: editionLabel.trim() || null,
+        edition_notes: editionNotes.trim() || null,
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
         author_ids: authors.map((a) => a.id),
         publisher_ids: publishers.map((p) => p.id),
         genre_ids: [...genreIds],
+        tag_ids: [...tagIds],
         formats: hasFormat
           ? [
               {
@@ -165,6 +175,9 @@ function BookForm() {
                 page_count: pageCount ? Number(pageCount) : null,
                 cover_image_url: coverUrl.trim() || null,
                 availability: availability || null,
+                price: price.trim() || null,
+                currency: currency.trim() || null,
+                notes: formatNotes.trim() || null,
               },
             ]
           : [],
@@ -179,12 +192,18 @@ function BookForm() {
       setAuthors([]);
       setPublishers([]);
       setGenreIds(new Set());
+      setTagIds(new Set());
       setFormatType("paperback");
       setAvailability("");
       setIsbn("");
       setPageCount("");
+      setPrice("");
+      setCurrency("");
+      setFormatNotes("");
       setSeriesId("");
       setSeriesPosition("");
+      setEditionLabel("");
+      setEditionNotes("");
       setCoverUrl("");
     },
   });
@@ -290,6 +309,21 @@ function BookForm() {
         </div>
       </div>
 
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className={labelCls}>Price</label>
+          <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 250" className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Currency</label>
+          <input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder="e.g. INR" className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Format notes</label>
+          <input value={formatNotes} onChange={(e) => setFormatNotes(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
       {seriesList.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -314,6 +348,17 @@ function BookForm() {
           </div>
         </div>
       )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Edition label</label>
+          <input value={editionLabel} onChange={(e) => setEditionLabel(e.target.value)} placeholder="e.g. First Edition" className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Edition notes</label>
+          <input value={editionNotes} onChange={(e) => setEditionNotes(e.target.value)} className={inputCls} />
+        </div>
+      </div>
 
       <ImageUploadField
         label="Cover image"
@@ -366,6 +411,35 @@ function BookForm() {
           ))}
         </div>
       </div>
+
+      {(allTags ?? []).length > 0 && (
+        <div>
+          <label className={labelCls}>Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {(allTags ?? []).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  setTagIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  tagIds.has(t.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {t.tag_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit book" />
     </form>

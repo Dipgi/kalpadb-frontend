@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { works, user, admin, type Rating, type PublicReview } from "../lib/api";
+import { works, user, admin, catalogue, type Rating, type PublicReview } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import { Stars, StarPicker } from "../components/StarRating";
 
@@ -23,6 +23,8 @@ export default function WorkDetailPage() {
     queryFn: () => works.get(Number(id)),
     enabled: !!id,
   });
+
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
 
   const shelfMutation = useMutation({
     mutationFn: ({ status }: { status: string }) =>
@@ -90,6 +92,10 @@ export default function WorkDetailPage() {
 
   const publishers = work.book?.publishers ?? [];
   const firstFormat = work.book?.formats?.[0] ?? null;
+  const seriesName =
+    work.book?.series_id != null
+      ? (seriesPage?.items.find((s) => s.id === work.book?.series_id)?.name ?? null)
+      : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -155,6 +161,11 @@ export default function WorkDetailPage() {
                 {g.genre_name}
               </span>
             ))}
+            {work.tags?.map((t) => (
+              <span key={`tag-${t.id}`} className="bg-violet-50 text-violet-700 text-xs px-2 py-0.5 rounded-full">
+                #{t.tag_name}
+              </span>
+            ))}
           </div>
 
           {work.description && (
@@ -208,7 +219,32 @@ export default function WorkDetailPage() {
               {firstFormat.format_type && <p>Format: {firstFormat.format_type}</p>}
               {firstFormat.page_count && <p>Pages: {firstFormat.page_count}</p>}
               {firstFormat.isbn && <p>ISBN: {firstFormat.isbn}</p>}
+              {firstFormat.availability && (
+                <p>Availability: {firstFormat.availability.replace(/_/g, " ")}</p>
+              )}
+              {(firstFormat.price || firstFormat.notes) && (
+                <p>
+                  {firstFormat.price && (
+                    <>Price: {firstFormat.price}{firstFormat.currency ? ` ${firstFormat.currency}` : ""}</>
+                  )}
+                  {firstFormat.notes && <span className="block text-gray-500">{firstFormat.notes}</span>}
+                </p>
+              )}
+              {work.book?.edition_label && <p>Edition: {work.book.edition_label}</p>}
+              {work.book?.edition_notes && (
+                <p className="text-gray-500">{work.book.edition_notes}</p>
+              )}
             </div>
+          </div>
+        )}
+
+        {work.book?.series_id != null && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Series</h3>
+            <p className="text-sm text-gray-700">
+              {seriesName ?? `Series #${work.book.series_id}`}
+              {work.book.series_position != null && ` (book ${work.book.series_position})`}
+            </p>
           </div>
         )}
 

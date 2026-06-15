@@ -573,17 +573,23 @@ export interface BookCreateIn {
   publication_date?: string | null;
   image_urls?: string[] | null;
   genre_ids?: number[];
+  tag_ids?: number[];
   author_ids?: number[];
   publisher_ids?: number[];
   publication_year?: number | null;
   series_id?: number | null;
   series_position?: number | null;
+  edition_label?: string | null;
+  edition_notes?: string | null;
   formats?: {
     format_type: string;
     isbn?: string | null;
     page_count?: number | null;
     cover_image_url?: string | null;
     availability?: string | null;
+    price?: string | null;
+    currency?: string | null;
+    notes?: string | null;
   }[];
 }
 
