@@ -324,6 +324,7 @@ export interface PublisherDetail {
   website: string | null;
   description: string | null;
   parent_publisher_id: number | null;
+  image_url: string | null;
 }
 
 export interface TagNode {
@@ -383,6 +384,33 @@ export const catalogue = {
 export const search = {
   query: (q: string, page = 1) =>
     request<SearchResult>(`/search?q=${encodeURIComponent(q)}&page=${page}&page_size=25`),
+};
+
+// ── Image uploads (Cloudflare R2) ─────────────────────────────────────────
+
+export type ImageCategory = "covers" | "illustrations" | "people" | "publishers";
+
+export const uploads = {
+  // Multipart file upload — must NOT set Content-Type (browser adds the boundary).
+  image: async (file: File, category: ImageCategory): Promise<{ url: string }> => {
+    const form = new FormData();
+    form.append("category", category);
+    form.append("file", file);
+    const headers: Record<string, string> = {};
+    if (_token) headers["Authorization"] = `Bearer ${_token}`;
+    const res = await fetch(`${BASE}/uploads/image`, { method: "POST", headers, body: form });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, formatDetail(body.detail) ?? res.statusText, body.detail);
+    }
+    return res.json();
+  },
+  // Re-host an external image into R2 by URL.
+  fromUrl: (url: string, category: ImageCategory) =>
+    request<{ url: string }>("/uploads/image-from-url", {
+      method: "POST",
+      body: JSON.stringify({ url, category }),
+    }),
 };
 
 // ── Stats & News ──────────────────────────────────────────────────────────
@@ -573,6 +601,7 @@ export interface PublisherCreateIn {
   founded_year?: number | null;
   website?: string | null;
   description?: string | null;
+  image_url?: string | null;
 }
 
 export interface BookUpdateIn {
@@ -611,6 +640,7 @@ export interface PublisherUpdateIn {
   defunct_year?: number | null;
   website?: string | null;
   description?: string | null;
+  image_url?: string | null;
 }
 
 export interface SeriesCreateIn {

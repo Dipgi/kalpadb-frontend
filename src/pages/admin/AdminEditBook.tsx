@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail, type BookUpdateIn } from "../../lib/api";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import ImageUploadField from "../../components/ImageUploadField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 const inputCls =
@@ -298,25 +299,12 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       )}
 
-      <div>
-        <label className={labelCls}>Cover image URL</label>
-        <div className="flex gap-3 items-start">
-          <input
-            value={coverUrl}
-            onChange={(e) => setCoverUrl(e.target.value)}
-            placeholder="https://…"
-            className={inputCls}
-          />
-          {coverUrl.trim() && (
-            <img
-              src={coverUrl.trim()}
-              alt="Cover preview"
-              className="w-12 rounded shadow shrink-0"
-              onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
-            />
-          )}
-        </div>
-      </div>
+      <ImageUploadField
+        label="Cover image"
+        category="covers"
+        value={coverUrl}
+        onChange={(url) => setCoverUrl(url ?? "")}
+      />
 
       <EntityPicker
         label="Authors"

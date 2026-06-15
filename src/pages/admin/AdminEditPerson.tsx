@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, ApiError, type Person } from "../../lib/api";
+import ImageUploadField from "../../components/ImageUploadField";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -123,25 +124,12 @@ function EditForm({ person }: { person: Person }) {
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
 
-      <div>
-        <label className={labelCls}>Image URL</label>
-        <div className="flex gap-3 items-start">
-          <input
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="https://…"
-            className={inputCls}
-          />
-          {imageUrl.trim() && (
-            <img
-              src={imageUrl.trim()}
-              alt="Preview"
-              className="w-12 h-12 rounded-full object-cover shrink-0"
-              onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
-            />
-          )}
-        </div>
-      </div>
+      <ImageUploadField
+        label="Image"
+        category="people"
+        value={imageUrl}
+        onChange={(url) => setImageUrl(url ?? "")}
+      />
 
       <p className="text-xs text-gray-400">
         Leaving a field blank keeps its current value (it won't clear it).

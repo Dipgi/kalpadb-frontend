@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { catalogue, volunteer, type GenreItem } from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
+import ImageUploadField from "../components/ImageUploadField";
 import { WORLD_LANGUAGES } from "../lib/languages";
 
 type Tab = "book" | "person" | "publisher" | "series";
@@ -217,10 +218,12 @@ function BookForm() {
         />
       </div>
 
-      <div>
-        <label className={labelCls}>Cover image URL</label>
-        <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} className={inputCls} />
-      </div>
+      <ImageUploadField
+        label="Cover image"
+        category="covers"
+        value={coverUrl}
+        onChange={(url) => setCoverUrl(url ?? "")}
+      />
 
       <EntityPicker
         label="Authors"
@@ -342,10 +345,12 @@ function PersonForm() {
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
 
-      <div>
-        <label className={labelCls}>Image URL</label>
-        <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={inputCls} />
-      </div>
+      <ImageUploadField
+        label="Image"
+        category="people"
+        value={imageUrl}
+        onChange={(url) => setImageUrl(url ?? "")}
+      />
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit person" />
     </form>
@@ -361,6 +366,7 @@ function PublisherForm() {
   const [foundedYear, setFoundedYear] = useState("");
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
@@ -372,6 +378,7 @@ function PublisherForm() {
         founded_year: foundedYear ? Number(foundedYear) : null,
         website: website.trim() || null,
         description: description.trim() || null,
+        image_url: imageUrl.trim() || null,
       }),
     onSuccess: () => {
       setSubmitted(true);
@@ -380,6 +387,7 @@ function PublisherForm() {
       setFoundedYear("");
       setWebsite("");
       setDescription("");
+      setImageUrl("");
     },
   });
 
@@ -430,6 +438,13 @@ function PublisherForm() {
         <label className={labelCls}>Description</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
+
+      <ImageUploadField
+        label="Image / logo"
+        category="publishers"
+        value={imageUrl}
+        onChange={(url) => setImageUrl(url ?? "")}
+      />
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit publisher" />
     </form>

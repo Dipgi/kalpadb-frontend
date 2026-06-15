@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, ApiError, type PublisherDetail } from "../../lib/api";
+import ImageUploadField from "../../components/ImageUploadField";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -31,6 +32,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
   const [defunctYear, setDefunctYear] = useState(publisher.defunct_year?.toString() ?? "");
   const [website, setWebsite] = useState(publisher.website ?? "");
   const [description, setDescription] = useState(publisher.description ?? "");
+  const [imageUrl, setImageUrl] = useState(publisher.image_url ?? "");
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -44,6 +46,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         defunct_year: defunctYear ? Number(defunctYear) : null,
         website: website.trim() || null,
         description: description.trim() || null,
+        image_url: imageUrl.trim() || null,
       });
       return admin.queue.review(sub.edit_id, true, "Direct admin edit");
     },
@@ -138,6 +141,13 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         <label className={labelCls}>Description</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
+
+      <ImageUploadField
+        label="Image / logo"
+        category="publishers"
+        value={imageUrl}
+        onChange={(url) => setImageUrl(url ?? "")}
+      />
 
       <p className="text-xs text-gray-400">
         Leaving a field blank keeps its current value (it won't clear it).
