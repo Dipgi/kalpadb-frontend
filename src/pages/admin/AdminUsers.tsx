@@ -13,10 +13,16 @@ export default function AdminUsers() {
     queryFn: () => admin.users.list(page),
   });
 
+  // Pending role change awaiting confirmation: { id, role } or null.
+  const [pendingRole, setPendingRole] = useState<{ id: number; role: string } | null>(null);
+
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: { role?: string; is_active?: boolean } }) =>
       admin.users.update(id, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-users"] }),
+    onSuccess: () => {
+      setPendingRole(null);
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
   });
 
   return (
@@ -54,17 +60,43 @@ export default function AdminUsers() {
                   </td>
                   <td className="px-4 py-3 text-gray-500">{u.email}</td>
                   <td className="px-4 py-3">
-                    <select
-                      value={u.role.toLowerCase()}
-                      onChange={(e) =>
-                        updateMutation.mutate({ id: u.id, data: { role: e.target.value.toUpperCase() } })
-                      }
-                      className="border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    >
-                      {ROLES.map((r) => (
-                        <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-                      ))}
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={pendingRole?.id === u.id ? pendingRole.role : u.role.toLowerCase()}
+                        disabled={updateMutation.isPending}
+                        onChange={(e) => {
+                          const next = e.target.value;
+                          // Clear pending if the selection returns to the current role.
+                          setPendingRole(next === u.role.toLowerCase() ? null : { id: u.id, role: next });
+                        }}
+                        className="border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-50"
+                      >
+                        {ROLES.map((r) => (
+                          <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                        ))}
+                      </select>
+                      {pendingRole?.id === u.id && (
+                        <>
+                          <button
+                            onClick={() =>
+                              // Send the lowercase enum value (UserRole: "user"|"volunteer"|"admin").
+                              updateMutation.mutate({ id: u.id, data: { role: pendingRole.role } })
+                            }
+                            disabled={updateMutation.isPending}
+                            className="text-xs px-2 py-1 rounded bg-violet-600 text-white font-medium hover:bg-violet-700 disabled:opacity-50"
+                          >
+                            {updateMutation.isPending ? "Saving…" : `Confirm → ${pendingRole.role}`}
+                          </button>
+                          <button
+                            onClick={() => setPendingRole(null)}
+                            disabled={updateMutation.isPending}
+                            className="text-xs px-2 py-1 rounded border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <button
