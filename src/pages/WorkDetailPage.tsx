@@ -257,6 +257,27 @@ export default function WorkDetailPage() {
           </div>
         )}
 
+        {work.book?.editors && work.book.editors.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Editors</h3>
+            <p className="text-sm text-gray-700">{work.book.editors.map((e) => e.name).join(", ")}</p>
+          </div>
+        )}
+
+        {work.book?.illustrators && work.book.illustrators.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Illustrators</h3>
+            <p className="text-sm text-gray-700">{work.book.illustrators.map((i) => i.name).join(", ")}</p>
+          </div>
+        )}
+
+        {work.book?.cover_artists && work.book.cover_artists.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Cover artists</h3>
+            <p className="text-sm text-gray-700">{work.book.cover_artists.map((c) => c.name).join(", ")}</p>
+          </div>
+        )}
+
         {work.awards?.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Awards</h3>

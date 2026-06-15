@@ -20,6 +20,20 @@ const AVAILABILITY_OPTIONS = [
   { value: "rare", label: "Rare" },
 ];
 
+/** Inline-create a person (name only), auto-approved, returned as a picker item. */
+async function createPersonInline(name: string): Promise<PickerItem> {
+  const sub = await volunteer.submitPerson({ name });
+  const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
+  return { id: entry.record_id!, name };
+}
+
+/** Inline-create a publisher (name only), auto-approved, returned as a picker item. */
+async function createPublisherInline(name: string): Promise<PickerItem> {
+  const sub = await volunteer.submitPublisher({ name });
+  const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
+  return { id: entry.record_id!, name };
+}
+
 export default function AdminEditBook() {
   const { id } = useParams<{ id: string }>();
   const { data: work, isLoading } = useQuery({
@@ -65,6 +79,18 @@ function EditForm({ work }: { work: WorkDetail }) {
   );
   const [authors, setAuthors] = useState<PickerItem[]>(
     work.authors.map((a) => ({ id: a.id, name: a.name }))
+  );
+  const [editors, setEditors] = useState<PickerItem[]>(
+    (work.book?.editors ?? []).map((p) => ({ id: p.id, name: p.name }))
+  );
+  const [illustrators, setIllustrators] = useState<PickerItem[]>(
+    (work.book?.illustrators ?? []).map((p) => ({ id: p.id, name: p.name }))
+  );
+  const [translators, setTranslators] = useState<PickerItem[]>(
+    (work.book?.translators ?? []).map((p) => ({ id: p.id, name: p.name }))
+  );
+  const [coverArtists, setCoverArtists] = useState<PickerItem[]>(
+    (work.book?.cover_artists ?? []).map((p) => ({ id: p.id, name: p.name }))
   );
   const [publishers, setPublishers] = useState<PickerItem[]>(
     (work.book?.publishers ?? []).map((p) => ({ id: p.id, name: p.name }))
@@ -144,6 +170,10 @@ function EditForm({ work }: { work: WorkDetail }) {
         publication_year: y,
         publication_date: y ? `${y}-01-01` : null,
         author_ids: authors.map((a) => a.id),
+        editor_ids: editors.map((e) => e.id),
+        illustrator_ids: illustrators.map((i) => i.id),
+        translator_ids: translators.map((t) => t.id),
+        cover_artist_ids: coverArtists.map((c) => c.id),
         publisher_ids: publishers.map((p) => p.id),
         genre_ids: [...genreIds],
         tag_ids: [...tagIds],
@@ -308,20 +338,62 @@ function EditForm({ work }: { work: WorkDetail }) {
 
       <EntityPicker
         label="Authors"
-        placeholder="Search persons…"
+        placeholder="Search or create a person…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
         selected={authors}
         onChange={setAuthors}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Editors"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={editors}
+        onChange={setEditors}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Translators"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={translators}
+        onChange={setTranslators}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Illustrators"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={illustrators}
+        onChange={setIllustrators}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Cover artists"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={coverArtists}
+        onChange={setCoverArtists}
+        onCreate={createPersonInline}
       />
 
       <EntityPicker
         label="Publishers"
-        placeholder="Search publishers…"
+        placeholder="Search or create a publisher…"
         fetchKey="picker-publishers"
         fetcher={(q) => catalogue.publishers(q)}
         selected={publishers}
         onChange={setPublishers}
+        onCreate={createPublisherInline}
       />
 
       <div>

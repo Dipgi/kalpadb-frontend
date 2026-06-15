@@ -17,6 +17,7 @@ export default function EntityPicker({
   fetcher,
   selected,
   onChange,
+  onCreate,
 }: {
   label: string;
   placeholder: string;
@@ -24,8 +25,11 @@ export default function EntityPicker({
   fetcher: (q: string) => Promise<{ items: PickerItem[] }>;
   selected: PickerItem[];
   onChange: (items: PickerItem[]) => void;
+  /** When provided, offers "+ Create '<name>'" to add a new record on the fly. */
+  onCreate?: (name: string) => Promise<PickerItem>;
 }) {
   const [q, setQ] = useState("");
+  const [creating, setCreating] = useState(false);
   const { data } = useQuery({
     queryKey: [fetchKey, q],
     queryFn: () => fetcher(q.trim()),
@@ -33,6 +37,22 @@ export default function EntityPicker({
   });
 
   const results = (data?.items ?? []).filter((r) => !selected.some((s) => s.id === r.id));
+  const term = q.trim();
+  // Offer create when there's no exact (case-insensitive) name match already visible/selected.
+  const exactMatch = [...results, ...selected].some((r) => r.name.toLowerCase() === term.toLowerCase());
+  const showCreate = !!onCreate && term.length >= 1 && !exactMatch;
+
+  async function handleCreate() {
+    if (!onCreate || !term) return;
+    setCreating(true);
+    try {
+      const created = await onCreate(term);
+      onChange([...selected, created]);
+      setQ("");
+    } finally {
+      setCreating(false);
+    }
+  }
 
   return (
     <div>
@@ -64,7 +84,7 @@ export default function EntityPicker({
         placeholder={placeholder}
         className={inputCls}
       />
-      {q.trim().length >= 1 && results.length > 0 && (
+      {term.length >= 1 && (results.length > 0 || showCreate) && (
         <ul className="border border-gray-200 rounded-md mt-1 divide-y divide-gray-100 bg-white max-h-44 overflow-y-auto">
           {results.map((r) => (
             <li key={r.id}>
@@ -80,6 +100,18 @@ export default function EntityPicker({
               </button>
             </li>
           ))}
+          {showCreate && (
+            <li>
+              <button
+                type="button"
+                onClick={handleCreate}
+                disabled={creating}
+                className="w-full text-left px-3 py-2 text-sm text-violet-700 font-medium hover:bg-violet-50 disabled:opacity-50"
+              >
+                {creating ? "Creating…" : `+ Create “${term}”`}
+              </button>
+            </li>
+          )}
         </ul>
       )}
     </div>

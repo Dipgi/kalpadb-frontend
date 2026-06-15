@@ -24,6 +24,18 @@ async function submitAndApprove(submit: () => Promise<EditSubmission>) {
   return admin.queue.review(sub.edit_id, true, "Direct admin entry");
 }
 
+/** Inline-create a person (name only) and return it as a picker item. */
+async function createPersonInline(name: string): Promise<PickerItem> {
+  const entry = await submitAndApprove(() => volunteer.submitPerson({ name }));
+  return { id: entry.record_id!, name };
+}
+
+/** Inline-create a publisher (name only) and return it as a picker item. */
+async function createPublisherInline(name: string): Promise<PickerItem> {
+  const entry = await submitAndApprove(() => volunteer.submitPublisher({ name }));
+  return { id: entry.record_id!, name };
+}
+
 export default function AdminAdd() {
   const [tab, setTab] = useState<Tab>("book");
 
@@ -98,6 +110,10 @@ function BookForm() {
   const [originalLanguage, setOriginalLanguage] = useState("");
   const [year, setYear] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
+  const [editors, setEditors] = useState<PickerItem[]>([]);
+  const [illustrators, setIllustrators] = useState<PickerItem[]>([]);
+  const [translators, setTranslators] = useState<PickerItem[]>([]);
+  const [coverArtists, setCoverArtists] = useState<PickerItem[]>([]);
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
@@ -133,6 +149,10 @@ function BookForm() {
           edition_notes: editionNotes.trim() || null,
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
           author_ids: authors.map((a) => a.id),
+          editor_ids: editors.map((e) => e.id),
+          illustrator_ids: illustrators.map((i) => i.id),
+          translator_ids: translators.map((t) => t.id),
+          cover_artist_ids: coverArtists.map((c) => c.id),
           publisher_ids: publishers.map((p) => p.id),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
@@ -162,6 +182,10 @@ function BookForm() {
       setOriginalLanguage("");
       setYear("");
       setAuthors([]);
+      setEditors([]);
+      setIllustrators([]);
+      setTranslators([]);
+      setCoverArtists([]);
       setPublishers([]);
       setGenreIds(new Set());
       setTagIds(new Set());
@@ -354,20 +378,62 @@ function BookForm() {
 
       <EntityPicker
         label="Authors"
-        placeholder="Search persons…"
+        placeholder="Search or create a person…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
         selected={authors}
         onChange={setAuthors}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Editors"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={editors}
+        onChange={setEditors}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Translators"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={translators}
+        onChange={setTranslators}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Illustrators"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={illustrators}
+        onChange={setIllustrators}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Cover artists"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={coverArtists}
+        onChange={setCoverArtists}
+        onCreate={createPersonInline}
       />
 
       <EntityPicker
         label="Publishers"
-        placeholder="Search publishers…"
+        placeholder="Search or create a publisher…"
         fetchKey="picker-publishers"
         fetcher={(q) => catalogue.publishers(q)}
         selected={publishers}
         onChange={setPublishers}
+        onCreate={createPublisherInline}
       />
 
       <div>

@@ -124,6 +124,7 @@ export interface WorkDetail extends WorkSummary {
     editors: { id: number; name: string }[];
     translators: { id: number; name: string }[];
     illustrators: { id: number; name: string }[];
+    cover_artists: { id: number; name: string }[];
   } | null;
   story: { word_count: number | null } | null;
 }
@@ -575,6 +576,10 @@ export interface BookCreateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  editor_ids?: number[];
+  illustrator_ids?: number[];
+  translator_ids?: number[];
+  cover_artist_ids?: number[];
   publisher_ids?: number[];
   publication_year?: number | null;
   series_id?: number | null;
@@ -627,6 +632,10 @@ export interface BookUpdateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  editor_ids?: number[];
+  illustrator_ids?: number[];
+  translator_ids?: number[];
+  cover_artist_ids?: number[];
   publisher_ids?: number[];
   formats?: ({ format_type: string } & Partial<Omit<BookFormat, "format_type">>)[];
 }
