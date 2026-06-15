@@ -576,6 +576,8 @@ export interface BookCreateIn {
   author_ids?: number[];
   publisher_ids?: number[];
   publication_year?: number | null;
+  series_id?: number | null;
+  series_position?: number | null;
   formats?: {
     format_type: string;
     isbn?: string | null;

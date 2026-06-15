@@ -88,6 +88,8 @@ function BookForm() {
     queryKey: ["all-languages"],
     queryFn: catalogue.allLanguages,
   });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const seriesList = seriesPage?.items ?? [];
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -101,6 +103,8 @@ function BookForm() {
   const [availability, setAvailability] = useState("");
   const [isbn, setIsbn] = useState("");
   const [pageCount, setPageCount] = useState("");
+  const [seriesId, setSeriesId] = useState("");
+  const [seriesPosition, setSeriesPosition] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [createdId, setCreatedId] = useState<number | null>(null);
 
@@ -116,6 +120,8 @@ function BookForm() {
           original_language: originalLanguage || null,
           publication_year: y,
           publication_date: y ? `${y}-01-01` : null,
+          series_id: seriesId ? Number(seriesId) : null,
+          series_position: seriesPosition ? Number(seriesPosition) : null,
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
           author_ids: authors.map((a) => a.id),
           publisher_ids: publishers.map((p) => p.id),
@@ -148,6 +154,8 @@ function BookForm() {
       setAvailability("");
       setIsbn("");
       setPageCount("");
+      setSeriesId("");
+      setSeriesPosition("");
       setCoverUrl("");
     },
   });
@@ -266,6 +274,31 @@ function BookForm() {
           </select>
         </div>
       </div>
+
+      {seriesList.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Series</label>
+            <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
+              <option value="">Not part of a series</option>
+              {seriesList.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Position in series</label>
+            <input
+              type="number"
+              min={1}
+              value={seriesPosition}
+              onChange={(e) => setSeriesPosition(e.target.value)}
+              disabled={!seriesId}
+              className={inputCls}
+            />
+          </div>
+        </div>
+      )}
 
       <ImageUploadField
         label="Cover image"
