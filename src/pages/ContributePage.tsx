@@ -13,6 +13,15 @@ const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 
+const FORMAT_TYPES = ["paperback", "hardcover", "ebook"];
+const AVAILABILITY_OPTIONS = [
+  { value: "", label: "Unknown" },
+  { value: "in_print", label: "In print" },
+  { value: "out_of_print", label: "Out of print" },
+  { value: "digital_only", label: "Digital only" },
+  { value: "rare", label: "Rare" },
+];
+
 export default function ContributePage() {
   const { user, loading } = useAuth();
   const [tab, setTab] = useState<Tab>("book");
@@ -111,6 +120,8 @@ function SubmitRow({ pending, error, label }: { pending: boolean; error: boolean
 function BookForm() {
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const seriesList = seriesPage?.items ?? [];
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -120,12 +131,19 @@ function BookForm() {
   const [authors, setAuthors] = useState<PickerItem[]>([]);
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [formatType, setFormatType] = useState("paperback");
+  const [availability, setAvailability] = useState("");
+  const [isbn, setIsbn] = useState("");
+  const [pageCount, setPageCount] = useState("");
+  const [seriesId, setSeriesId] = useState("");
+  const [seriesPosition, setSeriesPosition] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
     mutationFn: () => {
       const y = year ? Number(year) : null;
+      const hasFormat = isbn || pageCount || coverUrl || availability;
       return volunteer.submitBook({
         title: title.trim(),
         description: description.trim() || null,
@@ -133,10 +151,23 @@ function BookForm() {
         original_language: originalLanguage || null,
         publication_year: y,
         publication_date: y ? `${y}-01-01` : null,
+        series_id: seriesId ? Number(seriesId) : null,
+        series_position: seriesPosition ? Number(seriesPosition) : null,
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
         author_ids: authors.map((a) => a.id),
         publisher_ids: publishers.map((p) => p.id),
         genre_ids: [...genreIds],
+        formats: hasFormat
+          ? [
+              {
+                format_type: formatType,
+                isbn: isbn.trim() || null,
+                page_count: pageCount ? Number(pageCount) : null,
+                cover_image_url: coverUrl.trim() || null,
+                availability: availability || null,
+              },
+            ]
+          : [],
       });
     },
     onSuccess: () => {
@@ -148,6 +179,12 @@ function BookForm() {
       setAuthors([]);
       setPublishers([]);
       setGenreIds(new Set());
+      setFormatType("paperback");
+      setAvailability("");
+      setIsbn("");
+      setPageCount("");
+      setSeriesId("");
+      setSeriesPosition("");
       setCoverUrl("");
     },
   });
@@ -206,17 +243,77 @@ function BookForm() {
         </div>
       </div>
 
-      <div>
-        <label className={labelCls}>Publication year</label>
-        <input
-          type="number"
-          min={1000}
-          max={2100}
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          className={inputCls}
-        />
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className={labelCls}>Publication year</label>
+          <input
+            type="number"
+            min={1000}
+            max={2100}
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Pages</label>
+          <input
+            type="number"
+            min={1}
+            value={pageCount}
+            onChange={(e) => setPageCount(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>ISBN</label>
+          <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
+        </div>
       </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Format</label>
+          <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className={inputCls}>
+            {FORMAT_TYPES.map((f) => (
+              <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Availability</label>
+          <select value={availability} onChange={(e) => setAvailability(e.target.value)} className={inputCls}>
+            {AVAILABILITY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {seriesList.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Series</label>
+            <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
+              <option value="">Not part of a series</option>
+              {seriesList.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Position in series</label>
+            <input
+              type="number"
+              min={1}
+              value={seriesPosition}
+              onChange={(e) => setSeriesPosition(e.target.value)}
+              disabled={!seriesId}
+              className={inputCls}
+            />
+          </div>
+        </div>
+      )}
 
       <ImageUploadField
         label="Cover image"
