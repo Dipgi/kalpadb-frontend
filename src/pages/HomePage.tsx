@@ -19,10 +19,11 @@ export default function HomePage() {
       {/* Hero */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-3">
-          Indian Science Fiction Database
+          Indian Speculative Fiction Database
         </h1>
         <p className="text-gray-500 text-lg max-w-xl mx-auto">
-          A community-curated catalogue of SF works across Indian languages and media.
+          A community-curated catalogue of speculative fiction — science fiction, fantasy,
+          horror and more — across Indian languages and media.
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link

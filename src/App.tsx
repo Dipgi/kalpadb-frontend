@@ -47,6 +47,9 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="bg-gray-100 text-gray-400 text-[10px] leading-none py-1 px-4 text-right font-mono">
+              build {__BUILD_ID__}
+            </div>
             <Navbar />
             <main className="flex-1">
               <ErrorBoundary>
