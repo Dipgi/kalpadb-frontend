@@ -482,6 +482,8 @@ export interface EditLogEntry {
   reviewed_at: string | null;
   submitted_by: { id: number; username: string };
   reviewed_by: { id: number; username: string } | null;
+  /** Existing similar-name records, for pending person/publisher creates. */
+  duplicate_candidates?: DuplicateCandidate[];
 }
 
 export interface AdminUser {

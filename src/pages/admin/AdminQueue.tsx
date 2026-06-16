@@ -64,6 +64,29 @@ export default function AdminQueue() {
                       ? new Date(entry.submitted_at).toLocaleString()
                       : "unknown time"}
                   </p>
+                  {entry.duplicate_candidates && entry.duplicate_candidates.length > 0 && (
+                    <div className="mt-2 bg-amber-50 border border-amber-300 rounded-md px-3 py-2 text-xs">
+                      <p className="text-amber-900 font-medium mb-1">
+                        ⚠ A similar {entry.table_name === "publishers" ? "publisher" : "person"} may
+                        already exist — check before approving:
+                      </p>
+                      <ul className="space-y-0.5">
+                        {entry.duplicate_candidates.map((c) => (
+                          <li key={c.id} className="flex items-center gap-2">
+                            <a
+                              href={`/${entry.table_name === "publishers" ? "publishers" : "persons"}/${c.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-violet-700 hover:underline"
+                            >
+                              {c.name} <span className="text-gray-400">#{c.id}</span>
+                            </a>
+                            <span className="text-gray-400">{Math.round(c.similarity * 100)}%</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <details className="mt-2">
                     <summary className="text-xs text-violet-600 cursor-pointer hover:underline">
                       View payload
