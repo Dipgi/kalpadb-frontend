@@ -569,7 +569,11 @@ function PersonForm() {
           candidates={dup.candidates}
           busy={mutation.isPending}
           onCreateAnyway={() => mutation.mutate(true)}
-          onDismiss={() => setDup(null)}
+          onDismiss={() => {
+            setDup(null);
+            mutation.reset();
+            setName("");
+          }}
         />
       )}
 
@@ -675,7 +679,11 @@ function PublisherForm() {
           candidates={dup.candidates}
           busy={mutation.isPending}
           onCreateAnyway={() => mutation.mutate(true)}
-          onDismiss={() => setDup(null)}
+          onDismiss={() => {
+            setDup(null);
+            mutation.reset();
+            setName("");
+          }}
         />
       )}
 
