@@ -58,6 +58,34 @@ export class ApiError extends Error {
   }
 }
 
+/** An existing record flagged as a possible duplicate of one being created. */
+export interface DuplicateCandidate {
+  id: number;
+  name: string;
+  similarity: number;
+  localised_match: boolean;
+}
+
+export interface DuplicateError {
+  code: "duplicate_name";
+  message: string;
+  candidates: DuplicateCandidate[];
+}
+
+/**
+ * If `err` is a 409 duplicate-name rejection from POST /persons or /publishers,
+ * return its structured detail; otherwise null.
+ */
+export function getDuplicateError(err: unknown): DuplicateError | null {
+  if (err instanceof ApiError && err.status === 409) {
+    const d = err.detail as Partial<DuplicateError> | undefined;
+    if (d && d.code === "duplicate_name" && Array.isArray(d.candidates)) {
+      return d as DuplicateError;
+    }
+  }
+  return null;
+}
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export interface Page<T> {
@@ -674,12 +702,18 @@ export const volunteer = {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  submitPerson: (data: PersonCreateIn) =>
-    request<EditSubmission>("/persons", { method: "POST", body: JSON.stringify(data) }),
+  submitPerson: (data: PersonCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/persons${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updatePerson: (id: number, data: PersonUpdateIn) =>
     request<EditSubmission>(`/persons/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
-  submitPublisher: (data: PublisherCreateIn) =>
-    request<EditSubmission>("/publishers", { method: "POST", body: JSON.stringify(data) }),
+  submitPublisher: (data: PublisherCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/publishers${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updatePublisher: (id: number, data: PublisherUpdateIn) =>
     request<EditSubmission>(`/publishers/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   submitSeries: (data: SeriesCreateIn) =>

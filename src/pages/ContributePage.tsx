@@ -2,8 +2,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
-import { catalogue, volunteer, type GenreItem } from "../lib/api";
+import {
+  catalogue,
+  volunteer,
+  getDuplicateError,
+  type DuplicateError,
+  type GenreItem,
+} from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
+import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
 import { WORLD_LANGUAGES } from "../lib/languages";
 
@@ -504,24 +511,30 @@ function PersonForm() {
   const [birthDate, setBirthDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [dup, setDup] = useState<DuplicateError | null>(null);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      volunteer.submitPerson({
-        name: name.trim(),
-        bio: bio.trim() || null,
-        nationality: nationality.trim() || null,
-        role_type: roleType.trim() || null,
-        birth_date: birthDate || null,
-        image_url: imageUrl.trim() || null,
-      }),
+    mutationFn: (allowDuplicate: boolean) =>
+      volunteer.submitPerson(
+        {
+          name: name.trim(),
+          bio: bio.trim() || null,
+          nationality: nationality.trim() || null,
+          role_type: roleType.trim() || null,
+          birth_date: birthDate || null,
+          image_url: imageUrl.trim() || null,
+        },
+        allowDuplicate,
+      ),
     onSuccess: () => {
       setSubmitted(true);
+      setDup(null);
       setName("");
       setBio("");
       setBirthDate("");
       setImageUrl("");
     },
+    onError: (err) => setDup(getDuplicateError(err)),
   });
 
   return (
@@ -529,11 +542,24 @@ function PersonForm() {
       onSubmit={(e) => {
         e.preventDefault();
         setSubmitted(false);
-        if (name.trim()) mutation.mutate();
+        if (name.trim()) {
+          setDup(null);
+          mutation.mutate(false);
+        }
       }}
       className="space-y-4"
     >
       {submitted && <PendingBanner />}
+
+      {dup && (
+        <DuplicateMatchPrompt
+          kind="person"
+          candidates={dup.candidates}
+          busy={mutation.isPending}
+          onCreateAnyway={() => mutation.mutate(true)}
+          onDismiss={() => setDup(null)}
+        />
+      )}
 
       <div>
         <label className={labelCls}>Name *</label>
@@ -571,7 +597,7 @@ function PersonForm() {
         onChange={(url) => setImageUrl(url ?? "")}
       />
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit person" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit person" />
     </form>
   );
 }
@@ -587,20 +613,25 @@ function PublisherForm() {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [dup, setDup] = useState<DuplicateError | null>(null);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      volunteer.submitPublisher({
-        name: name.trim(),
-        city: city.trim() || null,
-        country: country.trim() || null,
-        founded_year: foundedYear ? Number(foundedYear) : null,
-        website: website.trim() || null,
-        description: description.trim() || null,
-        image_url: imageUrl.trim() || null,
-      }),
+    mutationFn: (allowDuplicate: boolean) =>
+      volunteer.submitPublisher(
+        {
+          name: name.trim(),
+          city: city.trim() || null,
+          country: country.trim() || null,
+          founded_year: foundedYear ? Number(foundedYear) : null,
+          website: website.trim() || null,
+          description: description.trim() || null,
+          image_url: imageUrl.trim() || null,
+        },
+        allowDuplicate,
+      ),
     onSuccess: () => {
       setSubmitted(true);
+      setDup(null);
       setName("");
       setCity("");
       setFoundedYear("");
@@ -608,6 +639,7 @@ function PublisherForm() {
       setDescription("");
       setImageUrl("");
     },
+    onError: (err) => setDup(getDuplicateError(err)),
   });
 
   return (
@@ -615,11 +647,24 @@ function PublisherForm() {
       onSubmit={(e) => {
         e.preventDefault();
         setSubmitted(false);
-        if (name.trim()) mutation.mutate();
+        if (name.trim()) {
+          setDup(null);
+          mutation.mutate(false);
+        }
       }}
       className="space-y-4"
     >
       {submitted && <PendingBanner />}
+
+      {dup && (
+        <DuplicateMatchPrompt
+          kind="publisher"
+          candidates={dup.candidates}
+          busy={mutation.isPending}
+          onCreateAnyway={() => mutation.mutate(true)}
+          onDismiss={() => setDup(null)}
+        />
+      )}
 
       <div>
         <label className={labelCls}>Name *</label>
@@ -665,7 +710,7 @@ function PublisherForm() {
         onChange={(url) => setImageUrl(url ?? "")}
       />
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit publisher" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit publisher" />
     </form>
   );
 }
