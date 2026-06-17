@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./hooks/useAuth";
 import Navbar from "./components/Navbar";
@@ -31,6 +31,8 @@ import AdminCatalogue from "./pages/admin/AdminCatalogue";
 import AdminAudit from "./pages/admin/AdminAudit";
 import ContributePage from "./pages/ContributePage";
 import NewsDetailPage from "./pages/NewsDetailPage";
+import LicensePage from "./pages/LicensePage";
+import CitePage from "./pages/CitePage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +72,8 @@ export default function App() {
                 <Route path="/shelf" element={<ShelfPage />} />
                 <Route path="/contribute" element={<ContributePage />} />
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
+                <Route path="/license" element={<LicensePage />} />
+                <Route path="/cite" element={<CitePage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="queue" element={<AdminQueue />} />
@@ -87,7 +91,22 @@ export default function App() {
               </ErrorBoundary>
             </main>
             <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-400">
-              &copy; 2026 Dip Ghosh. All rights reserved.
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <a
+                  href="https://creativecommons.org/licenses/by-sa/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-violet-700"
+                >
+                  Data under CC BY-SA 4.0
+                </a>
+                <span aria-hidden>·</span>
+                <Link to="/license" className="hover:text-violet-700">License</Link>
+                <span aria-hidden>·</span>
+                <Link to="/cite" className="hover:text-violet-700">Cite</Link>
+                <span aria-hidden>·</span>
+                <span>&copy; 2026 Dip Ghosh · KalpaDB&trade;</span>
+              </div>
             </footer>
           </div>
         </BrowserRouter>

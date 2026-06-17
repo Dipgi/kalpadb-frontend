@@ -229,6 +229,7 @@ export interface UserOut {
   email: string;
   role: string;
   is_active: boolean;
+  agreed_terms_at?: string | null;
 }
 
 export interface ShelfEntry {
@@ -275,8 +276,11 @@ export const auth = {
   register: (username: string, email: string, password: string, ab?: AntiBot) =>
     request<UserOut & { access_token: string }>("/auth/register", {
       method: "POST",
-      body: JSON.stringify({ username, email, password, ...antiBotBody(ab) }),
+      body: JSON.stringify({ username, email, password, agree_terms: true, ...antiBotBody(ab) }),
     }),
+
+  /** Record acceptance of the contributor agreement for an existing account. */
+  agreeTerms: () => request<UserOut>("/users/me/agree-terms", { method: "POST" }),
 
   verifyEmail: (token: string) =>
     request<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`, {

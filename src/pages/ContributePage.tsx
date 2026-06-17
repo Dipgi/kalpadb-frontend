@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import {
+  auth,
   catalogue,
   volunteer,
   getDuplicateError,
@@ -32,6 +33,9 @@ const AVAILABILITY_OPTIONS = [
 export default function ContributePage() {
   const { user, loading } = useAuth();
   const [tab, setTab] = useState<Tab>("book");
+  // Local override so the one-time terms gate disappears after acceptance
+  // without needing to refetch the auth context this session.
+  const [agreedNow, setAgreedNow] = useState(false);
 
   if (loading) return null;
 
@@ -58,6 +62,12 @@ export default function ContributePage() {
         </p>
       </Centered>
     );
+  }
+
+  // Accounts created before consent was captured at registration must accept
+  // the contributor agreement once before submitting anything.
+  if (!user.agreed_terms_at && !agreedNow) {
+    return <ContributorTermsGate onAgree={() => setAgreedNow(true)} />;
   }
 
   return (
@@ -95,6 +105,50 @@ function Centered({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="text-center max-w-sm">{children}</div>
+    </div>
+  );
+}
+
+function ContributorTermsGate({ onAgree }: { onAgree: () => void }) {
+  const [checked, setChecked] = useState(false);
+  const mutation = useMutation({
+    mutationFn: () => auth.agreeTerms(),
+    onSuccess: onAgree,
+  });
+
+  return (
+    <div className="max-w-xl mx-auto px-4 py-12">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Contributor agreement</h1>
+      <p className="text-sm text-gray-600 leading-relaxed mb-5">
+        Before adding records, please accept the contributor terms. You only need to do this once.
+      </p>
+
+      <label className="flex items-start gap-2 text-sm text-gray-700 mb-5">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => setChecked(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-700 focus:ring-violet-500"
+        />
+        <span>
+          I agree that any contribution I make may be published under{" "}
+          <Link to="/license" target="_blank" className="text-violet-700 hover:underline">
+            CC BY-SA 4.0
+          </Link>{" "}
+          and that KalpaDB may use, adapt, and relicense it as part of the database.
+        </span>
+      </label>
+
+      <button
+        onClick={() => mutation.mutate()}
+        disabled={!checked || mutation.isPending}
+        className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
+      >
+        {mutation.isPending ? "Saving…" : "I agree — continue"}
+      </button>
+      {mutation.isError && (
+        <p className="text-sm text-red-500 mt-3">Could not save your agreement — please try again.</p>
+      )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [hp, setHp] = useState(""); // honeypot — real users leave this empty
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0); // bump to reset the widget
@@ -128,13 +129,30 @@ export default function RegisterPage() {
             </label>
           </div>
 
+          <label className="flex items-start gap-2 text-xs text-gray-600">
+            <input
+              type="checkbox"
+              required
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-violet-700 focus:ring-violet-500"
+            />
+            <span>
+              I agree that any contribution I make may be published under{" "}
+              <Link to="/license" target="_blank" className="text-violet-700 hover:underline">
+                CC BY-SA 4.0
+              </Link>{" "}
+              and that KalpaDB may use, adapt, and relicense it as part of the database.
+            </span>
+          </label>
+
           <Turnstile key={captchaKey} onVerify={setTurnstileToken} onExpire={() => setTurnstileToken(null)} />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"
-            disabled={loading || (captchaRequired && !turnstileToken)}
+            disabled={loading || !agreeTerms || (captchaRequired && !turnstileToken)}
             className="bg-violet-700 text-white py-2.5 rounded-md font-medium hover:bg-violet-800 disabled:opacity-60 transition-colors"
           >
             {loading ? "Creating account…" : "Create account"}
