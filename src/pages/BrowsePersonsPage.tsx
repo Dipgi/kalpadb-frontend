@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
+import { formatRole } from "../lib/roles";
 import Pagination from "../components/Pagination";
 
 const ROLE_OPTIONS = [
@@ -132,7 +133,14 @@ export default function BrowsePersonsPage() {
                     </svg>
                   </div>
                 )}
-                <span className="text-sm text-gray-900 line-clamp-2">{p.name}</span>
+                <span className="min-w-0">
+                  <span className="block text-sm text-gray-900 line-clamp-2">{p.name}</span>
+                  {p.roles && p.roles.length > 0 && (
+                    <span className="block text-xs text-gray-400 line-clamp-1">
+                      {p.roles.map(formatRole).join(" · ")}
+                    </span>
+                  )}
+                </span>
               </Link>
             ))}
           </div>

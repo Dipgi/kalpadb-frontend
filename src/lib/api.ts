@@ -164,7 +164,10 @@ export interface Person {
   gender: string | null;
   image_url: string | null;
   nationality: string | null;
+  /** Free-text "primary / known-for" hint only — not authoritative. */
   role_type: string | null;
+  /** Roles derived from real credits across all work types. */
+  roles: string[];
   birth_date: string | null;
   end_date: string | null;
   localised: Record<string, Record<string, string>>;
@@ -204,6 +207,8 @@ export interface PersonSummary {
   id: number;
   name: string;
   image_url: string | null;
+  /** Roles derived from real credits across all work types. */
+  roles?: string[];
   localised?: Record<string, Record<string, string>>;
 }
 

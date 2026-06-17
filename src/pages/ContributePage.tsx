@@ -626,7 +626,7 @@ function PersonForm() {
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className={labelCls}>Role</label>
+          <label className={labelCls}>Primary role (hint)</label>
           <select value={roleType} onChange={(e) => setRoleType(e.target.value)} className={inputCls}>
             {["author", "illustrator", "editor", "translator"].map((r) => (
               <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>

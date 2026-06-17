@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
+import { formatRole } from "../lib/roles";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
 import Pagination from "../components/Pagination";
@@ -84,10 +85,24 @@ export default function PersonDetailPage() {
             {person.birth_date && (
               <span>b. {person.birth_date.slice(0, 4)}</span>
             )}
-            {person.role_type && (
+            {/* Fall back to the role_type hint only when there are no real credits yet. */}
+            {person.roles.length === 0 && person.role_type && (
               <span className="capitalize">{person.role_type}</span>
             )}
           </div>
+
+          {person.roles.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {person.roles.map((r) => (
+                <span
+                  key={r}
+                  className="text-xs px-2.5 py-0.5 rounded-full bg-violet-100 text-violet-700"
+                >
+                  {formatRole(r)}
+                </span>
+              ))}
+            </div>
+          )}
 
           {person.aliases.length > 0 && (
             <p className="text-sm text-gray-400 mb-3">
