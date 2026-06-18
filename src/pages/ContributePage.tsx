@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import {
   auth,
@@ -54,14 +54,7 @@ export default function ContributePage() {
 
   const role = user.role.toLowerCase();
   if (role !== "volunteer" && role !== "admin") {
-    return (
-      <Centered>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Contribute to KalpaDB</h1>
-        <p className="text-sm text-gray-500">
-          Your account needs volunteer access to submit records. Contact an admin to be upgraded.
-        </p>
-      </Centered>
-    );
+    return <VolunteerAccessGate />;
   }
 
   // Accounts created before consent was captured at registration must accept
@@ -105,6 +98,84 @@ function Centered({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="text-center max-w-sm">{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Shown to signed-in USERs who lack volunteer access. Lets them submit a
+ * self-service request (with an optional message) and reflects its status.
+ */
+function VolunteerAccessGate() {
+  const qc = useQueryClient();
+  const [message, setMessage] = useState("");
+
+  const { data: myRequest, isLoading } = useQuery({
+    queryKey: ["my-volunteer-request"],
+    queryFn: volunteer.myRequest,
+  });
+
+  const submit = useMutation({
+    mutationFn: () => volunteer.requestAccess(message.trim() || null),
+    onSuccess: (req) => qc.setQueryData(["my-volunteer-request"], req),
+  });
+
+  if (isLoading) return null;
+
+  const status = submit.data?.status ?? myRequest?.status;
+
+  if (status === "pending") {
+    return (
+      <Centered>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Request submitted</h1>
+        <p className="text-sm text-gray-500">
+          Your request for volunteer access is pending review. We'll upgrade your account once an
+          admin approves it.
+        </p>
+      </Centered>
+    );
+  }
+
+  return (
+    <div className="max-w-xl mx-auto px-4 py-12">
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Become a volunteer</h1>
+      <p className="text-sm text-gray-600 leading-relaxed mb-5">
+        Contributing new books, people, and publishers needs volunteer access. Request it below and
+        an admin will review your account. Submissions are always checked before going live.
+      </p>
+
+      {status === "rejected" && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-md px-4 py-3 mb-4">
+          Your previous request wasn't approved
+          {myRequest?.reviewer_note ? `: ${myRequest.reviewer_note}` : "."} You can submit a new
+          request below.
+        </div>
+      )}
+
+      <label className="block text-xs font-semibold text-gray-500 mb-1">
+        Message to the admin <span className="font-normal text-gray-400">(optional)</span>
+      </label>
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        rows={3}
+        maxLength={2000}
+        placeholder="Tell us a bit about how you'd like to help…"
+        className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 mb-4"
+      />
+
+      <button
+        onClick={() => submit.mutate()}
+        disabled={submit.isPending}
+        className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
+      >
+        {submit.isPending ? "Submitting…" : "Request volunteer access"}
+      </button>
+      {submit.isError && (
+        <p className="text-sm text-red-500 mt-3">
+          Could not submit your request — please try again.
+        </p>
+      )}
     </div>
   );
 }

@@ -515,6 +515,22 @@ export interface AuditEntry {
   actor: { id: number; username: string } | null;
 }
 
+export interface VolunteerRequest {
+  id: number;
+  user: { id: number; username: string };
+  status: "pending" | "approved" | "rejected";
+  message: string | null;
+  reviewer_note: string | null;
+  reviewed_by: { id: number; username: string } | null;
+  created_at: string | null;
+  reviewed_at: string | null;
+}
+
+export interface PendingCounts {
+  volunteer_requests: number;
+  edit_queue: number;
+}
+
 // ── Admin API ─────────────────────────────────────────────────────────────
 
 export const admin = {
@@ -550,6 +566,20 @@ export const admin = {
     update: (id: number, data: { role?: string; is_active?: boolean }) =>
       request<AdminUser>(`/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   },
+
+  volunteerRequests: {
+    list: (status: "pending" | "approved" | "rejected" = "pending", page = 1) =>
+      request<Page<VolunteerRequest>>(
+        `/admin/volunteer-requests?status=${status}&page=${page}&page_size=25`
+      ),
+    review: (id: number, approve: boolean, reviewer_note?: string) =>
+      request<VolunteerRequest>(`/admin/volunteer-requests/${id}/review`, {
+        method: "POST",
+        body: JSON.stringify({ approve, reviewer_note: reviewer_note ?? null }),
+      }),
+  },
+
+  pendingCounts: () => request<PendingCounts>("/admin/pending-counts"),
 
   works: {
     setGenres: (lw_id: number, genre_ids: number[]) =>
@@ -729,6 +759,14 @@ export const volunteer = {
     request<EditSubmission>(`/publishers/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   submitSeries: (data: SeriesCreateIn) =>
     request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
+
+  // Self-service volunteer-access request (any signed-in USER).
+  requestAccess: (message?: string | null) =>
+    request<VolunteerRequest>("/volunteer/request", {
+      method: "POST",
+      body: JSON.stringify({ message: message ?? null }),
+    }),
+  myRequest: () => request<VolunteerRequest | null>("/volunteer/request/mine"),
 };
 
 // ── User features ─────────────────────────────────────────────────────────
