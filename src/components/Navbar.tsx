@@ -27,9 +27,7 @@ export default function Navbar() {
           {user ? (
             <>
               <Link to="/shelf" className="hover:text-gray-900">My Shelf</Link>
-              {["volunteer", "admin"].includes(user.role.toLowerCase()) && (
-                <Link to="/contribute" className="hover:text-gray-900">Contribute</Link>
-              )}
+              <Link to="/contribute" className="hover:text-gray-900">Contribute</Link>
               {user.role.toLowerCase() === "admin" && (
                 <Link to="/admin" className="hover:text-gray-900 text-violet-600 font-medium">Admin</Link>
               )}
@@ -78,9 +76,7 @@ export default function Navbar() {
           {user ? (
             <>
               <Link to="/shelf" onClick={() => setMenuOpen(false)}>My Shelf</Link>
-              {["volunteer", "admin"].includes(user.role.toLowerCase()) && (
-                <Link to="/contribute" onClick={() => setMenuOpen(false)}>Contribute</Link>
-              )}
+              <Link to="/contribute" onClick={() => setMenuOpen(false)}>Contribute</Link>
               {user.role.toLowerCase() === "admin" && (
                 <Link to="/admin" onClick={() => setMenuOpen(false)} className="text-violet-600 font-medium">Admin</Link>
               )}
