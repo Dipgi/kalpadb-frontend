@@ -410,7 +410,8 @@ export const catalogue = {
   allTags: () =>
     request<{ id: number; tag_name: string; slug: string }[]>("/tags?flat=true"),
   series: () => request<Page<{ id: number; name: string }>>("/series?page_size=100"),
-  languages: () => request<{ code: string; name: string }[]>("/languages"),
+  // Browse filter: only languages that actually have works (self-maintaining).
+  languages: () => request<{ code: string; name: string }[]>("/languages?in_use=true"),
   allLanguages: () =>
     request<{ code: string; name: string; name_local: string | null }[]>(
       "/languages?active_only=false"
