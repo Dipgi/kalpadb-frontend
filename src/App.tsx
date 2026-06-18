@@ -22,6 +22,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminQueue from "./pages/admin/AdminQueue";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminVolunteerRequests from "./pages/admin/AdminVolunteerRequests";
 import AdminTagging from "./pages/admin/AdminTagging";
 import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
@@ -79,6 +80,7 @@ export default function App() {
                   <Route path="queue" element={<AdminQueue />} />
                   <Route path="news" element={<AdminNews />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="volunteer-requests" element={<AdminVolunteerRequests />} />
                   <Route path="tagging" element={<AdminTagging />} />
                   <Route path="add" element={<AdminAdd />} />
                   <Route path="catalogue" element={<AdminCatalogue />} />
