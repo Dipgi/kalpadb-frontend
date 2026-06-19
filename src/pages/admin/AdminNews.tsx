@@ -37,7 +37,7 @@ export default function AdminNews() {
     mutationFn: () => admin.news.update(editing!.id, {
       title: form.title,
       body: form.body,
-      summary: form.summary || undefined,
+      summary: form.summary,
       status: form.status,
       pinned: form.pinned,
     }),
