@@ -70,12 +70,12 @@ export default function PersonDetailPage() {
         <div className="flex-1">
           <div className="flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">{person.name}</h1>
-            {isAdmin && (
+            {user && ["admin", "volunteer"].includes(user.role.toLowerCase()) && (
               <Link
-                to={`/admin/edit-person/${person.id}`}
+                to={isAdmin ? `/admin/edit-person/${person.id}` : `/persons/${person.id}/edit`}
                 className="shrink-0 text-sm px-3 py-1.5 rounded-md border border-violet-300 text-violet-700 hover:bg-violet-50 transition-colors"
               >
-                Edit ✎
+                {isAdmin ? "Edit ✎" : "Suggest an edit ✎"}
               </Link>
             )}
           </div>

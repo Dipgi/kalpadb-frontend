@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { admin, type EditLogEntry } from "../../lib/api";
+import { admin, getConflictError, type EditLogEntry, type EditConflict } from "../../lib/api";
+import EditDiff from "../../components/EditDiff";
 
 export default function AdminQueue() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [rejectNote, setRejectNote] = useState<Record<number, string>>({});
   const [rejectOpen, setRejectOpen] = useState<number | null>(null);
+  // edit_id → conflicting fields, surfaced when a clean approve is blocked by drift.
+  const [conflicts, setConflicts] = useState<Record<number, EditConflict[]>>({});
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-queue", page],
@@ -14,11 +17,29 @@ export default function AdminQueue() {
   });
 
   const review = useMutation({
-    mutationFn: ({ id, approve, note }: { id: number; approve: boolean; note?: string }) =>
-      admin.queue.review(id, approve, note),
-    onSuccess: () => {
+    mutationFn: ({
+      id,
+      approve,
+      note,
+      force,
+    }: {
+      id: number;
+      approve: boolean;
+      note?: string;
+      force?: boolean;
+    }) => admin.queue.review(id, approve, note, force),
+    onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ["admin-queue"] });
       setRejectOpen(null);
+      setConflicts((c) => {
+        const next = { ...c };
+        delete next[vars.id];
+        return next;
+      });
+    },
+    onError: (err, vars) => {
+      const conflict = getConflictError(err);
+      if (conflict) setConflicts((c) => ({ ...c, [vars.id]: conflict.conflicts }));
     },
   });
 
@@ -87,14 +108,47 @@ export default function AdminQueue() {
                       </ul>
                     </div>
                   )}
-                  <details className="mt-2">
+                  {entry.submitter_note && (
+                    <p className="mt-2 text-xs text-gray-600">
+                      <span className="font-semibold text-gray-500">Contributor note:</span>{" "}
+                      {entry.submitter_note}
+                    </p>
+                  )}
+                  <details className="mt-2" open={entry.action.toLowerCase() === "update"}>
                     <summary className="text-xs text-violet-600 cursor-pointer hover:underline">
-                      View payload
+                      {entry.action.toLowerCase() === "update" ? "View changes" : "View details"}
                     </summary>
-                    <pre className="mt-1 text-xs bg-gray-50 border border-gray-100 rounded p-2 overflow-auto max-h-40">
-                      {JSON.stringify(entry.payload, null, 2)}
-                    </pre>
+                    <div className="mt-1">
+                      <EditDiff entry={entry} />
+                    </div>
                   </details>
+
+                  {conflicts[entry.id] && conflicts[entry.id].length > 0 && (
+                    <div className="mt-2 bg-amber-50 border border-amber-300 rounded-md px-3 py-2 text-xs">
+                      <p className="text-amber-900 font-medium mb-1">
+                        ⚠ This record changed since the edit was submitted — approving will overwrite
+                        the newer values:
+                      </p>
+                      <ul className="space-y-0.5 text-amber-900">
+                        {conflicts[entry.id].map((c) => (
+                          <li key={c.field}>
+                            <span className="font-mono">{c.field}</span>: now{" "}
+                            <span className="font-medium">{String(c.current ?? "—")}</span> (edit was
+                            based on <span className="line-through">{String(c.base ?? "—")}</span>)
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        disabled={review.isPending}
+                        onClick={() =>
+                          review.mutate({ id: entry.id, approve: true, force: true })
+                        }
+                        className="mt-2 text-xs px-3 py-1 bg-amber-600 text-white rounded-md hover:bg-amber-700 disabled:opacity-60 transition-colors"
+                      >
+                        Approve anyway (overwrite)
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col gap-2 shrink-0">

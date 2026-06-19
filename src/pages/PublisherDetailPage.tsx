@@ -58,12 +58,12 @@ export default function PublisherDetailPage() {
             <p className="text-sm text-gray-600 leading-relaxed mt-3 max-w-2xl">{publisher.description}</p>
           )}
         </div>
-        {isAdmin && (
+        {user && ["admin", "volunteer"].includes(user.role.toLowerCase()) && (
           <Link
-            to={`/admin/edit-publisher/${publisher.id}`}
+            to={isAdmin ? `/admin/edit-publisher/${publisher.id}` : `/publishers/${publisher.id}/edit`}
             className="shrink-0 text-sm px-3 py-1.5 rounded-md border border-violet-300 text-violet-700 hover:bg-violet-50 transition-colors"
           >
-            Edit ✎
+            {isAdmin ? "Edit ✎" : "Suggest an edit ✎"}
           </Link>
         )}
       </div>

@@ -28,6 +28,9 @@ export default function Navbar() {
             <>
               <Link to="/shelf" className="hover:text-gray-900">My Shelf</Link>
               <Link to="/contribute" className="hover:text-gray-900">Contribute</Link>
+              {["admin", "volunteer"].includes(user.role.toLowerCase()) && (
+                <Link to="/my-submissions" className="hover:text-gray-900">My Submissions</Link>
+              )}
               {user.role.toLowerCase() === "admin" && (
                 <Link to="/admin" className="hover:text-gray-900 text-violet-600 font-medium">Admin</Link>
               )}
@@ -77,6 +80,9 @@ export default function Navbar() {
             <>
               <Link to="/shelf" onClick={() => setMenuOpen(false)}>My Shelf</Link>
               <Link to="/contribute" onClick={() => setMenuOpen(false)}>Contribute</Link>
+              {["admin", "volunteer"].includes(user.role.toLowerCase()) && (
+                <Link to="/my-submissions" onClick={() => setMenuOpen(false)}>My Submissions</Link>
+              )}
               {user.role.toLowerCase() === "admin" && (
                 <Link to="/admin" onClick={() => setMenuOpen(false)} className="text-violet-600 font-medium">Admin</Link>
               )}

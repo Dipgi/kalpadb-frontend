@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail, type BookUpdateIn } from "../../lib/api";
+import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import ImageUploadField from "../../components/ImageUploadField";
+import ContributorGate from "../../components/ContributorGate";
+import EditNoteField from "../../components/EditNoteField";
+import EditSavedBanner from "../../components/EditSavedBanner";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 const inputCls =
@@ -55,11 +59,18 @@ export default function AdminEditBook() {
       </div>
     );
   }
-  return <EditForm key={work.id} work={work} />;
+  return (
+    <ContributorGate>
+      <EditForm key={work.id} work={work} />
+    </ContributorGate>
+  );
 }
 
 function EditForm({ work }: { work: WorkDetail }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
+  const isAdmin = user?.role.toLowerCase() === "admin";
+  const [note, setNote] = useState("");
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
@@ -183,14 +194,17 @@ function EditForm({ work }: { work: WorkDetail }) {
         edition_notes: editionNotes.trim() || null,
         // empty list clears the work-level cover (null would mean "no change")
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
-      });
-      return admin.queue.review(sub.edit_id, true, "Direct admin edit");
+      }, isAdmin ? undefined : note);
+      if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
+      return sub;
     },
     onSuccess: () => {
       setSaved(true);
-      qc.invalidateQueries({ queryKey: ["work", String(work.id)] });
-      qc.invalidateQueries({ queryKey: ["works"] });
-      qc.invalidateQueries({ queryKey: ["genres"] });
+      if (isAdmin) {
+        qc.invalidateQueries({ queryKey: ["work", String(work.id)] });
+        qc.invalidateQueries({ queryKey: ["works"] });
+        qc.invalidateQueries({ queryKey: ["genres"] });
+      }
     },
   });
 
@@ -209,12 +223,7 @@ function EditForm({ work }: { work: WorkDetail }) {
       </h1>
 
       {saved && (
-        <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md px-4 py-3">
-          Saved.{" "}
-          <Link to={`/works/${work.id}`} className="underline font-medium">
-            View book →
-          </Link>
-        </div>
+        <EditSavedBanner isAdmin={!!isAdmin} viewHref={`/works/${work.id}`} viewLabel="View book" />
       )}
 
       <div>
@@ -343,7 +352,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={authors}
         onChange={setAuthors}
-        onCreate={createPersonInline}
+        onCreate={isAdmin ? createPersonInline : undefined}
       />
 
       <EntityPicker
@@ -353,7 +362,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={editors}
         onChange={setEditors}
-        onCreate={createPersonInline}
+        onCreate={isAdmin ? createPersonInline : undefined}
       />
 
       <EntityPicker
@@ -363,7 +372,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={translators}
         onChange={setTranslators}
-        onCreate={createPersonInline}
+        onCreate={isAdmin ? createPersonInline : undefined}
       />
 
       <EntityPicker
@@ -373,7 +382,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={illustrators}
         onChange={setIllustrators}
-        onCreate={createPersonInline}
+        onCreate={isAdmin ? createPersonInline : undefined}
       />
 
       <EntityPicker
@@ -383,7 +392,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={coverArtists}
         onChange={setCoverArtists}
-        onCreate={createPersonInline}
+        onCreate={isAdmin ? createPersonInline : undefined}
       />
 
       <EntityPicker
@@ -393,7 +402,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.publishers(q)}
         selected={publishers}
         onChange={setPublishers}
-        onCreate={createPublisherInline}
+        onCreate={isAdmin ? createPublisherInline : undefined}
       />
 
       <div>
@@ -492,13 +501,21 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       )}
 
+      <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
+
       <div className="flex items-center gap-3 pt-2">
         <button
           type="submit"
           disabled={mutation.isPending}
           className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
         >
-          {mutation.isPending ? "Saving…" : "Save changes"}
+          {mutation.isPending
+            ? isAdmin
+              ? "Saving…"
+              : "Submitting…"
+            : isAdmin
+              ? "Save changes"
+              : "Submit for review"}
         </button>
         <Link to={`/works/${work.id}`} className="text-sm text-gray-500 hover:text-gray-700">
           Cancel
@@ -507,27 +524,29 @@ function EditForm({ work }: { work: WorkDetail }) {
           <span className="text-sm text-red-500">Save failed — try again.</span>
         )}
 
-        <button
-          type="button"
-          disabled={deleteMutation.isPending}
-          onClick={() => {
-            if (confirmDelete) deleteMutation.mutate();
-            else setConfirmDelete(true);
-          }}
-          onBlur={() => setConfirmDelete(false)}
-          className={`ml-auto text-sm px-4 py-2 rounded-md border transition-colors disabled:opacity-40 ${
-            confirmDelete
-              ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
-              : "border-red-300 text-red-600 hover:bg-red-50"
-          }`}
-        >
-          {deleteMutation.isPending
-            ? "Deleting…"
-            : confirmDelete
-              ? "Click again to permanently delete"
-              : "Delete book"}
-        </button>
-        {deleteMutation.isError && (
+        {isAdmin && (
+          <button
+            type="button"
+            disabled={deleteMutation.isPending}
+            onClick={() => {
+              if (confirmDelete) deleteMutation.mutate();
+              else setConfirmDelete(true);
+            }}
+            onBlur={() => setConfirmDelete(false)}
+            className={`ml-auto text-sm px-4 py-2 rounded-md border transition-colors disabled:opacity-40 ${
+              confirmDelete
+                ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
+                : "border-red-300 text-red-600 hover:bg-red-50"
+            }`}
+          >
+            {deleteMutation.isPending
+              ? "Deleting…"
+              : confirmDelete
+                ? "Click again to permanently delete"
+                : "Delete book"}
+          </button>
+        )}
+        {isAdmin && deleteMutation.isError && (
           <span className="text-sm text-red-500">Delete failed.</span>
         )}
       </div>

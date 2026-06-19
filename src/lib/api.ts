@@ -480,6 +480,20 @@ export interface NewsPost {
   author: { id: number; username: string };
 }
 
+/** One changed field in an UPDATE diff: before (`from`) and after (`to`). */
+export interface DiffChange {
+  from?: unknown;
+  to: unknown;
+}
+
+/** A field whose live value drifted from the submitted base, blocking a clean approve. */
+export interface EditConflict {
+  field: string;
+  base: unknown;
+  current: unknown;
+  submitted: unknown;
+}
+
 export interface EditLogEntry {
   id: number;
   table_name: string;
@@ -487,6 +501,9 @@ export interface EditLogEntry {
   action: string;
   status: string;
   payload: Record<string, unknown>;
+  /** UPDATE only: {field: {from, to}}. Null for CREATE/DELETE. */
+  diff: Record<string, DiffChange> | null;
+  submitter_note: string | null;
   reviewer_note: string | null;
   submitted_at: string | null;
   reviewed_at: string | null;
@@ -494,6 +511,25 @@ export interface EditLogEntry {
   reviewed_by: { id: number; username: string } | null;
   /** Existing similar-name records, for pending person/publisher creates. */
   duplicate_candidates?: DuplicateCandidate[];
+  /** Populated on the review-detail endpoint when a pending UPDATE's base drifted. */
+  conflicts?: EditConflict[];
+}
+
+export interface ConflictDetail {
+  message: string;
+  conflicts: EditConflict[];
+}
+
+/**
+ * If `err` is a 409 base-conflict from approving an UPDATE, return its structured
+ * detail (the drifted fields); otherwise null.
+ */
+export function getConflictError(err: unknown): ConflictDetail | null {
+  if (err instanceof ApiError && err.status === 409) {
+    const d = err.detail as Partial<ConflictDetail> | undefined;
+    if (d && Array.isArray(d.conflicts)) return d as ConflictDetail;
+  }
+  return null;
 }
 
 export interface AdminUser {
@@ -554,10 +590,11 @@ export const admin = {
   queue: {
     list: (page = 1) =>
       request<Page<EditLogEntry>>(`/admin/queue?page=${page}&page_size=20`),
-    review: (id: number, approve: boolean, reviewer_note?: string) =>
+    get: (id: number) => request<EditLogEntry>(`/admin/queue/${id}`),
+    review: (id: number, approve: boolean, reviewer_note?: string, force = false) =>
       request<EditLogEntry>(`/admin/queue/${id}/review`, {
         method: "POST",
-        body: JSON.stringify({ approve, reviewer_note: reviewer_note ?? null }),
+        body: JSON.stringify({ approve, reviewer_note: reviewer_note ?? null, force }),
       }),
   },
 
@@ -736,11 +773,16 @@ export interface SeriesCreateIn {
   slug?: string | null;
 }
 
+/** Append a reviewer note as a query param (submission metadata, not part of the body). */
+function noteQuery(note?: string | null): string {
+  return note && note.trim() ? `?note=${encodeURIComponent(note.trim())}` : "";
+}
+
 export const volunteer = {
   submitBook: (data: BookCreateIn) =>
     request<EditSubmission>("/works/books", { method: "POST", body: JSON.stringify(data) }),
-  updateBook: (work_id: number, data: BookUpdateIn) =>
-    request<EditSubmission>(`/works/books/${work_id}`, {
+  updateBook: (work_id: number, data: BookUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/books/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
@@ -749,17 +791,31 @@ export const volunteer = {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  updatePerson: (id: number, data: PersonUpdateIn) =>
-    request<EditSubmission>(`/persons/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  updatePerson: (id: number, data: PersonUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/persons/${id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
   submitPublisher: (data: PublisherCreateIn, allowDuplicate = false) =>
     request<EditSubmission>(`/publishers${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  updatePublisher: (id: number, data: PublisherUpdateIn) =>
-    request<EditSubmission>(`/publishers/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  updatePublisher: (id: number, data: PublisherUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/publishers/${id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
   submitSeries: (data: SeriesCreateIn) =>
     request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
+
+  // A volunteer's own submission history (read-only) + withdraw a pending one.
+  mySubmissions: (status?: "pending" | "approved" | "rejected", page = 1) =>
+    request<Page<EditLogEntry>>(
+      `/volunteer/submissions?page=${page}&page_size=25${status ? `&status=${status}` : ""}`
+    ),
+  withdrawSubmission: (id: number) =>
+    request(`/volunteer/submissions/${id}`, { method: "DELETE" }),
 
   // Self-service volunteer-access request (any signed-in USER).
   requestAccess: (message?: string | null) =>

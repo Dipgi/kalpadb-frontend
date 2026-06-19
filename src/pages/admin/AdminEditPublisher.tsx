@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, ApiError, type PublisherDetail } from "../../lib/api";
+import { useAuth } from "../../hooks/useAuth";
 import ImageUploadField from "../../components/ImageUploadField";
+import ContributorGate from "../../components/ContributorGate";
+import EditNoteField from "../../components/EditNoteField";
+import EditSavedBanner from "../../components/EditSavedBanner";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -18,12 +22,18 @@ export default function AdminEditPublisher() {
 
   if (isLoading) return <div className="text-gray-400 py-12 text-center">Loading publisher…</div>;
   if (!publisher) return <div className="text-gray-400 py-12 text-center">Publisher not found.</div>;
-  return <EditForm key={publisher.id} publisher={publisher} />;
+  return (
+    <ContributorGate>
+      <EditForm key={publisher.id} publisher={publisher} />
+    </ContributorGate>
+  );
 }
 
 function EditForm({ publisher }: { publisher: PublisherDetail }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role.toLowerCase() === "admin";
 
   const [name, setName] = useState(publisher.name);
   const [city, setCity] = useState(publisher.city ?? "");
@@ -33,26 +43,32 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
   const [website, setWebsite] = useState(publisher.website ?? "");
   const [description, setDescription] = useState(publisher.description ?? "");
   const [imageUrl, setImageUrl] = useState(publisher.image_url ?? "");
+  const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const sub = await volunteer.updatePublisher(publisher.id, {
-        name: name.trim(),
-        city: city.trim() || null,
-        country: country.trim() || null,
-        founded_year: foundedYear ? Number(foundedYear) : null,
-        defunct_year: defunctYear ? Number(defunctYear) : null,
-        website: website.trim() || null,
-        description: description.trim() || null,
-        image_url: imageUrl.trim() || null,
-      });
-      return admin.queue.review(sub.edit_id, true, "Direct admin edit");
+      const sub = await volunteer.updatePublisher(
+        publisher.id,
+        {
+          name: name.trim(),
+          city: city.trim() || null,
+          country: country.trim() || null,
+          founded_year: foundedYear ? Number(foundedYear) : null,
+          defunct_year: defunctYear ? Number(defunctYear) : null,
+          website: website.trim() || null,
+          description: description.trim() || null,
+          image_url: imageUrl.trim() || null,
+        },
+        isAdmin ? undefined : note,
+      );
+      if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
+      return sub;
     },
     onSuccess: () => {
       setSaved(true);
-      qc.invalidateQueries({ queryKey: ["publisher", String(publisher.id)] });
+      if (isAdmin) qc.invalidateQueries({ queryKey: ["publisher", String(publisher.id)] });
     },
   });
 
@@ -86,9 +102,11 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
       </h1>
 
       {saved && (
-        <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md px-4 py-3">
-          Saved.
-        </div>
+        <EditSavedBanner
+          isAdmin={!!isAdmin}
+          viewHref={`/publishers/${publisher.id}`}
+          viewLabel="View publisher"
+        />
       )}
 
       <div>
@@ -153,41 +171,54 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         Leaving a field blank keeps its current value (it won't clear it).
       </p>
 
+      <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
+
       <div className="flex items-center gap-3 pt-2">
         <button
           type="submit"
           disabled={mutation.isPending}
           className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
         >
-          {mutation.isPending ? "Saving…" : "Save changes"}
+          {mutation.isPending
+            ? isAdmin
+              ? "Saving…"
+              : "Submitting…"
+            : isAdmin
+              ? "Save changes"
+              : "Submit for review"}
         </button>
-        <Link to="/admin/catalogue" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link
+          to={isAdmin ? "/admin/catalogue" : `/publishers/${publisher.id}`}
+          className="text-sm text-gray-500 hover:text-gray-700"
+        >
           Cancel
         </Link>
         {mutation.isError && <span className="text-sm text-red-500">Save failed — try again.</span>}
 
-        <button
-          type="button"
-          disabled={deleteMutation.isPending}
-          onClick={() => {
-            if (confirmDelete) deleteMutation.mutate();
-            else setConfirmDelete(true);
-          }}
-          onBlur={() => setConfirmDelete(false)}
-          className={`ml-auto text-sm px-4 py-2 rounded-md border transition-colors disabled:opacity-40 ${
-            confirmDelete
-              ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
-              : "border-red-300 text-red-600 hover:bg-red-50"
-          }`}
-        >
-          {deleteMutation.isPending
-            ? "Deleting…"
-            : confirmDelete
-              ? "Click again to permanently delete"
-              : "Delete publisher"}
-        </button>
+        {isAdmin && (
+          <button
+            type="button"
+            disabled={deleteMutation.isPending}
+            onClick={() => {
+              if (confirmDelete) deleteMutation.mutate();
+              else setConfirmDelete(true);
+            }}
+            onBlur={() => setConfirmDelete(false)}
+            className={`ml-auto text-sm px-4 py-2 rounded-md border transition-colors disabled:opacity-40 ${
+              confirmDelete
+                ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
+                : "border-red-300 text-red-600 hover:bg-red-50"
+            }`}
+          >
+            {deleteMutation.isPending
+              ? "Deleting…"
+              : confirmDelete
+                ? "Click again to permanently delete"
+                : "Delete publisher"}
+          </button>
+        )}
       </div>
-      {deleteErr && <p className="text-sm text-red-500 text-right">{deleteErr}</p>}
+      {isAdmin && deleteErr && <p className="text-sm text-red-500 text-right">{deleteErr}</p>}
     </form>
   );
 }

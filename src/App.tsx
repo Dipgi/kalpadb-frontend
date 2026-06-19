@@ -31,6 +31,7 @@ import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
 import AdminCatalogue from "./pages/admin/AdminCatalogue";
 import AdminAudit from "./pages/admin/AdminAudit";
 import ContributePage from "./pages/ContributePage";
+import MySubmissionsPage from "./pages/MySubmissionsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
 import LicensePage from "./pages/LicensePage";
 import CitePage from "./pages/CitePage";
@@ -72,6 +73,31 @@ export default function App() {
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/shelf" element={<ShelfPage />} />
                 <Route path="/contribute" element={<ContributePage />} />
+                <Route path="/my-submissions" element={<MySubmissionsPage />} />
+                <Route
+                  path="/works/:id/edit"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditBook />
+                    </div>
+                  }
+                />
+                <Route
+                  path="/persons/:id/edit"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditPerson />
+                    </div>
+                  }
+                />
+                <Route
+                  path="/publishers/:id/edit"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditPublisher />
+                    </div>
+                  }
+                />
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
                 <Route path="/license" element={<LicensePage />} />
                 <Route path="/cite" element={<CitePage />} />
