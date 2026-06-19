@@ -30,6 +30,7 @@ export default function AdminQueue() {
     }) => admin.queue.review(id, approve, note, force),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: ["admin-queue"] });
+      qc.invalidateQueries({ queryKey: ["admin-pending-counts"] });
       setRejectOpen(null);
       setConflicts((c) => {
         const next = { ...c };
