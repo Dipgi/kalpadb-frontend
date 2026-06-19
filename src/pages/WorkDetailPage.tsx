@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, user, admin, catalogue, type Rating, type PublicReview } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
+import { romanisedTitle } from "../lib/title";
 import { Stars, StarPicker } from "../components/StarRating";
 
 const SHELF_STATUSES: { value: string; label: string }[] = [
@@ -133,6 +134,11 @@ export default function WorkDetailPage() {
                 </Link>
               )}
           </div>
+          {romanisedTitle(work.localised, work.title) && (
+            <p className="text-base text-gray-400 italic mb-1">
+              {romanisedTitle(work.localised, work.title)}
+            </p>
+          )}
           <p className="text-gray-500 mb-3">
             {work.authors.map((a, i) => (
               <span key={a.id}>

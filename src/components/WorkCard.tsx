@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import type { WorkSummary } from "../lib/api";
+import { romanisedTitle } from "../lib/title";
 
 export default function WorkCard({ work }: { work: WorkSummary }) {
   const author = work.authors[0]?.name ?? "Unknown";
   const moreAuthors = work.authors.length > 1 ? ` +${work.authors.length - 1}` : "";
   const year = work.publication_date ? work.publication_date.slice(0, 4) : null;
+  const roman = romanisedTitle(work.localised, work.title);
 
   return (
     <Link
@@ -31,6 +33,9 @@ export default function WorkCard({ work }: { work: WorkSummary }) {
         <p className="text-sm font-medium text-gray-900 leading-snug line-clamp-2">
           {work.title}
         </p>
+        {roman && (
+          <p className="text-xs text-gray-400 italic leading-snug line-clamp-1">{roman}</p>
+        )}
         <p className="text-xs text-gray-500">
           {author}{moreAuthors}
         </p>
