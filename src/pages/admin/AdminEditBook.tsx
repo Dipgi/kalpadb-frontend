@@ -241,7 +241,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
@@ -289,7 +289,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Edition label</label>
           <input
@@ -310,7 +310,7 @@ function EditForm({ work }: { work: WorkDetail }) {
       </div>
 
       {seriesList.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Series</label>
             <select
@@ -432,7 +432,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div>
           <label className={labelCls}>Format</label>
           <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className={inputCls}>

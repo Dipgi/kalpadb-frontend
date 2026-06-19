@@ -113,7 +113,7 @@ function EditForm({ person }: { person: Person }) {
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Primary role (hint)</label>
           <select value={roleType} onChange={(e) => setRoleType(e.target.value)} className={inputCls}>

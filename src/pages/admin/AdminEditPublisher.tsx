@@ -114,7 +114,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>City</label>
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
@@ -125,7 +125,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Founded year</label>
           <input

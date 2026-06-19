@@ -77,7 +77,7 @@ export default function AdminDashboard() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
           ))}

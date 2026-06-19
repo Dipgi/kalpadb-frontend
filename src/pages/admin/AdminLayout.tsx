@@ -33,23 +33,25 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 flex gap-8">
-      {/* Sidebar */}
-      <nav className="w-44 shrink-0">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Admin</p>
-        <ul className="space-y-1">
+    <div className="max-w-6xl mx-auto px-4 py-6 md:py-8 md:flex md:gap-8">
+      {/* Nav: horizontal scrollable strip on mobile, fixed sidebar on md+ */}
+      <nav className="md:w-44 md:shrink-0 mb-5 md:mb-0">
+        <p className="hidden md:block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+          Admin
+        </p>
+        <ul className="flex gap-1 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:pb-0 md:flex-col md:overflow-visible md:space-y-1">
           {NAV.map(({ to, label, end, badge }) => {
             const count = badge ? counts?.[badge] ?? 0 : 0;
             return (
-              <li key={to}>
+              <li key={to} className="shrink-0">
                 <NavLink
                   to={to}
                   end={end}
                   className={({ isActive }) =>
-                    `flex items-center justify-between gap-2 px-3 py-2 rounded-md text-sm transition-colors ${
+                    `flex items-center gap-2 whitespace-nowrap px-3 py-2 rounded-md text-sm transition-colors md:justify-between ${
                       isActive
                         ? "bg-violet-100 text-violet-700 font-medium"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-gray-600 bg-gray-50 md:bg-transparent hover:bg-gray-100"
                     }`
                   }
                 >

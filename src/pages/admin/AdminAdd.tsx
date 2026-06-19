@@ -243,7 +243,7 @@ function BookForm() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
@@ -280,7 +280,7 @@ function BookForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Publication year</label>
           <input
@@ -308,7 +308,7 @@ function BookForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Format</label>
           <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className={inputCls}>
@@ -331,7 +331,7 @@ function BookForm() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Price</label>
           <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 250" className={inputCls} />
@@ -347,7 +347,7 @@ function BookForm() {
       </div>
 
       {seriesList.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Series</label>
             <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
@@ -371,7 +371,7 @@ function BookForm() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Edition label</label>
           <input value={editionLabel} onChange={(e) => setEditionLabel(e.target.value)} placeholder="e.g. First Edition" className={inputCls} />
@@ -582,7 +582,7 @@ function PersonForm() {
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Primary role (hint)</label>
           <select value={roleType} onChange={(e) => setRoleType(e.target.value)} className={inputCls}>
@@ -692,7 +692,7 @@ function PublisherForm() {
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>City</label>
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
