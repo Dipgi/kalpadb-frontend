@@ -519,6 +519,7 @@ function PersonForm() {
   const [nationality, setNationality] = useState("Indian");
   const [roleType, setRoleType] = useState("author");
   const [birthDate, setBirthDate] = useState("");
+  const [deathDate, setDeathDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [createdId, setCreatedId] = useState<number | null>(null);
   const [dup, setDup] = useState<DuplicateError | null>(null);
@@ -533,6 +534,7 @@ function PersonForm() {
             nationality: nationality.trim() || null,
             role_type: roleType.trim() || null,
             birth_date: birthDate || null,
+            end_date: deathDate || null,
             image_url: imageUrl.trim() || null,
           },
           allowDuplicate,
@@ -544,6 +546,7 @@ function PersonForm() {
       setName("");
       setBio("");
       setBirthDate("");
+      setDeathDate("");
       setImageUrl("");
     },
     onError: (err) => setDup(getDuplicateError(err)),
@@ -599,6 +602,10 @@ function PersonForm() {
         <div>
           <label className={labelCls}>Birth date</label>
           <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Death date</label>
+          <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
         </div>
       </div>
 

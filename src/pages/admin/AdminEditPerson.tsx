@@ -41,6 +41,7 @@ function EditForm({ person }: { person: Person }) {
   const [roleType, setRoleType] = useState(person.role_type ?? "author");
   const [nationality, setNationality] = useState(person.nationality ?? "");
   const [birthDate, setBirthDate] = useState(person.birth_date ?? "");
+  const [deathDate, setDeathDate] = useState(person.end_date ?? "");
   const [bio, setBio] = useState(person.bio ?? "");
   const [imageUrl, setImageUrl] = useState(person.image_url ?? "");
   const [note, setNote] = useState("");
@@ -57,6 +58,7 @@ function EditForm({ person }: { person: Person }) {
           nationality: nationality.trim() || null,
           role_type: roleType.trim() || null,
           birth_date: birthDate || null,
+          end_date: deathDate || null,
           image_url: imageUrl.trim() || null,
         },
         isAdmin ? undefined : note,
@@ -135,6 +137,10 @@ function EditForm({ person }: { person: Person }) {
         <div>
           <label className={labelCls}>Birth date</label>
           <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Death date</label>
+          <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
         </div>
       </div>
 

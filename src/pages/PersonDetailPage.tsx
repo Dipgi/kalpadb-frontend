@@ -82,8 +82,14 @@ export default function PersonDetailPage() {
 
           <div className="flex flex-wrap gap-3 text-sm text-gray-500 mb-3">
             {person.nationality && <span>{person.nationality}</span>}
-            {person.birth_date && (
-              <span>b. {person.birth_date.slice(0, 4)}</span>
+            {(person.birth_date || person.end_date) && (
+              <span>
+                {person.birth_date && person.end_date
+                  ? `${person.birth_date.slice(0, 4)}–${person.end_date.slice(0, 4)}`
+                  : person.birth_date
+                    ? `b. ${person.birth_date.slice(0, 4)}`
+                    : `d. ${person.end_date!.slice(0, 4)}`}
+              </span>
             )}
             {/* Fall back to the role_type hint only when there are no real credits yet. */}
             {person.roles.length === 0 && person.role_type && (

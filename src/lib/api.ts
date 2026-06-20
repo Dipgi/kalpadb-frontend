@@ -712,6 +712,7 @@ export interface PersonCreateIn {
   nationality?: string | null;
   role_type?: string | null;
   birth_date?: string | null;
+  end_date?: string | null;
   image_url?: string | null;
 }
 
@@ -754,6 +755,7 @@ export interface PersonUpdateIn {
   nationality?: string | null;
   role_type?: string | null;
   birth_date?: string | null;
+  end_date?: string | null;
   image_url?: string | null;
 }
 
