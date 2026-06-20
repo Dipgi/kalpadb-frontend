@@ -41,7 +41,16 @@ export default function PublisherDetailPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       <div className="flex items-start justify-between gap-3 mb-6">
-        <div>
+        <div className="flex items-start gap-4 min-w-0">
+          {publisher.image_url && (
+            <img
+              src={publisher.image_url}
+              alt={`${publisher.name} logo`}
+              className="w-20 h-20 object-contain rounded-md border border-gray-200 bg-white p-1 shrink-0"
+              onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+            />
+          )}
+          <div className="min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">{publisher.name}</h1>
           {meta.length > 0 && <p className="text-sm text-gray-500">{meta.join(" · ")}</p>}
           {publisher.website && (
@@ -57,6 +66,7 @@ export default function PublisherDetailPage() {
           {publisher.description && (
             <p className="text-sm text-gray-600 leading-relaxed mt-3 max-w-2xl">{publisher.description}</p>
           )}
+          </div>
         </div>
         {user && ["admin", "volunteer"].includes(user.role.toLowerCase()) && (
           <Link

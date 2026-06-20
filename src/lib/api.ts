@@ -218,6 +218,7 @@ export interface PublisherSummary {
   slug: string | null;
   city: string | null;
   country: string | null;
+  image_url: string | null;
 }
 
 export interface SearchResult {

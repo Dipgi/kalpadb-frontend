@@ -86,14 +86,24 @@ export default function BrowsePublishersPage() {
               <Link
                 key={p.id}
                 to={`/publishers/${p.id}`}
-                className="border border-gray-200 rounded-lg px-4 py-3 hover:shadow-sm transition-shadow bg-white"
+                className="flex items-center gap-3 border border-gray-200 rounded-lg px-4 py-3 hover:shadow-sm transition-shadow bg-white"
               >
-                <p className="text-sm font-medium text-gray-900">{p.name}</p>
-                {(p.city || p.country) && (
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {[p.city, p.country].filter(Boolean).join(", ")}
-                  </p>
+                {p.image_url && (
+                  <img
+                    src={p.image_url}
+                    alt={`${p.name} logo`}
+                    className="w-10 h-10 object-contain rounded shrink-0"
+                    onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+                  />
                 )}
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                  {(p.city || p.country) && (
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {[p.city, p.country].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                </div>
               </Link>
             ))}
           </div>
