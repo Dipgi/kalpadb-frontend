@@ -69,7 +69,10 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
     },
     onSuccess: () => {
       setSaved(true);
-      if (isAdmin) qc.invalidateQueries({ queryKey: ["publisher", String(publisher.id)] });
+      if (isAdmin) {
+        qc.invalidateQueries({ queryKey: ["publisher", String(publisher.id)] });
+        qc.invalidateQueries({ queryKey: ["publishers-list"] });
+      }
     },
   });
 

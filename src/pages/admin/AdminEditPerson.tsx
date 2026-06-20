@@ -67,7 +67,10 @@ function EditForm({ person }: { person: Person }) {
     },
     onSuccess: () => {
       setSaved(true);
-      if (isAdmin) qc.invalidateQueries({ queryKey: ["person", String(person.id)] });
+      if (isAdmin) {
+        qc.invalidateQueries({ queryKey: ["person", String(person.id)] });
+        qc.invalidateQueries({ queryKey: ["persons-list"] });
+      }
     },
   });
 
