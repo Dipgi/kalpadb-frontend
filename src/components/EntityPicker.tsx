@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getDuplicateError, type DuplicateCandidate } from "../lib/api";
 
 export interface PickerItem {
@@ -32,6 +32,7 @@ export default function EntityPicker({
    */
   onCreate?: (name: string, opts?: { allowDuplicate?: boolean }) => Promise<PickerItem>;
 }) {
+  const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [creating, setCreating] = useState(false);
   // Possible duplicates returned by the backend when the user tried to create.
@@ -59,6 +60,9 @@ export default function EntityPicker({
     setCreating(true);
     try {
       const created = await onCreate(term, { allowDuplicate });
+      // The new record now exists live — drop this search cache so every picker of
+      // this type (and a re-search of the same term) finds it without a hard refresh.
+      qc.invalidateQueries({ queryKey: [fetchKey] });
       pick(created);
     } catch (err) {
       const dup = getDuplicateError(err);

@@ -25,15 +25,21 @@ const AVAILABILITY_OPTIONS = [
 ];
 
 /** Inline-create a person (name only), auto-approved, returned as a picker item. */
-async function createPersonInline(name: string): Promise<PickerItem> {
-  const sub = await volunteer.submitPerson({ name });
+async function createPersonInline(
+  name: string,
+  opts?: { allowDuplicate?: boolean },
+): Promise<PickerItem> {
+  const sub = await volunteer.submitPerson({ name }, opts?.allowDuplicate);
   const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
   return { id: entry.record_id!, name };
 }
 
 /** Inline-create a publisher (name only), auto-approved, returned as a picker item. */
-async function createPublisherInline(name: string): Promise<PickerItem> {
-  const sub = await volunteer.submitPublisher({ name });
+async function createPublisherInline(
+  name: string,
+  opts?: { allowDuplicate?: boolean },
+): Promise<PickerItem> {
+  const sub = await volunteer.submitPublisher({ name }, opts?.allowDuplicate);
   const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
   return { id: entry.record_id!, name };
 }
