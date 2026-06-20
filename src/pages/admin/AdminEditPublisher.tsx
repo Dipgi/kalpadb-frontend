@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, ApiError, type PublisherDetail } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import ImageUploadField from "../../components/ImageUploadField";
+import CountrySelect from "../../components/CountrySelect";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
@@ -120,8 +121,8 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Country code</label>
-          <input value={country} onChange={(e) => setCountry(e.target.value)} maxLength={10} className={inputCls} />
+          <label className={labelCls}>Country</label>
+          <CountrySelect value={country} onChange={setCountry} />
         </div>
       </div>
 
