@@ -35,6 +35,8 @@ import MySubmissionsPage from "./pages/MySubmissionsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
 import LicensePage from "./pages/LicensePage";
 import CitePage from "./pages/CitePage";
+import HelpPage from "./pages/HelpPage";
+import AdminGuide from "./pages/admin/AdminGuide";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -101,6 +103,7 @@ export default function App() {
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
                 <Route path="/license" element={<LicensePage />} />
                 <Route path="/cite" element={<CitePage />} />
+                <Route path="/help" element={<HelpPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="queue" element={<AdminQueue />} />
@@ -111,6 +114,7 @@ export default function App() {
                   <Route path="add" element={<AdminAdd />} />
                   <Route path="catalogue" element={<AdminCatalogue />} />
                   <Route path="audit" element={<AdminAudit />} />
+                  <Route path="guide" element={<AdminGuide />} />
                   <Route path="edit/:id" element={<AdminEditBook />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
@@ -128,6 +132,8 @@ export default function App() {
                 >
                   Data under CC BY-SA 4.0
                 </a>
+                <span aria-hidden>·</span>
+                <Link to="/help" className="hover:text-violet-700">Help</Link>
                 <span aria-hidden>·</span>
                 <Link to="/license" className="hover:text-violet-700">License</Link>
                 <span aria-hidden>·</span>

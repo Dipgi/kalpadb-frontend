@@ -24,6 +24,7 @@ export default function Navbar() {
           <Link to="/persons" className="hover:text-gray-900">People</Link>
           <Link to="/publishers" className="hover:text-gray-900">Publishers</Link>
           <Link to="/search" className="hover:text-gray-900">Search</Link>
+          <Link to="/help" className="hover:text-gray-900">Help</Link>
           {user ? (
             <>
               <Link to="/shelf" className="hover:text-gray-900">My Shelf</Link>
@@ -76,6 +77,7 @@ export default function Navbar() {
           <Link to="/persons" onClick={() => setMenuOpen(false)}>People</Link>
           <Link to="/publishers" onClick={() => setMenuOpen(false)}>Publishers</Link>
           <Link to="/search" onClick={() => setMenuOpen(false)}>Search</Link>
+          <Link to="/help" onClick={() => setMenuOpen(false)}>Help</Link>
           {user ? (
             <>
               <Link to="/shelf" onClick={() => setMenuOpen(false)}>My Shelf</Link>
