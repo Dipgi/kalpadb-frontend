@@ -80,6 +80,12 @@ export default function PersonDetailPage() {
             )}
           </div>
 
+          {person.primary_language && person.localised?.name?.[person.primary_language] && (
+            <p className="text-lg text-gray-600 mb-1" lang={person.primary_language}>
+              {person.localised.name[person.primary_language]}
+            </p>
+          )}
+
           <div className="flex flex-wrap gap-3 text-sm text-gray-500 mb-3">
             {person.nationality && <span>{person.nationality}</span>}
             {(person.birth_date || person.end_date) && (

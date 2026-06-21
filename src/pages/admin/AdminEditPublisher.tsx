@@ -9,6 +9,7 @@ import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
+import NativeNameField from "../../components/NativeNameField";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -46,12 +47,19 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
   const [description, setDescription] = useState(publisher.description ?? "");
   const [imageUrl, setImageUrl] = useState(publisher.image_url ?? "");
   const [primaryLanguage, setPrimaryLanguage] = useState(publisher.primary_language ?? "");
+  const [nativeName, setNativeName] = useState(
+    publisher.primary_language ? (publisher.localised?.name?.[publisher.primary_language] ?? "") : "",
+  );
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const localised =
+        primaryLanguage && nativeName.trim()
+          ? { name: { [primaryLanguage]: nativeName.trim() } }
+          : undefined;
       const sub = await volunteer.updatePublisher(
         publisher.id,
         {
@@ -64,6 +72,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
           description: description.trim() || null,
           image_url: imageUrl.trim() || null,
           primary_language: primaryLanguage || null,
+          localised,
         },
         isAdmin ? undefined : note,
       );
@@ -133,6 +142,12 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
       </div>
 
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

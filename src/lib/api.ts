@@ -367,6 +367,7 @@ export interface PublisherDetail {
   parent_publisher_id: number | null;
   image_url: string | null;
   primary_language: string | null;
+  localised: Record<string, Record<string, string>>;
 }
 
 export interface TagNode {
@@ -720,6 +721,8 @@ export interface PersonCreateIn {
   end_date?: string | null;
   image_url?: string | null;
   primary_language?: string | null;
+  /** Manual localised overrides: { field: { lang: value } }, e.g. { name: { bn: "সত্যজিৎ রায়" } }. */
+  localised?: Record<string, Record<string, string>>;
 }
 
 export interface PublisherCreateIn {
@@ -731,6 +734,8 @@ export interface PublisherCreateIn {
   description?: string | null;
   image_url?: string | null;
   primary_language?: string | null;
+  /** Manual localised overrides: { field: { lang: value } }, e.g. { name: { bn: "…" } }. */
+  localised?: Record<string, Record<string, string>>;
 }
 
 export interface BookUpdateIn {
@@ -767,6 +772,7 @@ export interface PersonUpdateIn {
   end_date?: string | null;
   image_url?: string | null;
   primary_language?: string | null;
+  localised?: Record<string, Record<string, string>>;
 }
 
 export interface PublisherUpdateIn {
@@ -779,6 +785,7 @@ export interface PublisherUpdateIn {
   description?: string | null;
   image_url?: string | null;
   primary_language?: string | null;
+  localised?: Record<string, Record<string, string>>;
 }
 
 export interface SeriesCreateIn {

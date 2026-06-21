@@ -8,6 +8,7 @@ import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
+import NativeNameField from "../../components/NativeNameField";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -42,6 +43,9 @@ function EditForm({ person }: { person: Person }) {
   const [roleType, setRoleType] = useState(person.role_type ?? "author");
   const [nationality, setNationality] = useState(person.nationality ?? "");
   const [primaryLanguage, setPrimaryLanguage] = useState(person.primary_language ?? "");
+  const [nativeName, setNativeName] = useState(
+    person.primary_language ? (person.localised?.name?.[person.primary_language] ?? "") : "",
+  );
   const [birthDate, setBirthDate] = useState(person.birth_date ?? "");
   const [deathDate, setDeathDate] = useState(person.end_date ?? "");
   const [bio, setBio] = useState(person.bio ?? "");
@@ -52,6 +56,10 @@ function EditForm({ person }: { person: Person }) {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const localised =
+        primaryLanguage && nativeName.trim()
+          ? { name: { [primaryLanguage]: nativeName.trim() } }
+          : undefined;
       const sub = await volunteer.updatePerson(
         person.id,
         {
@@ -63,6 +71,7 @@ function EditForm({ person }: { person: Person }) {
           birth_date: birthDate || null,
           end_date: deathDate || null,
           image_url: imageUrl.trim() || null,
+          localised,
         },
         isAdmin ? undefined : note,
       );
@@ -148,6 +157,12 @@ function EditForm({ person }: { person: Person }) {
       </div>
 
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
 
       <div>
         <label className={labelCls}>Bio</label>

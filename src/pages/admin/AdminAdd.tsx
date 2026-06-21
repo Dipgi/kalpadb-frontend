@@ -15,6 +15,7 @@ import DuplicateMatchPrompt from "../../components/DuplicateMatchPrompt";
 import ImageUploadField from "../../components/ImageUploadField";
 import CountrySelect from "../../components/CountrySelect";
 import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
+import NativeNameField from "../../components/NativeNameField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 type Tab = "book" | "person" | "publisher";
@@ -545,6 +546,7 @@ function PersonForm() {
   const [nationality, setNationality] = useState("Indian");
   const [roleType, setRoleType] = useState("author");
   const [primaryLanguage, setPrimaryLanguage] = useState("");
+  const [nativeName, setNativeName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [deathDate, setDeathDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -564,6 +566,10 @@ function PersonForm() {
             birth_date: birthDate || null,
             end_date: deathDate || null,
             image_url: imageUrl.trim() || null,
+            localised:
+              primaryLanguage && nativeName.trim()
+                ? { name: { [primaryLanguage]: nativeName.trim() } }
+                : undefined,
           },
           allowDuplicate,
         )
@@ -574,6 +580,7 @@ function PersonForm() {
       setName("");
       setBio("");
       setPrimaryLanguage("");
+      setNativeName("");
       setBirthDate("");
       setDeathDate("");
       setImageUrl("");
@@ -640,6 +647,12 @@ function PersonForm() {
 
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
+
       <div>
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
@@ -668,6 +681,7 @@ function PublisherForm() {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [primaryLanguage, setPrimaryLanguage] = useState("");
+  const [nativeName, setNativeName] = useState("");
   const [created, setCreated] = useState(false);
   const [dup, setDup] = useState<DuplicateError | null>(null);
 
@@ -684,6 +698,10 @@ function PublisherForm() {
             description: description.trim() || null,
             image_url: imageUrl.trim() || null,
             primary_language: primaryLanguage || null,
+            localised:
+              primaryLanguage && nativeName.trim()
+                ? { name: { [primaryLanguage]: nativeName.trim() } }
+                : undefined,
           },
           allowDuplicate,
         )
@@ -698,6 +716,7 @@ function PublisherForm() {
       setDescription("");
       setImageUrl("");
       setPrimaryLanguage("");
+      setNativeName("");
     },
     onError: (err) => setDup(getDuplicateError(err)),
   });
@@ -757,6 +776,12 @@ function PublisherForm() {
       </div>
 
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
 
       <div>
         <label className={labelCls}>Website</label>

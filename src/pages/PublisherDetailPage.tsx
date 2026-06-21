@@ -52,6 +52,11 @@ export default function PublisherDetailPage() {
           )}
           <div className="min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">{publisher.name}</h1>
+          {publisher.primary_language && publisher.localised?.name?.[publisher.primary_language] && (
+            <p className="text-lg text-gray-600 mb-1" lang={publisher.primary_language}>
+              {publisher.localised.name[publisher.primary_language]}
+            </p>
+          )}
           {meta.length > 0 && <p className="text-sm text-gray-500">{meta.join(" · ")}</p>}
           {publisher.website && (
             <a
