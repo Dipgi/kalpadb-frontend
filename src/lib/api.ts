@@ -166,6 +166,8 @@ export interface Person {
   nationality: string | null;
   /** Free-text "primary / known-for" hint only — not authoritative. */
   role_type: string | null;
+  /** Native/primary language code ('bn','mr',…) — which localised name form to feature. */
+  primary_language: string | null;
   /** Roles derived from real credits across all work types. */
   roles: string[];
   birth_date: string | null;
@@ -364,6 +366,7 @@ export interface PublisherDetail {
   description: string | null;
   parent_publisher_id: number | null;
   image_url: string | null;
+  primary_language: string | null;
 }
 
 export interface TagNode {
@@ -716,6 +719,7 @@ export interface PersonCreateIn {
   birth_date?: string | null;
   end_date?: string | null;
   image_url?: string | null;
+  primary_language?: string | null;
 }
 
 export interface PublisherCreateIn {
@@ -726,6 +730,7 @@ export interface PublisherCreateIn {
   website?: string | null;
   description?: string | null;
   image_url?: string | null;
+  primary_language?: string | null;
 }
 
 export interface BookUpdateIn {
@@ -761,6 +766,7 @@ export interface PersonUpdateIn {
   birth_date?: string | null;
   end_date?: string | null;
   image_url?: string | null;
+  primary_language?: string | null;
 }
 
 export interface PublisherUpdateIn {
@@ -772,6 +778,7 @@ export interface PublisherUpdateIn {
   website?: string | null;
   description?: string | null;
   image_url?: string | null;
+  primary_language?: string | null;
 }
 
 export interface SeriesCreateIn {

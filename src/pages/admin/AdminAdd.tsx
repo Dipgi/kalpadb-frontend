@@ -14,6 +14,7 @@ import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import DuplicateMatchPrompt from "../../components/DuplicateMatchPrompt";
 import ImageUploadField from "../../components/ImageUploadField";
 import CountrySelect from "../../components/CountrySelect";
+import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 type Tab = "book" | "person" | "publisher";
@@ -543,6 +544,7 @@ function PersonForm() {
   const [bio, setBio] = useState("");
   const [nationality, setNationality] = useState("Indian");
   const [roleType, setRoleType] = useState("author");
+  const [primaryLanguage, setPrimaryLanguage] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [deathDate, setDeathDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -558,6 +560,7 @@ function PersonForm() {
             bio: bio.trim() || null,
             nationality: nationality.trim() || null,
             role_type: roleType.trim() || null,
+            primary_language: primaryLanguage || null,
             birth_date: birthDate || null,
             end_date: deathDate || null,
             image_url: imageUrl.trim() || null,
@@ -570,6 +573,7 @@ function PersonForm() {
       setDup(null);
       setName("");
       setBio("");
+      setPrimaryLanguage("");
       setBirthDate("");
       setDeathDate("");
       setImageUrl("");
@@ -634,6 +638,8 @@ function PersonForm() {
         </div>
       </div>
 
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
       <div>
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
@@ -661,6 +667,7 @@ function PublisherForm() {
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [primaryLanguage, setPrimaryLanguage] = useState("");
   const [created, setCreated] = useState(false);
   const [dup, setDup] = useState<DuplicateError | null>(null);
 
@@ -676,6 +683,7 @@ function PublisherForm() {
             website: website.trim() || null,
             description: description.trim() || null,
             image_url: imageUrl.trim() || null,
+            primary_language: primaryLanguage || null,
           },
           allowDuplicate,
         )
@@ -689,6 +697,7 @@ function PublisherForm() {
       setWebsite("");
       setDescription("");
       setImageUrl("");
+      setPrimaryLanguage("");
     },
     onError: (err) => setDup(getDuplicateError(err)),
   });
@@ -746,6 +755,8 @@ function PublisherForm() {
           />
         </div>
       </div>
+
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
       <div>
         <label className={labelCls}>Website</label>

@@ -8,6 +8,7 @@ import CountrySelect from "../../components/CountrySelect";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
+import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -44,6 +45,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
   const [website, setWebsite] = useState(publisher.website ?? "");
   const [description, setDescription] = useState(publisher.description ?? "");
   const [imageUrl, setImageUrl] = useState(publisher.image_url ?? "");
+  const [primaryLanguage, setPrimaryLanguage] = useState(publisher.primary_language ?? "");
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -61,6 +63,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
           website: website.trim() || null,
           description: description.trim() || null,
           image_url: imageUrl.trim() || null,
+          primary_language: primaryLanguage || null,
         },
         isAdmin ? undefined : note,
       );
@@ -128,6 +131,8 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
           <CountrySelect value={country} onChange={setCountry} />
         </div>
       </div>
+
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

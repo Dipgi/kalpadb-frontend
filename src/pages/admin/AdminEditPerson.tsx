@@ -7,6 +7,7 @@ import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
+import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -40,6 +41,7 @@ function EditForm({ person }: { person: Person }) {
   const [name, setName] = useState(person.name);
   const [roleType, setRoleType] = useState(person.role_type ?? "author");
   const [nationality, setNationality] = useState(person.nationality ?? "");
+  const [primaryLanguage, setPrimaryLanguage] = useState(person.primary_language ?? "");
   const [birthDate, setBirthDate] = useState(person.birth_date ?? "");
   const [deathDate, setDeathDate] = useState(person.end_date ?? "");
   const [bio, setBio] = useState(person.bio ?? "");
@@ -57,6 +59,7 @@ function EditForm({ person }: { person: Person }) {
           bio: bio.trim() || null,
           nationality: nationality.trim() || null,
           role_type: roleType.trim() || null,
+          primary_language: primaryLanguage || null,
           birth_date: birthDate || null,
           end_date: deathDate || null,
           image_url: imageUrl.trim() || null,
@@ -143,6 +146,8 @@ function EditForm({ person }: { person: Person }) {
           <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
         </div>
       </div>
+
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
       <div>
         <label className={labelCls}>Bio</label>
