@@ -747,6 +747,8 @@ export interface BookUpdateIn {
   cover_artist_ids?: number[];
   publisher_ids?: number[];
   formats?: ({ format_type: string } & Partial<Omit<BookFormat, "format_type">>)[];
+  /** Manual localised overrides: { field: { lang: value } }, e.g. { title: { "bn-Latn": "…" } }. */
+  localised?: Record<string, Record<string, string>>;
 }
 
 export interface PersonUpdateIn {
