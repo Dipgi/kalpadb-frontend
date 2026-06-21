@@ -704,6 +704,8 @@ export interface BookCreateIn {
     currency?: string | null;
     notes?: string | null;
   }[];
+  /** Optional manual localised overrides: { field: { lang: value } }, e.g. { title: { "bn-Latn": "…" } }. */
+  localised?: Record<string, Record<string, string>>;
 }
 
 export interface PersonCreateIn {
