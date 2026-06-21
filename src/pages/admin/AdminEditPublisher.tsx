@@ -126,8 +126,11 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
       )}
 
       <div>
-        <label className={labelCls}>Name *</label>
+        <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
+        <p className="mt-1 text-xs text-gray-400">
+          The canonical English / romanised spelling. The native-script form is added below.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
