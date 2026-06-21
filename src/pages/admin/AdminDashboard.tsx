@@ -25,12 +25,12 @@ export default function AdminDashboard() {
     : "Never";
 
   const STAT_CARDS = [
-    { label: "Works", value: s.total_works },
-    { label: "Authors", value: s.total_authors },
-    { label: "Books", value: s.total_books },
-    { label: "Publishers", value: s.total_publishers },
-    { label: "Languages", value: s.total_languages },
-    { label: "Users", value: s.total_users },
+    { label: "Works", value: s.total_works, to: "/browse" },
+    { label: "Authors", value: s.total_authors, to: "/persons" },
+    { label: "Books", value: s.total_books, to: "/browse" },
+    { label: "Publishers", value: s.total_publishers, to: "/publishers" },
+    { label: "Languages", value: s.total_languages, to: "/browse" },
+    { label: "Users", value: s.total_users, to: "/admin/users" },
   ];
 
   return (
@@ -84,13 +84,17 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {STAT_CARDS.map(({ label, value }) => (
-            <div key={label} className="bg-white border border-gray-200 rounded-lg p-4">
+          {STAT_CARDS.map(({ label, value, to }) => (
+            <Link
+              key={label}
+              to={to}
+              className="bg-white border border-gray-200 rounded-lg p-4 block transition-colors hover:bg-gray-50 hover:border-violet-200"
+            >
               <p className="text-2xl font-bold text-gray-900">
                 {value?.toLocaleString() ?? "—"}
               </p>
               <p className="text-sm text-gray-500 mt-0.5">{label}</p>
-            </div>
+            </Link>
           ))}
         </div>
       )}

@@ -45,17 +45,21 @@ export default function HomePage() {
       {siteStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: "Works", value: siteStats.stats.total_works },
-            { label: "Authors", value: siteStats.stats.total_authors },
-            { label: "Publishers", value: siteStats.stats.total_publishers },
-            { label: "Languages", value: siteStats.stats.total_languages },
-          ].map(({ label, value }) => (
-            <div key={label} className="text-center bg-violet-50 rounded-lg py-4">
+            { label: "Works", value: siteStats.stats.total_works, to: "/browse" },
+            { label: "Authors", value: siteStats.stats.total_authors, to: "/persons" },
+            { label: "Publishers", value: siteStats.stats.total_publishers, to: "/publishers" },
+            { label: "Languages", value: siteStats.stats.total_languages, to: "/browse" },
+          ].map(({ label, value, to }) => (
+            <Link
+              key={label}
+              to={to}
+              className="text-center bg-violet-50 rounded-lg py-4 block transition-colors hover:bg-violet-100"
+            >
               <p className="text-2xl font-bold text-violet-700">
                 {value?.toLocaleString() ?? "—"}
               </p>
               <p className="text-sm text-gray-500 mt-1">{label}</p>
-            </div>
+            </Link>
           ))}
         </div>
       )}
