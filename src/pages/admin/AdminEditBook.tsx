@@ -8,6 +8,8 @@ import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
+import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
+import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 const inputCls =
@@ -136,6 +138,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [availability, setAvailability] = useState(firstFormat?.availability ?? "");
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pendingClears, setPendingClears] = useState<ClearedField[] | null>(null);
   const navigate = useNavigate();
 
   const deleteMutation = useMutation({
@@ -219,6 +222,7 @@ function EditForm({ work }: { work: WorkDetail }) {
     },
     onSuccess: () => {
       setSaved(true);
+      setPendingClears(null);
       if (isAdmin) {
         qc.invalidateQueries({ queryKey: ["work", String(work.id)] });
         qc.invalidateQueries({ queryKey: ["works"] });
@@ -227,12 +231,44 @@ function EditForm({ work }: { work: WorkDetail }) {
     },
   });
 
+  // Admin blanks clear the field; warn (once) before saving. Volunteers' blanks
+  // are left unchanged by the backend, so no warning is needed.
+  function attemptSave() {
+    setSaved(false);
+    if (!title.trim()) return;
+    if (isAdmin) {
+      const cleared = findClearedFields([
+        { label: "Description", previous: work.description, next: description.trim() || null },
+        {
+          label: "Original language",
+          previous: work.original_language,
+          next: originalLanguage || null,
+        },
+        {
+          label: "Publication year",
+          previous: work.book?.publication_year,
+          next: year ? Number(year) : null,
+        },
+        { label: "Edition label", previous: work.book?.edition_label, next: editionLabel.trim() || null },
+        { label: "Edition notes", previous: work.book?.edition_notes, next: editionNotes.trim() || null },
+        { label: "Cover image", previous: work.image_urls?.[0], next: coverUrl.trim() || null },
+        { label: "ISBN", previous: firstFormat?.isbn, next: isbn.trim() || null },
+        { label: "Pages", previous: firstFormat?.page_count, next: pageCount ? Number(pageCount) : null },
+        { label: "Availability", previous: firstFormat?.availability, next: availability || null },
+      ]);
+      if (cleared.length) {
+        setPendingClears(cleared);
+        return;
+      }
+    }
+    mutation.mutate();
+  }
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        setSaved(false);
-        if (title.trim()) mutation.mutate();
+        attemptSave();
       }}
       className="max-w-2xl space-y-4"
     >
@@ -240,6 +276,15 @@ function EditForm({ work }: { work: WorkDetail }) {
         Edit Book
         <span className="ml-2 text-sm font-normal text-gray-400">#{work.id}</span>
       </h1>
+
+      {pendingClears && (
+        <ClearedFieldsPrompt
+          fields={pendingClears}
+          onConfirm={() => mutation.mutate()}
+          onCancel={() => setPendingClears(null)}
+          busy={mutation.isPending}
+        />
+      )}
 
       {saved && (
         <EditSavedBanner isAdmin={!!isAdmin} viewHref={`/works/${work.id}`} viewLabel="View book" />

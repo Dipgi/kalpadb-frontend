@@ -10,6 +10,8 @@ import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
+import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
+import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -53,6 +55,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pendingClears, setPendingClears] = useState<ClearedField[] | null>(null);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -81,12 +84,49 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
     },
     onSuccess: () => {
       setSaved(true);
+      setPendingClears(null);
       if (isAdmin) {
         qc.invalidateQueries({ queryKey: ["publisher", String(publisher.id)] });
         qc.invalidateQueries({ queryKey: ["publishers-list"] });
       }
     },
   });
+
+  // Admin blanks clear the field; warn (once) before saving. Volunteers' blanks
+  // are left unchanged by the backend, so no warning is needed.
+  function attemptSave() {
+    setSaved(false);
+    if (!name.trim()) return;
+    if (isAdmin) {
+      const cleared = findClearedFields([
+        { label: "City", previous: publisher.city, next: city.trim() || null },
+        { label: "Country", previous: publisher.country, next: country.trim() || null },
+        {
+          label: "Founded year",
+          previous: publisher.founded_year,
+          next: foundedYear ? Number(foundedYear) : null,
+        },
+        {
+          label: "Defunct year",
+          previous: publisher.defunct_year,
+          next: defunctYear ? Number(defunctYear) : null,
+        },
+        { label: "Website", previous: publisher.website, next: website.trim() || null },
+        { label: "Description", previous: publisher.description, next: description.trim() || null },
+        { label: "Image / logo", previous: publisher.image_url, next: imageUrl.trim() || null },
+        {
+          label: "Primary language",
+          previous: publisher.primary_language,
+          next: primaryLanguage || null,
+        },
+      ]);
+      if (cleared.length) {
+        setPendingClears(cleared);
+        return;
+      }
+    }
+    mutation.mutate();
+  }
 
   const deleteMutation = useMutation({
     mutationFn: () => admin.publishers.delete(publisher.id),
@@ -107,8 +147,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        setSaved(false);
-        if (name.trim()) mutation.mutate();
+        attemptSave();
       }}
       className="max-w-2xl space-y-4"
     >
@@ -116,6 +155,15 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         Edit Publisher
         <span className="ml-2 text-sm font-normal text-gray-400">#{publisher.id}</span>
       </h1>
+
+      {pendingClears && (
+        <ClearedFieldsPrompt
+          fields={pendingClears}
+          onConfirm={() => mutation.mutate()}
+          onCancel={() => setPendingClears(null)}
+          busy={mutation.isPending}
+        />
+      )}
 
       {saved && (
         <EditSavedBanner
@@ -195,7 +243,9 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
       />
 
       <p className="text-xs text-gray-400">
-        Leaving a field blank keeps its current value (it won't clear it).
+        {isAdmin
+          ? "Clearing a field removes its current value — you'll be asked to confirm before saving."
+          : "Leaving a field blank keeps its current value (it won't clear it)."}
       </p>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
