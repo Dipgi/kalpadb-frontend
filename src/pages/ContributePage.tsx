@@ -13,6 +13,7 @@ import {
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
 import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
+import PenNamesField, { type PenName } from "../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../lib/languages";
 
 type Tab = "book" | "person" | "publisher" | "series";
@@ -635,6 +636,7 @@ function PersonForm() {
   const [roleType, setRoleType] = useState("author");
   const [birthDate, setBirthDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [penNames, setPenNames] = useState<PenName[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [dup, setDup] = useState<DuplicateError | null>(null);
 
@@ -648,6 +650,9 @@ function PersonForm() {
           role_type: roleType.trim() || null,
           birth_date: birthDate || null,
           image_url: imageUrl.trim() || null,
+          aliases: penNames
+            .filter((p) => p.alias.trim())
+            .map((p) => ({ alias: p.alias.trim(), alias_type: "pen_name", language: p.language })),
         },
         allowDuplicate,
       ),
@@ -658,6 +663,7 @@ function PersonForm() {
       setBio("");
       setBirthDate("");
       setImageUrl("");
+      setPenNames([]);
     },
     onError: (err) => setDup(getDuplicateError(err)),
   });
@@ -718,6 +724,8 @@ function PersonForm() {
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
+
+      <PenNamesField value={penNames} onChange={setPenNames} />
 
       <ImageUploadField
         label="Image"

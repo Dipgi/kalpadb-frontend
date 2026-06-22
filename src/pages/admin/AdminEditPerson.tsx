@@ -11,6 +11,7 @@ import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
+import PenNamesField, { type PenName } from "../../components/PenNamesField";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -57,6 +58,17 @@ function EditForm({ person }: { person: Person }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [pendingClears, setPendingClears] = useState<ClearedField[] | null>(null);
 
+  // Pen names are editable here; non-pen aliases (alternate romanisation, maiden
+  // name) are preserved untouched and re-sent on save (aliases use replace-semantics).
+  const preservedAliases = person.aliases.filter(
+    (a) => a.alias_type != null && a.alias_type !== "pen_name",
+  );
+  const [penNames, setPenNames] = useState<PenName[]>(
+    person.aliases
+      .filter((a) => a.alias_type === "pen_name" || a.alias_type == null)
+      .map((a) => ({ alias: a.alias, language: a.language })),
+  );
+
   const mutation = useMutation({
     mutationFn: async () => {
       const localised =
@@ -75,6 +87,16 @@ function EditForm({ person }: { person: Person }) {
           end_date: deathDate || null,
           image_url: imageUrl.trim() || null,
           localised,
+          aliases: [
+            ...preservedAliases.map((a) => ({
+              alias: a.alias,
+              alias_type: a.alias_type,
+              language: a.language,
+            })),
+            ...penNames
+              .filter((p) => p.alias.trim())
+              .map((p) => ({ alias: p.alias.trim(), alias_type: "pen_name", language: p.language })),
+          ],
         },
         isAdmin ? undefined : note,
       );
@@ -210,6 +232,8 @@ function EditForm({ person }: { person: Person }) {
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
+
+      <PenNamesField value={penNames} onChange={setPenNames} />
 
       <ImageUploadField
         label="Image"

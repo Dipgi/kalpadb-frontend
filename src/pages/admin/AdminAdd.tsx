@@ -16,6 +16,7 @@ import ImageUploadField from "../../components/ImageUploadField";
 import CountrySelect from "../../components/CountrySelect";
 import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
+import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 
 type Tab = "book" | "person" | "publisher";
@@ -550,6 +551,7 @@ function PersonForm() {
   const [birthDate, setBirthDate] = useState("");
   const [deathDate, setDeathDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [penNames, setPenNames] = useState<PenName[]>([]);
   const [createdId, setCreatedId] = useState<number | null>(null);
   const [dup, setDup] = useState<DuplicateError | null>(null);
 
@@ -570,6 +572,9 @@ function PersonForm() {
               primaryLanguage && nativeName.trim()
                 ? { name: { [primaryLanguage]: nativeName.trim() } }
                 : undefined,
+            aliases: penNames
+              .filter((p) => p.alias.trim())
+              .map((p) => ({ alias: p.alias.trim(), alias_type: "pen_name", language: p.language })),
           },
           allowDuplicate,
         )
@@ -584,6 +589,7 @@ function PersonForm() {
       setBirthDate("");
       setDeathDate("");
       setImageUrl("");
+      setPenNames([]);
     },
     onError: (err) => setDup(getDuplicateError(err)),
   });
@@ -660,6 +666,8 @@ function PersonForm() {
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
+
+      <PenNamesField value={penNames} onChange={setPenNames} />
 
       <ImageUploadField
         label="Image"

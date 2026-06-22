@@ -173,8 +173,15 @@ export interface Person {
   birth_date: string | null;
   end_date: string | null;
   localised: Record<string, Record<string, string>>;
-  aliases: { alias: string }[];
+  aliases: { alias: string; alias_type: string | null; language: string | null }[];
   external_links: { url: string; link_type: string }[];
+}
+
+/** A pen name / alias to submit with a person. alias_type is "pen_name" for pen names. */
+export interface PersonAliasIn {
+  alias: string;
+  alias_type?: string | null;
+  language?: string | null;
 }
 
 export interface StatsOut {
@@ -723,6 +730,8 @@ export interface PersonCreateIn {
   primary_language?: string | null;
   /** Manual localised overrides: { field: { lang: value } }, e.g. { name: { bn: "সত্যজিৎ রায়" } }. */
   localised?: Record<string, Record<string, string>>;
+  /** Pen names / aliases for the person. */
+  aliases?: PersonAliasIn[];
 }
 
 export interface PublisherCreateIn {
@@ -773,6 +782,8 @@ export interface PersonUpdateIn {
   image_url?: string | null;
   primary_language?: string | null;
   localised?: Record<string, Record<string, string>>;
+  /** Full set of pen names / aliases (replace-semantics); omit to leave unchanged. */
+  aliases?: PersonAliasIn[];
 }
 
 export interface PublisherUpdateIn {
