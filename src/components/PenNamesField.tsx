@@ -4,8 +4,10 @@ import { catalogue } from "../lib/api";
 /** A single pen name row. Language is optional (the script/language it's written in). */
 export type PenName = { alias: string; language: string | null };
 
-const inputCls =
-  "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
+// Border styling without a width — width is set per field below so the flex row
+// lays out correctly (a shared `w-full` made the select expand and crush the input).
+const fieldCls =
+  "border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 
 /**
@@ -35,17 +37,17 @@ export default function PenNamesField({
       {value.length > 0 && (
         <div className="space-y-2 mb-2">
           {value.map((row, i) => (
-            <div key={i} className="flex gap-2">
+            <div key={i} className="flex gap-2 items-center">
               <input
                 value={row.alias}
                 onChange={(e) => patch(i, { alias: e.target.value })}
                 placeholder="Another name this person writes under"
-                className={`${inputCls} flex-1`}
+                className={`${fieldCls} flex-1 min-w-0`}
               />
               <select
                 value={row.language ?? ""}
                 onChange={(e) => patch(i, { language: e.target.value || null })}
-                className={`${inputCls} w-36`}
+                className={`${fieldCls} w-36 shrink-0`}
                 aria-label="Pen name language"
               >
                 <option value="">— language —</option>
