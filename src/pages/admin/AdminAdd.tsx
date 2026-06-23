@@ -11,6 +11,11 @@ import {
   type GenreItem,
 } from "../../lib/api";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import FormatsEditor, {
+  type FormatRow,
+  emptyFormatRow,
+  formatRowsToPayload,
+} from "../../components/FormatsEditor";
 import DuplicateMatchPrompt from "../../components/DuplicateMatchPrompt";
 import ImageUploadField from "../../components/ImageUploadField";
 import CountrySelect from "../../components/CountrySelect";
@@ -100,16 +105,6 @@ function SuccessBanner({ message, link, linkText }: { message: string; link?: st
 
 // ── Book form ───────────────────────────────────────────────────────────────
 
-const FORMAT_TYPES = ["paperback", "hardcover", "ebook"];
-
-const AVAILABILITY_OPTIONS = [
-  { value: "", label: "Unknown" },
-  { value: "in_print", label: "In print" },
-  { value: "out_of_print", label: "Out of print" },
-  { value: "digital_only", label: "Digital only" },
-  { value: "rare", label: "Rare" },
-];
-
 function BookForm() {
   const qc = useQueryClient();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
@@ -136,13 +131,7 @@ function BookForm() {
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
-  const [formatType, setFormatType] = useState("paperback");
-  const [availability, setAvailability] = useState("");
-  const [isbn, setIsbn] = useState("");
-  const [pageCount, setPageCount] = useState("");
-  const [price, setPrice] = useState("");
-  const [currency, setCurrency] = useState("");
-  const [formatNotes, setFormatNotes] = useState("");
+  const [formats, setFormats] = useState<FormatRow[]>([emptyFormatRow()]);
   const [seriesId, setSeriesId] = useState("");
   const [seriesPosition, setSeriesPosition] = useState("");
   const [editionLabel, setEditionLabel] = useState("");
@@ -153,7 +142,6 @@ function BookForm() {
   const mutation = useMutation({
     mutationFn: () => {
       const y = year ? Number(year) : null;
-      const hasFormat = isbn || pageCount || coverUrl || availability || price || currency || formatNotes;
       // Only pin a manual romanisation when one was typed; otherwise let the backend
       // auto-generate it from the title.
       const localised = roman.trim()
@@ -181,20 +169,7 @@ function BookForm() {
           publisher_ids: publishers.map((p) => p.id),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
-          formats: hasFormat
-            ? [
-                {
-                  format_type: formatType,
-                  isbn: isbn.trim() || null,
-                  page_count: pageCount ? Number(pageCount) : null,
-                  cover_image_url: coverUrl.trim() || null,
-                  availability: availability || null,
-                  price: price.trim() || null,
-                  currency: currency.trim() || null,
-                  notes: formatNotes.trim() || null,
-                },
-              ]
-            : [],
+          formats: formatRowsToPayload(formats),
         })
       );
     },
@@ -215,12 +190,7 @@ function BookForm() {
       setPublishers([]);
       setGenreIds(new Set());
       setTagIds(new Set());
-      setAvailability("");
-      setIsbn("");
-      setPageCount("");
-      setPrice("");
-      setCurrency("");
-      setFormatNotes("");
+      setFormats([emptyFormatRow()]);
       setSeriesId("");
       setSeriesPosition("");
       setEditionLabel("");
@@ -321,59 +291,9 @@ function BookForm() {
             className={inputCls}
           />
         </div>
-        <div>
-          <label className={labelCls}>Pages</label>
-          <input
-            type="number"
-            min={1}
-            value={pageCount}
-            onChange={(e) => setPageCount(e.target.value)}
-            className={inputCls}
-          />
-        </div>
-        <div>
-          <label className={labelCls}>ISBN</label>
-          <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className={labelCls}>Format</label>
-          <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className={inputCls}>
-            {FORMAT_TYPES.map((f) => (
-              <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className={labelCls}>Availability</label>
-          <select
-            value={availability}
-            onChange={(e) => setAvailability(e.target.value)}
-            className={inputCls}
-          >
-            {AVAILABILITY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div>
-          <label className={labelCls}>Price</label>
-          <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 250" className={inputCls} />
-        </div>
-        <div>
-          <label className={labelCls}>Currency</label>
-          <input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder="e.g. INR" className={inputCls} />
-        </div>
-        <div>
-          <label className={labelCls}>Format notes</label>
-          <input value={formatNotes} onChange={(e) => setFormatNotes(e.target.value)} className={inputCls} />
-        </div>
-      </div>
+      <FormatsEditor value={formats} onChange={setFormats} />
 
       {seriesList.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

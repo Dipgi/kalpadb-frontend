@@ -92,7 +92,9 @@ export default function WorkDetailPage() {
     ?? (work.publication_date ? work.publication_date.slice(0, 4) : null);
 
   const publishers = work.book?.publishers ?? [];
-  const firstFormat = work.book?.formats?.[0] ?? null;
+  const formats = work.book?.formats ?? [];
+  const hasDetails =
+    formats.length > 0 || work.book?.edition_label || work.book?.edition_notes;
   const seriesName =
     work.book?.series_id != null
       ? (seriesPage?.items.find((s) => s.id === work.book?.series_id)?.name ?? null)
@@ -224,28 +226,36 @@ export default function WorkDetailPage() {
           </div>
         )}
 
-        {firstFormat && (
+        {hasDetails && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Details</h3>
-            <div className="text-sm text-gray-700 space-y-1">
-              {firstFormat.format_type && <p>Format: {firstFormat.format_type}</p>}
-              {firstFormat.page_count && <p>Pages: {firstFormat.page_count}</p>}
-              {firstFormat.isbn && <p>ISBN: {firstFormat.isbn}</p>}
-              {firstFormat.availability && (
-                <p>Availability: {firstFormat.availability.replace(/_/g, " ")}</p>
-              )}
-              {(firstFormat.price || firstFormat.notes) && (
-                <p>
-                  {firstFormat.price && (
-                    <>Price: {firstFormat.price}{firstFormat.currency ? ` ${firstFormat.currency}` : ""}</>
+            <div className="text-sm text-gray-700 space-y-3">
+              {(work.book?.edition_label || work.book?.edition_notes) && (
+                <div className="space-y-1">
+                  {work.book?.edition_label && <p>Edition: {work.book.edition_label}</p>}
+                  {work.book?.edition_notes && (
+                    <p className="text-gray-500">{work.book.edition_notes}</p>
                   )}
-                  {firstFormat.notes && <span className="block text-gray-500">{firstFormat.notes}</span>}
-                </p>
+                </div>
               )}
-              {work.book?.edition_label && <p>Edition: {work.book.edition_label}</p>}
-              {work.book?.edition_notes && (
-                <p className="text-gray-500">{work.book.edition_notes}</p>
-              )}
+              {formats.map((f, i) => (
+                <div
+                  key={i}
+                  className={formats.length > 1 ? "border-l-2 border-gray-100 pl-3 space-y-1" : "space-y-1"}
+                >
+                  {f.format_type && <p className="font-medium capitalize">{f.format_type}</p>}
+                  {f.page_count && <p>Pages: {f.page_count}</p>}
+                  {f.isbn && <p>ISBN: {f.isbn}</p>}
+                  {f.availability && <p>Availability: {f.availability.replace(/_/g, " ")}</p>}
+                  {f.price && (
+                    <p>
+                      Price: {f.price}
+                      {f.currency ? ` ${f.currency}` : ""}
+                    </p>
+                  )}
+                  {f.notes && <p className="text-gray-500">{f.notes}</p>}
+                </div>
+              ))}
             </div>
           </div>
         )}

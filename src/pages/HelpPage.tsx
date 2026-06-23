@@ -191,7 +191,8 @@ export default function HelpPage() {
           <li>
             <strong>Editions vs formats:</strong> a new textual edition (revised, illustrated…) is a
             separate record; hardcover/paperback/ebook of the <em>same</em> edition are formats on
-            one record.
+            one record — use “Add another format” on the book form to list each one (with its own
+            ISBN, page count, price and availability).
           </li>
           <li>
             <strong>Genres vs tags:</strong> genres are broad categories (e.g. Hard SF); tags are
