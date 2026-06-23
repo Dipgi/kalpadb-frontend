@@ -147,6 +147,9 @@ export interface WorkDetail extends WorkSummary {
     series_position: number | null;
     edition_label: string | null;
     edition_notes: string | null;
+    original_title: string | null;
+    original_author: string | null;
+    source_relation: string | null;
     formats: BookFormat[];
     publishers: { id: number; name: string }[];
     editors: { id: number; name: string }[];
@@ -763,6 +766,9 @@ export interface BookCreateIn {
   series_position?: number | null;
   edition_label?: string | null;
   edition_notes?: string | null;
+  original_title?: string | null;
+  original_author?: string | null;
+  source_relation?: string | null;
   formats?: {
     format_type: string;
     isbn?: string | null;
@@ -817,6 +823,9 @@ export interface BookUpdateIn {
   series_position?: number | null;
   edition_label?: string | null;
   edition_notes?: string | null;
+  original_title?: string | null;
+  original_author?: string | null;
+  source_relation?: string | null;
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
@@ -904,6 +913,11 @@ export const volunteer = {
     }),
   submitSeries: (data: SeriesCreateIn) =>
     request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
+  addTranslation: (workId: number, data: TranslationLinkInput) =>
+    request<EditSubmission>(`/works/${workId}/translations`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updateSeries: (id: number, data: SeriesUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/series/${id}${noteQuery(note)}`, {
       method: "PATCH",

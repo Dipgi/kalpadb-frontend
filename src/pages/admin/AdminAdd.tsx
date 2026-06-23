@@ -16,6 +16,11 @@ import FormatsEditor, {
   emptyFormatRow,
   formatRowsToPayload,
 } from "../../components/FormatsEditor";
+import SourceAttributionFields, {
+  type SourceAttribution,
+  emptySourceAttribution,
+  sourceAttributionPayload,
+} from "../../components/SourceAttributionFields";
 import DuplicateMatchPrompt from "../../components/DuplicateMatchPrompt";
 import ImageUploadField from "../../components/ImageUploadField";
 import CountrySelect from "../../components/CountrySelect";
@@ -132,6 +137,7 @@ function BookForm() {
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [formats, setFormats] = useState<FormatRow[]>([emptyFormatRow()]);
+  const [source, setSource] = useState<SourceAttribution>(emptySourceAttribution());
   const [seriesId, setSeriesId] = useState("");
   const [seriesPosition, setSeriesPosition] = useState("");
   const [editionLabel, setEditionLabel] = useState("");
@@ -160,6 +166,7 @@ function BookForm() {
           series_position: seriesPosition ? Number(seriesPosition) : null,
           edition_label: editionLabel.trim() || null,
           edition_notes: editionNotes.trim() || null,
+          ...sourceAttributionPayload(source),
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
           author_ids: authors.map((a) => a.id),
           editor_ids: editors.map((e) => e.id),
@@ -191,6 +198,7 @@ function BookForm() {
       setGenreIds(new Set());
       setTagIds(new Set());
       setFormats([emptyFormatRow()]);
+      setSource(emptySourceAttribution());
       setSeriesId("");
       setSeriesPosition("");
       setEditionLabel("");
@@ -294,6 +302,8 @@ function BookForm() {
       </div>
 
       <FormatsEditor value={formats} onChange={setFormats} />
+
+      <SourceAttributionFields value={source} onChange={setSource} />
 
       {seriesList.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

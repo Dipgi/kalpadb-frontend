@@ -10,6 +10,10 @@ import FormatsEditor, {
   formatRowsToPayload,
 } from "../../components/FormatsEditor";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
+import SourceAttributionFields, {
+  type SourceAttribution,
+  sourceAttributionPayload,
+} from "../../components/SourceAttributionFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
@@ -130,6 +134,11 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [formats, setFormats] = useState<FormatRow[]>(
     formatRowsFromExisting(work.book?.formats)
   );
+  const [source, setSource] = useState<SourceAttribution>({
+    original_title: work.book?.original_title ?? "",
+    original_author: work.book?.original_author ?? "",
+    source_relation: work.book?.source_relation ?? "",
+  });
   const [saved, setSaved] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [pendingClears, setPendingClears] = useState<ClearedField[] | null>(null);
@@ -182,6 +191,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         series_position: seriesPosition ? Number(seriesPosition) : null,
         edition_label: editionLabel.trim() || null,
         edition_notes: editionNotes.trim() || null,
+        ...sourceAttributionPayload(source),
         // empty list clears the work-level cover (null would mean "no change")
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
       }, isAdmin ? undefined : note);
@@ -491,6 +501,8 @@ function EditForm({ work }: { work: WorkDetail }) {
         workLanguage={work.language}
         isAdmin={!!isAdmin}
       />
+
+      <SourceAttributionFields value={source} onChange={setSource} />
 
       {(allTags ?? []).length > 0 && (
         <div>

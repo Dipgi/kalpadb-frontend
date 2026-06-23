@@ -324,6 +324,25 @@ export default function WorkDetailPage() {
           </div>
         )}
 
+        {work.book?.original_title && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Source
+            </h3>
+            <p className="text-sm text-gray-700">
+              {work.book.source_relation === "transcreation"
+                ? "Transcreation of "
+                : work.book.source_relation === "inspired_by"
+                  ? "Inspired by "
+                  : work.book.source_relation === "translation"
+                    ? "Translation of "
+                    : "Based on "}
+              <span className="italic">{work.book.original_title}</span>
+              {work.book.original_author && ` by ${work.book.original_author}`}
+            </p>
+          </div>
+        )}
+
         {translations && translations.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
