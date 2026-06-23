@@ -6,7 +6,7 @@ export default function WorkCard({ work }: { work: WorkSummary }) {
   const author = work.authors[0]?.name ?? "Unknown";
   const moreAuthors = work.authors.length > 1 ? ` +${work.authors.length - 1}` : "";
   const year = work.publication_date ? work.publication_date.slice(0, 4) : null;
-  const roman = romanisedTitle(work.localised, work.title);
+  const roman = romanisedTitle(work.localised, work.title, work.language);
 
   return (
     <Link

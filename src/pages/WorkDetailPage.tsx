@@ -136,9 +136,9 @@ export default function WorkDetailPage() {
                 </Link>
               )}
           </div>
-          {romanisedTitle(work.localised, work.title) && (
+          {romanisedTitle(work.localised, work.title, work.language) && (
             <p className="text-base text-gray-400 italic mb-1">
-              {romanisedTitle(work.localised, work.title)}
+              {romanisedTitle(work.localised, work.title, work.language)}
             </p>
           )}
           <p className="text-gray-500 mb-3">
