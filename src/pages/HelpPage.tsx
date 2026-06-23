@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "21 June 2026";
+const LAST_UPDATED = "23 June 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -72,6 +72,10 @@ export default function HelpPage() {
             <Link to="/persons" className="text-violet-700 hover:underline">People</Link> and{" "}
             <Link to="/publishers" className="text-violet-700 hover:underline">Publishers</Link> —
             browse authors/creators and publishing houses.
+          </li>
+          <li>
+            <Link to="/series" className="text-violet-700 hover:underline">Series</Link> — browse
+            book and comic series; each series page lists its works in reading order.
           </li>
           <li>Every work, person, and publisher has its own detail page with full information.</li>
         </ul>
@@ -152,8 +156,8 @@ export default function HelpPage() {
             <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link> page.
           </li>
           <li>
-            <strong>Suggest an edit</strong> from any work, person, or publisher page using the
-            “Suggest an edit” button — add a note for the reviewer explaining your change.
+            <strong>Suggest an edit</strong> from any work, person, publisher, or series page using
+            the “Suggest an edit” button — add a note for the reviewer explaining your change.
           </li>
           <li>
             If you try to add something that may already exist, you’ll see possible duplicates first

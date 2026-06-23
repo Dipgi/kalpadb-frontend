@@ -479,6 +479,13 @@ function BookForm() {
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
+            <p className="text-xs text-gray-400 mt-1">
+              Not listed?{" "}
+              <Link to="/series" target="_blank" className="text-violet-600 hover:underline">
+                Browse existing series
+              </Link>{" "}
+              first to avoid duplicates.
+            </p>
           </div>
           <div>
             <label className={labelCls}>Position in series</label>

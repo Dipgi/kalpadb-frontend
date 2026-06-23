@@ -230,6 +230,14 @@ export interface PublisherSummary {
   image_url: string | null;
 }
 
+export interface BookSeriesOut {
+  id: number;
+  name: string;
+  description: string | null;
+  slug: string | null;
+  localised: Record<string, Record<string, string>>;
+}
+
 export interface SearchResult {
   query: string;
   total: number;
@@ -422,6 +430,25 @@ export const catalogue = {
   allTags: () =>
     request<{ id: number; tag_name: string; slug: string }[]>("/tags?flat=true"),
   series: () => request<Page<{ id: number; name: string }>>("/series?page_size=100"),
+  // Browse listing + detail for the public Series pages.
+  seriesList: (params: { q?: string; page?: number } = {}) => {
+    const p = new URLSearchParams();
+    if (params.q) p.set("q", params.q);
+    p.set("page", String(params.page ?? 1));
+    p.set("page_size", "30");
+    return request<Page<BookSeriesOut>>(`/series?${p}`);
+  },
+  seriesDetail: (id: number) => request<BookSeriesOut>(`/series/${id}`),
+  seriesWorks: (
+    id: number,
+    params: { sort?: "position_asc" | "date_asc" | "title_asc"; page?: number } = {}
+  ) => {
+    const p = new URLSearchParams();
+    p.set("sort", params.sort ?? "position_asc");
+    p.set("page", String(params.page ?? 1));
+    p.set("page_size", "50");
+    return request<Page<WorkSummary>>(`/series/${id}/works?${p}`);
+  },
   // Browse filter: only languages that actually have works (self-maintaining).
   languages: () => request<{ code: string; name: string }[]>("/languages?in_use=true"),
   allLanguages: () =>
@@ -805,6 +832,12 @@ export interface SeriesCreateIn {
   slug?: string | null;
 }
 
+export interface SeriesUpdateIn {
+  name?: string | null;
+  description?: string | null;
+  slug?: string | null;
+}
+
 /** Append a reviewer note as a query param (submission metadata, not part of the body). */
 function noteQuery(note?: string | null): string {
   return note && note.trim() ? `?note=${encodeURIComponent(note.trim())}` : "";
@@ -840,6 +873,11 @@ export const volunteer = {
     }),
   submitSeries: (data: SeriesCreateIn) =>
     request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
+  updateSeries: (id: number, data: SeriesUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/series/${id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 
   // A volunteer's own submission history (read-only) + withdraw a pending one.
   mySubmissions: (status?: "pending" | "approved" | "rejected", page = 1) =>

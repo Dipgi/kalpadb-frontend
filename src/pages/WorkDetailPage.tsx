@@ -254,7 +254,12 @@ export default function WorkDetailPage() {
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Series</h3>
             <p className="text-sm text-gray-700">
-              {seriesName ?? `Series #${work.book.series_id}`}
+              <Link
+                to={`/series/${work.book.series_id}`}
+                className="text-violet-700 hover:underline"
+              >
+                {seriesName ?? `Series #${work.book.series_id}`}
+              </Link>
               {work.book.series_position != null && ` (book ${work.book.series_position})`}
             </p>
           </div>

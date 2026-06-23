@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "21 June 2026";
+const LAST_UPDATED = "23 June 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -93,7 +93,9 @@ export default function AdminGuide() {
         <p>
           <Link to="/admin/catalogue" className="text-violet-700 hover:underline">Catalogue</Link>{" "}
           manages supporting entities: create book series and tags, and search to{" "}
-          <strong>edit or delete</strong> persons and publishers.
+          <strong>edit or delete</strong> persons and publishers. Series can be edited or deleted
+          from their own <Link to="/series" className="text-violet-700 hover:underline">series</Link>{" "}
+          page using the Edit button.
         </p>
         <p className="text-amber-700">
           Deletes are permanent and immediate. Before deleting a person/publisher, make sure they

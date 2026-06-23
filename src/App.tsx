@@ -10,6 +10,8 @@ import PersonDetailPage from "./pages/PersonDetailPage";
 import PublisherDetailPage from "./pages/PublisherDetailPage";
 import BrowsePersonsPage from "./pages/BrowsePersonsPage";
 import BrowsePublishersPage from "./pages/BrowsePublishersPage";
+import BrowseSeriesPage from "./pages/BrowseSeriesPage";
+import SeriesDetailPage from "./pages/SeriesDetailPage";
 import SearchPage from "./pages/SearchPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -28,6 +30,7 @@ import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditPerson from "./pages/admin/AdminEditPerson";
 import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
+import AdminEditSeries from "./pages/admin/AdminEditSeries";
 import AdminCatalogue from "./pages/admin/AdminCatalogue";
 import AdminAudit from "./pages/admin/AdminAudit";
 import ContributePage from "./pages/ContributePage";
@@ -67,6 +70,8 @@ export default function App() {
                 <Route path="/persons/:id" element={<PersonDetailPage />} />
                 <Route path="/publishers" element={<BrowsePublishersPage />} />
                 <Route path="/publishers/:id" element={<PublisherDetailPage />} />
+                <Route path="/series" element={<BrowseSeriesPage />} />
+                <Route path="/series/:id" element={<SeriesDetailPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
@@ -100,6 +105,14 @@ export default function App() {
                     </div>
                   }
                 />
+                <Route
+                  path="/series/:id/edit"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditSeries />
+                    </div>
+                  }
+                />
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
                 <Route path="/license" element={<LicensePage />} />
                 <Route path="/cite" element={<CitePage />} />
@@ -118,6 +131,7 @@ export default function App() {
                   <Route path="edit/:id" element={<AdminEditBook />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
+                  <Route path="edit-series/:id" element={<AdminEditSeries />} />
                 </Route>
               </Routes>
               </ErrorBoundary>
