@@ -197,9 +197,12 @@ export default function HelpPage() {
           <li>
             <strong>Translations:</strong> when the same work exists in another language as a
             separate record, link them in the “Translations &amp; editions” box on the book edit
-            page — the link then shows on both works’ pages. If the original <em>isn’t</em> in the
-            catalogue (e.g. a Bengali transcreation of a foreign novel), record it instead in the
-            “Based on an external work” box (relationship + original title &amp; author).
+            page — the link then shows on both works’ pages. Use the{" "}
+            <em>This work is the original / translation</em> toggle to set the direction before
+            picking the other work, so each side is labelled correctly. If the original{" "}
+            <em>isn’t</em> in the catalogue (e.g. a Bengali transcreation of a foreign novel),
+            record it instead in the “Based on an external work” box (relationship + original title
+            &amp; author).
           </li>
           <li>
             <strong>Genres vs tags:</strong> genres are broad categories (e.g. Hard SF); tags are
