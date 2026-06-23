@@ -350,7 +350,33 @@ export const works = {
 
   reviews: (id: number, page = 1, size = 20) =>
     request<Page<PublicReview>>(`/works/${id}/reviews?page=${page}&page_size=${size}`),
+
+  // Translation editions of a work, in BOTH directions (its translations + the
+  // original it was translated from). `work` is always the other work.
+  translations: (id: number) =>
+    request<TranslationEdition[]>(`/works/${id}/translations`),
 };
+
+export interface TranslationEdition {
+  link_id: number;
+  role: "translation" | "original";
+  work: WorkSummary;
+  original_language: string | null;
+  target_language: string | null;
+  translator_stakeholder_id: number | null;
+  translator: { id: number; name: string } | null;
+  translation_notes: string | null;
+  published_year: number | null;
+}
+
+export interface TranslationLinkInput {
+  translated_lw_id: number;
+  original_language?: string | null;
+  target_language?: string | null;
+  translator_stakeholder_id?: number | null;
+  translation_notes?: string | null;
+  published_year?: number | null;
+}
 
 export interface PublicReview {
   id: number;
@@ -678,6 +704,11 @@ export const admin = {
 
   series: {
     delete: (id: number) => request(`/admin/series/${id}`, { method: "DELETE" }),
+  },
+
+  translations: {
+    delete: (linkId: number) =>
+      request(`/works/translations/${linkId}`, { method: "DELETE" }),
   },
 
   reviews: {

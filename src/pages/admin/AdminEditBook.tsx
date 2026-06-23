@@ -9,6 +9,7 @@ import FormatsEditor, {
   formatRowsFromExisting,
   formatRowsToPayload,
 } from "../../components/FormatsEditor";
+import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
@@ -484,6 +485,12 @@ function EditForm({ work }: { work: WorkDetail }) {
       </div>
 
       <FormatsEditor value={formats} onChange={setFormats} />
+
+      <TranslationLinksEditor
+        workId={work.id}
+        workLanguage={work.language}
+        isAdmin={!!isAdmin}
+      />
 
       {(allTags ?? []).length > 0 && (
         <div>

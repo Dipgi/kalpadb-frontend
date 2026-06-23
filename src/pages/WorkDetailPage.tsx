@@ -27,6 +27,12 @@ export default function WorkDetailPage() {
 
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
 
+  const { data: translations } = useQuery({
+    queryKey: ["work-translations", Number(id)],
+    queryFn: () => works.translations(Number(id)),
+    enabled: !!id,
+  });
+
   const shelfMutation = useMutation({
     mutationFn: ({ status }: { status: string }) =>
       user.upsertShelf(work!.id, status),
@@ -314,6 +320,33 @@ export default function WorkDetailPage() {
                   {a.category.name} ({a.year}) — {a.result}
                 </li>
               ))}
+            </ul>
+          </div>
+        )}
+
+        {translations && translations.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Translations &amp; editions
+            </h3>
+            <ul className="text-sm space-y-1">
+              {translations.map((t) => {
+                const roman = romanisedTitle(t.work.localised, t.work.title, t.work.language);
+                return (
+                  <li key={t.link_id}>
+                    <span className="text-gray-400 text-xs mr-1">
+                      {t.role === "original" ? "Original:" : "Translation:"}
+                    </span>
+                    <Link to={`/works/${t.work.id}`} className="text-violet-700 hover:underline">
+                      {t.work.title}
+                    </Link>
+                    {roman && <span className="text-gray-400 ml-1 text-xs">({roman})</span>}
+                    {t.work.language && (
+                      <span className="text-gray-400 ml-1 uppercase text-xs">{t.work.language}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
