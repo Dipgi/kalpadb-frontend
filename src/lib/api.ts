@@ -374,6 +374,7 @@ export interface TranslationEdition {
 
 export interface TranslationLinkInput {
   translated_lw_id: number;
+  this_work_role?: "original" | "translation";
   original_language?: string | null;
   target_language?: string | null;
   translator_stakeholder_id?: number | null;

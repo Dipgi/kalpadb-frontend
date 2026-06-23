@@ -27,6 +27,8 @@ export default function TranslationLinksEditor({
   const qc = useQueryClient();
   const [q, setQ] = useState("");
   const [submittedNote, setSubmittedNote] = useState(false);
+  // Whether THIS work is the original or the translation of the work being added.
+  const [thisRole, setThisRole] = useState<"original" | "translation">("original");
 
   const { data: editions } = useQuery({
     queryKey: ["work-translations", workId],
@@ -43,10 +45,12 @@ export default function TranslationLinksEditor({
 
   const addMutation = useMutation({
     mutationFn: async (picked: WorkSummary) => {
+      const thisIsOriginal = thisRole === "original";
       const sub = await volunteer.addTranslation(workId, {
         translated_lw_id: picked.id,
-        original_language: workLanguage,
-        target_language: picked.language,
+        this_work_role: thisRole,
+        original_language: thisIsOriginal ? workLanguage : picked.language,
+        target_language: thisIsOriginal ? picked.language : workLanguage,
       });
       if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
       return sub;
@@ -123,6 +127,29 @@ export default function TranslationLinksEditor({
       )}
 
       <div>
+        <div className="flex items-center gap-2 mb-2 text-xs text-gray-500">
+          <span>This work is the</span>
+          <div className="inline-flex rounded-md border border-gray-200 overflow-hidden">
+            {(["original", "translation"] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setThisRole(r)}
+                className={
+                  "px-2.5 py-1 capitalize " +
+                  (thisRole === r
+                    ? "bg-violet-600 text-white"
+                    : "bg-white text-gray-600 hover:bg-violet-50")
+                }
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <span>
+            of the work you add — so pick the {thisRole === "original" ? "translation" : "original"}.
+          </span>
+        </div>
         <input
           value={q}
           onChange={(e) => {
