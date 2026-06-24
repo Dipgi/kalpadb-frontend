@@ -28,6 +28,7 @@ import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
+import { WORK_TYPE_OPTIONS } from "../../lib/workTypes";
 
 type Tab = "book" | "person" | "publisher";
 
@@ -124,6 +125,7 @@ function BookForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
+  const [contentType, setContentType] = useState("");
   // Optional manual romanised title; blank → backend auto-generates one.
   const [roman, setRoman] = useState("");
   const [originalLanguage, setOriginalLanguage] = useState("");
@@ -157,6 +159,7 @@ function BookForm() {
         volunteer.submitBook({
           title: title.trim(),
           description: description.trim() || null,
+          content_type: contentType || null,
           language,
           localised,
           original_language: originalLanguage || null,
@@ -251,6 +254,21 @@ function BookForm() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Work type</label>
+          <select
+            value={contentType}
+            onChange={(e) => setContentType(e.target.value)}
+            className={inputCls}
+          >
+            <option value="">Unspecified</option>
+            {WORK_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>

@@ -347,6 +347,7 @@ export const auth = {
 export const works = {
   list: (params: {
     type?: string;
+    content_type?: string;
     lang?: string;
     genre_slug?: string;
     sort?: string;
@@ -355,6 +356,7 @@ export const works = {
   } = {}) => {
     const q = new URLSearchParams();
     if (params.type) q.set("type", params.type);
+    if (params.content_type) q.set("content_type", params.content_type);
     if (params.lang) q.set("lang", params.lang);
     if (params.genre_slug) q.set("genre_slug", params.genre_slug);
     if (params.sort) q.set("sort", params.sort);
@@ -765,6 +767,7 @@ export interface EditSubmission {
 export interface BookCreateIn {
   title: string;
   description?: string | null;
+  content_type?: string | null;
   language?: string | null;
   original_language?: string | null;
   publication_date?: string | null;
@@ -830,6 +833,7 @@ export interface PublisherCreateIn {
 export interface BookUpdateIn {
   title?: string;
   description?: string | null;
+  content_type?: string | null;
   language?: string | null;
   original_language?: string | null;
   publication_date?: string | null;

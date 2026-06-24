@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { works, catalogue } from "../lib/api";
 import WorkCard from "../components/WorkCard";
 import Pagination from "../components/Pagination";
+import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
 
 const WORK_TYPES = ["BOOK", "STORY", "COMIC", "MAGAZINE", "MEDIA"];
 
@@ -17,6 +18,7 @@ const SORT_OPTIONS = [
 export default function BrowsePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const type = searchParams.get("type") ?? "";
+  const contentType = searchParams.get("content_type") ?? "";
   const lang = searchParams.get("lang") ?? "";
   const genreSlug = searchParams.get("genre_slug") ?? "";
   const sort = searchParams.get("sort") ?? "added_desc";
@@ -26,10 +28,11 @@ export default function BrowsePage() {
   const { data: languages } = useQuery({ queryKey: ["languages"], queryFn: catalogue.languages });
 
   const { data: result, isLoading } = useQuery({
-    queryKey: ["works", type, lang, genreSlug, sort, page],
+    queryKey: ["works", type, contentType, lang, genreSlug, sort, page],
     queryFn: () =>
       works.list({
         type: type || undefined,
+        content_type: contentType || undefined,
         lang: lang || undefined,
         genre_slug: genreSlug || undefined,
         sort,
@@ -56,7 +59,7 @@ export default function BrowsePage() {
     });
   }
 
-  const hasFilters = !!(type || lang || genreSlug);
+  const hasFilters = !!(type || contentType || lang || genreSlug);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -73,6 +76,19 @@ export default function BrowsePage() {
           {WORK_TYPES.map((t) => (
             <option key={t} value={t}>
               {t.charAt(0) + t.slice(1).toLowerCase()}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={contentType}
+          onChange={(e) => set("content_type", e.target.value)}
+          className="border border-gray-200 rounded-md px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+        >
+          <option value="">All work types</option>
+          {WORK_TYPE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
             </option>
           ))}
         </select>
