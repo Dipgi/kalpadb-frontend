@@ -17,14 +17,13 @@ export default function AboutPage() {
     <div className="max-w-2xl mx-auto px-4 py-10 prose-sm">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">About KalpaDB</h1>
       <p className="text-sm text-gray-500 mb-8">
-        A community-built catalogue of Bengali and Indian science fiction, fantasy, and
-        speculative fiction.
+        A community-built catalogue of Indian science fiction, fantasy, and speculative fiction.
       </p>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">What we do</h2>
         <p className="text-sm text-gray-600 leading-relaxed">
-          KalpaDB documents the people, publishers, and works behind Bengali speculative
+          KalpaDB documents the people, publishers, and works behind Indian speculative
           fiction — books, anthologies, magazines, and the writers, translators, and artists who
           make them. Our goal is a reliable, openly licensed reference for readers, researchers,
           and fans. The dataset is released under{" "}
@@ -39,6 +38,45 @@ export default function AboutPage() {
           — see <Link to="/license" className="text-violet-700 hover:underline">License &amp; Reuse</Link>{" "}
           and <Link to="/cite" className="text-violet-700 hover:underline">how to cite</Link>.
         </p>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">In collaboration with</h2>
+        <ul className="list-disc pl-5 space-y-2 text-sm text-gray-600 leading-relaxed">
+          <li>
+            <a
+              href="https://www.kalpabiswa.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-violet-700 hover:underline font-medium"
+            >
+              Kalpabiswa Webmag
+            </a>{" "}
+            — the only speculative-fiction Bengali webmag from India.
+          </li>
+          <li>
+            <a
+              href="https://www.kalpabiswabooks.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-violet-700 hover:underline font-medium"
+            >
+              Kalpabiswa Publication
+            </a>{" "}
+            — Bengali and English speculative-fiction publication.
+          </li>
+          <li>
+            <a
+              href="https://indiansf.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-violet-700 hover:underline font-medium"
+            >
+              Science Fiction and Fantasy Society of India (SFFSI)
+            </a>
+            .
+          </li>
+        </ul>
       </section>
 
       <section className="mb-8">
