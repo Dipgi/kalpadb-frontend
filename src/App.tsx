@@ -3,8 +3,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./hooks/useAuth";
 import Navbar from "./components/Navbar";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { lazy, Suspense } from "react";
 import HomePage from "./pages/HomePage";
 import BrowsePage from "./pages/BrowsePage";
+// Code-split: keeps the recharts bundle out of the main chunk until /explore is opened.
+const ExplorePage = lazy(() => import("./pages/ExplorePage"));
 import WorkDetailPage from "./pages/WorkDetailPage";
 import PersonDetailPage from "./pages/PersonDetailPage";
 import PublisherDetailPage from "./pages/PublisherDetailPage";
@@ -65,6 +68,20 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/browse" element={<BrowsePage />} />
+                <Route
+                  path="/explore"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-400">
+                          Loading…
+                        </div>
+                      }
+                    >
+                      <ExplorePage />
+                    </Suspense>
+                  }
+                />
                 <Route path="/works/:id" element={<WorkDetailPage />} />
                 <Route path="/persons" element={<BrowsePersonsPage />} />
                 <Route path="/persons/:id" element={<PersonDetailPage />} />

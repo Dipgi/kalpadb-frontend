@@ -201,6 +201,20 @@ export interface StatsOut {
   refreshed_at: string | null;
 }
 
+export interface InsightItem {
+  label: string;
+  count: number;
+  id?: number | string | null;
+}
+
+export interface InsightsOut {
+  total_works: number;
+  by_genre: InsightItem[];
+  top_publishers: InsightItem[];
+  top_authors: InsightItem[];
+  by_content_type: InsightItem[];
+}
+
 export interface NewsItem {
   id: number;
   title: string;
@@ -525,6 +539,7 @@ export const uploads = {
 
 export const stats = {
   get: () => request<StatsOut>("/stats"),
+  insights: () => request<InsightsOut>("/stats/insights"),
 };
 
 export const news = {
