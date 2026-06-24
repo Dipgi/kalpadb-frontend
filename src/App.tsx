@@ -42,6 +42,8 @@ import NewsDetailPage from "./pages/NewsDetailPage";
 import LicensePage from "./pages/LicensePage";
 import CitePage from "./pages/CitePage";
 import HelpPage from "./pages/HelpPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 import AdminGuide from "./pages/admin/AdminGuide";
 
 const queryClient = new QueryClient({
@@ -134,6 +136,8 @@ export default function App() {
                 <Route path="/license" element={<LicensePage />} />
                 <Route path="/cite" element={<CitePage />} />
                 <Route path="/help" element={<HelpPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                   <Route path="queue" element={<AdminQueue />} />
@@ -163,6 +167,10 @@ export default function App() {
                 >
                   Data under CC BY-SA 4.0
                 </a>
+                <span aria-hidden>·</span>
+                <Link to="/about" className="hover:text-violet-700">About</Link>
+                <span aria-hidden>·</span>
+                <Link to="/contact" className="hover:text-violet-700">Contact</Link>
                 <span aria-hidden>·</span>
                 <Link to="/help" className="hover:text-violet-700">Help</Link>
                 <span aria-hidden>·</span>
