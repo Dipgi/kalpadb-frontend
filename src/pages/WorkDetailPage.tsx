@@ -171,6 +171,11 @@ export default function WorkDetailPage() {
             <span className="bg-violet-100 text-violet-700 text-xs px-2 py-0.5 rounded-full capitalize">
               {work.type.toLowerCase()}
             </span>
+            {work.content_type && (
+              <span className="bg-violet-100 text-violet-700 text-xs px-2 py-0.5 rounded-full">
+                {work.content_type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              </span>
+            )}
             {work.language && (
               <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full uppercase">
                 {work.language}
