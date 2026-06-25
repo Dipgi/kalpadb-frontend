@@ -262,15 +262,6 @@ function EditForm({ work }: { work: WorkDetail }) {
         <span className="ml-2 text-sm font-normal text-gray-400">#{work.id}</span>
       </h1>
 
-      {pendingClears && (
-        <ClearedFieldsPrompt
-          fields={pendingClears}
-          onConfirm={() => mutation.mutate()}
-          onCancel={() => setPendingClears(null)}
-          busy={mutation.isPending}
-        />
-      )}
-
       {saved && (
         <EditSavedBanner isAdmin={!!isAdmin} viewHref={`/works/${work.id}`} viewLabel="View book" />
       )}
@@ -552,6 +543,15 @@ function EditForm({ work }: { work: WorkDetail }) {
       )}
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
+
+      {pendingClears && (
+        <ClearedFieldsPrompt
+          fields={pendingClears}
+          onConfirm={() => mutation.mutate()}
+          onCancel={() => setPendingClears(null)}
+          busy={mutation.isPending}
+        />
+      )}
 
       <div className="flex items-center gap-3 pt-2">
         <button
