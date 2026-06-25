@@ -15,7 +15,17 @@ import {
 import { stats, type InsightItem } from "../lib/api";
 
 const VIOLET = "#6d28d9";
-const PIE_COLORS = ["#6d28d9", "#9333ea", "#c084fc", "#a78bfa", "#7c3aed", "#ddd6fe"];
+// Distinct categorical hues so adjacent slices are easy to tell apart.
+const PIE_COLORS = [
+  "#6d28d9", // violet
+  "#2563eb", // blue
+  "#059669", // emerald
+  "#d97706", // amber
+  "#dc2626", // red
+  "#db2777", // pink
+  "#0891b2", // cyan
+  "#65a30d", // lime
+];
 
 function ChartCard({
   title,
@@ -135,13 +145,15 @@ export default function ExplorePage() {
                     cx="50%"
                     cy="50%"
                     outerRadius={90}
+                    stroke="#fff"
+                    strokeWidth={2}
                   >
                     {classified.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
                   <Legend />
-                  <Tooltip formatter={(value) => [`${value} works`, ""]} />
+                  <Tooltip formatter={(value, name) => [`${value} works`, name]} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
