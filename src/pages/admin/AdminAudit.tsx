@@ -4,7 +4,7 @@ import { admin, type AuditEntry } from "../../lib/api";
 
 const TARGET_FILTERS = [
   { value: "", label: "All activity" },
-  { value: "submission", label: "Submissions (approve/reject)" },
+  { value: "submission", label: "Submissions (submit/approve/reject)" },
   { value: "work", label: "Works" },
   { value: "person", label: "People" },
   { value: "publisher", label: "Publishers" },
@@ -66,7 +66,8 @@ export default function AdminAudit() {
         </select>
       </div>
       <p className="text-sm text-gray-400 mb-6">
-        Read-only record of moderation, content changes, reviews and user management. Newest first.
+        Read-only record of contributor submissions, moderation, content changes, reviews and user
+        management — across all users. Newest first.
       </p>
 
       {isLoading ? (
