@@ -3,11 +3,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./hooks/useAuth";
 import Navbar from "./components/Navbar";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import { lazyWithRetry } from "./lib/lazyWithRetry";
 import HomePage from "./pages/HomePage";
 import BrowsePage from "./pages/BrowsePage";
 // Code-split: keeps the recharts bundle out of the main chunk until /explore is opened.
-const ExplorePage = lazy(() => import("./pages/ExplorePage"));
+// lazyWithRetry recovers from stale chunk hashes after a redeploy (one-time reload).
+const ExplorePage = lazyWithRetry(() => import("./pages/ExplorePage"));
 import WorkDetailPage from "./pages/WorkDetailPage";
 import PersonDetailPage from "./pages/PersonDetailPage";
 import PublisherDetailPage from "./pages/PublisherDetailPage";
