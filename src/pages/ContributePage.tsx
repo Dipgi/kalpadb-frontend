@@ -24,6 +24,8 @@ import SourceAttributionFields, {
 import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
 import PenNamesField, { type PenName } from "../components/PenNamesField";
+import PrimaryLanguageSelect from "../components/PrimaryLanguageSelect";
+import NativeNameField from "../components/NativeNameField";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
 
@@ -588,7 +590,10 @@ function PersonForm() {
   const [bio, setBio] = useState("");
   const [nationality, setNationality] = useState("Indian");
   const [roleType, setRoleType] = useState("author");
+  const [primaryLanguage, setPrimaryLanguage] = useState("");
+  const [nativeName, setNativeName] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [deathDate, setDeathDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [penNames, setPenNames] = useState<PenName[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -602,8 +607,14 @@ function PersonForm() {
           bio: bio.trim() || null,
           nationality: nationality.trim() || null,
           role_type: roleType.trim() || null,
+          primary_language: primaryLanguage || null,
           birth_date: birthDate || null,
+          end_date: deathDate || null,
           image_url: imageUrl.trim() || null,
+          localised:
+            primaryLanguage && nativeName.trim()
+              ? { name: { [primaryLanguage]: nativeName.trim() } }
+              : undefined,
           aliases: penNames
             .filter((p) => p.alias.trim())
             .map((p) => ({ alias: p.alias.trim(), alias_type: "pen_name", language: p.language })),
@@ -615,7 +626,10 @@ function PersonForm() {
       setDup(null);
       setName("");
       setBio("");
+      setPrimaryLanguage("");
+      setNativeName("");
       setBirthDate("");
+      setDeathDate("");
       setImageUrl("");
       setPenNames([]);
     },
@@ -651,11 +665,14 @@ function PersonForm() {
       )}
 
       <div>
-        <label className={labelCls}>Name *</label>
+        <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
+        <p className="mt-1 text-xs text-gray-400">
+          The canonical English / romanised spelling. The native-script form is added below.
+        </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Primary role (hint)</label>
           <select value={roleType} onChange={(e) => setRoleType(e.target.value)} className={inputCls}>
@@ -672,7 +689,19 @@ function PersonForm() {
           <label className={labelCls}>Birth date</label>
           <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className={inputCls} />
         </div>
+        <div>
+          <label className={labelCls}>Death date</label>
+          <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
+        </div>
       </div>
+
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
 
       <div>
         <label className={labelCls}>Bio</label>

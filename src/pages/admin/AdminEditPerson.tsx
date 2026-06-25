@@ -169,15 +169,6 @@ function EditForm({ person }: { person: Person }) {
         <span className="ml-2 text-sm font-normal text-gray-400">#{person.id}</span>
       </h1>
 
-      {pendingClears && (
-        <ClearedFieldsPrompt
-          fields={pendingClears}
-          onConfirm={() => mutation.mutate()}
-          onCancel={() => setPendingClears(null)}
-          busy={mutation.isPending}
-        />
-      )}
-
       {saved && (
         <EditSavedBanner
           isAdmin={!!isAdmin}
@@ -249,6 +240,15 @@ function EditForm({ person }: { person: Person }) {
       </p>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
+
+      {pendingClears && (
+        <ClearedFieldsPrompt
+          fields={pendingClears}
+          onConfirm={() => mutation.mutate()}
+          onCancel={() => setPendingClears(null)}
+          busy={mutation.isPending}
+        />
+      )}
 
       <div className="flex items-center gap-3 pt-2">
         <button
