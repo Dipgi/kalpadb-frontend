@@ -26,6 +26,7 @@ import ImageUploadField from "../components/ImageUploadField";
 import PenNamesField, { type PenName } from "../components/PenNamesField";
 import PrimaryLanguageSelect from "../components/PrimaryLanguageSelect";
 import NativeNameField from "../components/NativeNameField";
+import CountrySelect from "../components/CountrySelect";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
 
@@ -729,9 +730,12 @@ function PublisherForm() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("IN");
   const [foundedYear, setFoundedYear] = useState("");
+  const [defunctYear, setDefunctYear] = useState("");
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [primaryLanguage, setPrimaryLanguage] = useState("");
+  const [nativeName, setNativeName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [dup, setDup] = useState<DuplicateError | null>(null);
 
@@ -743,9 +747,15 @@ function PublisherForm() {
           city: city.trim() || null,
           country: country.trim() || null,
           founded_year: foundedYear ? Number(foundedYear) : null,
+          defunct_year: defunctYear ? Number(defunctYear) : null,
           website: website.trim() || null,
           description: description.trim() || null,
           image_url: imageUrl.trim() || null,
+          primary_language: primaryLanguage || null,
+          localised:
+            primaryLanguage && nativeName.trim()
+              ? { name: { [primaryLanguage]: nativeName.trim() } }
+              : undefined,
         },
         allowDuplicate,
       ),
@@ -755,9 +765,12 @@ function PublisherForm() {
       setName("");
       setCity("");
       setFoundedYear("");
+      setDefunctYear("");
       setWebsite("");
       setDescription("");
       setImageUrl("");
+      setPrimaryLanguage("");
+      setNativeName("");
     },
     onError: (err) => setDup(getDuplicateError(err)),
   });
@@ -791,19 +804,33 @@ function PublisherForm() {
       )}
 
       <div>
-        <label className={labelCls}>Name *</label>
+        <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
+        <p className="mt-1 text-xs text-gray-400">
+          The canonical English / romanised spelling. The native-script form is added below.
+        </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>City</label>
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Country code</label>
-          <input value={country} onChange={(e) => setCountry(e.target.value)} maxLength={10} className={inputCls} />
+          <label className={labelCls}>Country</label>
+          <CountrySelect value={country} onChange={setCountry} />
         </div>
+      </div>
+
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Founded year</label>
           <input
@@ -812,6 +839,17 @@ function PublisherForm() {
             max={2100}
             value={foundedYear}
             onChange={(e) => setFoundedYear(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Defunct year</label>
+          <input
+            type="number"
+            min={1000}
+            max={2100}
+            value={defunctYear}
+            onChange={(e) => setDefunctYear(e.target.value)}
             className={inputCls}
           />
         </div>

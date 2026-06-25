@@ -822,6 +822,7 @@ export interface PublisherCreateIn {
   city?: string | null;
   country?: string | null;
   founded_year?: number | null;
+  defunct_year?: number | null;
   website?: string | null;
   description?: string | null;
   image_url?: string | null;

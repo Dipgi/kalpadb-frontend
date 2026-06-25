@@ -610,6 +610,7 @@ function PublisherForm() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("IN");
   const [foundedYear, setFoundedYear] = useState("");
+  const [defunctYear, setDefunctYear] = useState("");
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -627,6 +628,7 @@ function PublisherForm() {
             city: city.trim() || null,
             country: country.trim() || null,
             founded_year: foundedYear ? Number(foundedYear) : null,
+            defunct_year: defunctYear ? Number(defunctYear) : null,
             website: website.trim() || null,
             description: description.trim() || null,
             image_url: imageUrl.trim() || null,
@@ -645,6 +647,7 @@ function PublisherForm() {
       setName("");
       setCity("");
       setFoundedYear("");
+      setDefunctYear("");
       setWebsite("");
       setDescription("");
       setImageUrl("");
@@ -689,7 +692,7 @@ function PublisherForm() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>City</label>
           <input value={city} onChange={(e) => setCity(e.target.value)} className={inputCls} />
@@ -698,6 +701,17 @@ function PublisherForm() {
           <label className={labelCls}>Country</label>
           <CountrySelect value={country} onChange={setCountry} />
         </div>
+      </div>
+
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Founded year</label>
           <input
@@ -709,15 +723,18 @@ function PublisherForm() {
             className={inputCls}
           />
         </div>
+        <div>
+          <label className={labelCls}>Defunct year</label>
+          <input
+            type="number"
+            min={1000}
+            max={2100}
+            value={defunctYear}
+            onChange={(e) => setDefunctYear(e.target.value)}
+            className={inputCls}
+          />
+        </div>
       </div>
-
-      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
-
-      <NativeNameField
-        primaryLanguage={primaryLanguage}
-        value={nativeName}
-        onChange={setNativeName}
-      />
 
       <div>
         <label className={labelCls}>Website</label>
