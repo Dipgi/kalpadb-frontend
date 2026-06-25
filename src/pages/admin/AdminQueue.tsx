@@ -10,6 +10,8 @@ export default function AdminQueue() {
   const [rejectOpen, setRejectOpen] = useState<number | null>(null);
   // edit_id → conflicting fields, surfaced when a clean approve is blocked by drift.
   const [conflicts, setConflicts] = useState<Record<number, EditConflict[]>>({});
+  // edit_id → error message for a failed approve/reject that isn't a conflict.
+  const [errMsg, setErrMsg] = useState<Record<number, string>>({});
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-queue", page],
@@ -37,10 +39,21 @@ export default function AdminQueue() {
         delete next[vars.id];
         return next;
       });
+      setErrMsg((m) => {
+        const next = { ...m };
+        delete next[vars.id];
+        return next;
+      });
     },
     onError: (err, vars) => {
       const conflict = getConflictError(err);
-      if (conflict) setConflicts((c) => ({ ...c, [vars.id]: conflict.conflicts }));
+      if (conflict) {
+        setConflicts((c) => ({ ...c, [vars.id]: conflict.conflicts }));
+      } else {
+        // Surface anything else (e.g. a 500) instead of silently doing nothing.
+        const msg = err instanceof Error && err.message ? err.message : "Action failed — try again.";
+        setErrMsg((m) => ({ ...m, [vars.id]: msg }));
+      }
     },
   });
 
@@ -169,6 +182,12 @@ export default function AdminQueue() {
                   </button>
                 </div>
               </div>
+
+              {errMsg[entry.id] && (
+                <p className="mt-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                  {errMsg[entry.id]}
+                </p>
+              )}
 
               {rejectOpen === entry.id && (
                 <div className="mt-3 flex gap-2">
