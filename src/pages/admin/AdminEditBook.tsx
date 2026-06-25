@@ -369,25 +369,15 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className={labelCls}>Edition label</label>
-          <input
-            value={editionLabel}
-            onChange={(e) => setEditionLabel(e.target.value)}
-            placeholder="e.g. First Edition, Revised"
-            className={inputCls}
-          />
-        </div>
-        <div>
-          <label className={labelCls}>Edition notes</label>
-          <input
-            value={editionNotes}
-            onChange={(e) => setEditionNotes(e.target.value)}
-            className={inputCls}
-          />
-        </div>
-      </div>
+      <FormatsEditor value={formats} onChange={setFormats} />
+
+      <SourceAttributionFields value={source} onChange={setSource} />
+
+      <TranslationLinksEditor
+        workId={work.id}
+        workLanguage={work.language}
+        isAdmin={!!isAdmin}
+      />
 
       {seriesList.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -417,6 +407,26 @@ function EditForm({ work }: { work: WorkDetail }) {
           </div>
         </div>
       )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Edition label</label>
+          <input
+            value={editionLabel}
+            onChange={(e) => setEditionLabel(e.target.value)}
+            placeholder="e.g. First Edition, Revised"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Edition notes</label>
+          <input
+            value={editionNotes}
+            onChange={(e) => setEditionNotes(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+      </div>
 
       <ImageUploadField
         label="Cover image"
@@ -511,16 +521,6 @@ function EditForm({ work }: { work: WorkDetail }) {
           ))}
         </div>
       </div>
-
-      <FormatsEditor value={formats} onChange={setFormats} />
-
-      <TranslationLinksEditor
-        workId={work.id}
-        workLanguage={work.language}
-        isAdmin={!!isAdmin}
-      />
-
-      <SourceAttributionFields value={source} onChange={setSource} />
 
       {(allTags ?? []).length > 0 && (
         <div>

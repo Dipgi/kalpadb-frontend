@@ -262,6 +262,8 @@ function BookForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
+  // Optional manual romanised title; blank → backend auto-generates one.
+  const [roman, setRoman] = useState("");
   const [originalLanguage, setOriginalLanguage] = useState("");
   const [year, setYear] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
@@ -285,11 +287,17 @@ function BookForm() {
   const mutation = useMutation({
     mutationFn: () => {
       const y = year ? Number(year) : null;
+      // Only pin a manual romanisation when one was typed; otherwise let the backend
+      // auto-generate it from the title.
+      const localised = roman.trim()
+        ? { title: { [`${language}-Latn`]: roman.trim() } }
+        : undefined;
       return volunteer.submitBook({
         title: title.trim(),
         description: description.trim() || null,
         content_type: contentType || null,
         language,
+        localised,
         original_language: originalLanguage || null,
         publication_year: y,
         publication_date: y ? `${y}-01-01` : null,
@@ -314,6 +322,7 @@ function BookForm() {
       setSubmitted(true);
       setTitle("");
       setDescription("");
+      setRoman("");
       setOriginalLanguage("");
       setYear("");
       setAuthors([]);
@@ -350,12 +359,28 @@ function BookForm() {
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
       </div>
 
+      {language !== "en" && (
+        <div>
+          <label className={labelCls}>Romanised title ({language}-Latn)</label>
+          <input
+            value={roman}
+            onChange={(e) => setRoman(e.target.value)}
+            placeholder="Optional — leave blank to auto-generate from the title"
+            className={inputCls}
+          />
+          <p className="mt-1 text-xs text-gray-400">
+            For search. Leave blank and it’s generated automatically; fill it in only to
+            override, which pins your version.
+          </p>
+        </div>
+      )}
+
       <div>
         <label className={labelCls}>Description</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Work type</label>
           <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
@@ -397,9 +422,6 @@ function BookForm() {
             </optgroup>
           </select>
         </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Publication year</label>
           <input

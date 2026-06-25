@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, user, admin, catalogue, type Rating, type PublicReview } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import { romanisedTitle } from "../lib/title";
+import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
 
 const SHELF_STATUSES: { value: string; label: string }[] = [
@@ -26,6 +27,7 @@ export default function WorkDetailPage() {
   });
 
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
 
   const { data: translations } = useQuery({
     queryKey: ["work-translations", Number(id)],
@@ -105,6 +107,10 @@ export default function WorkDetailPage() {
     work.book?.series_id != null
       ? (seriesPage?.items.find((s) => s.id === work.book?.series_id)?.name ?? null)
       : null;
+  const langName = (code: string) =>
+    languages?.find((l) => l.code === code)?.name ??
+    WORLD_LANGUAGES.find((l) => l.code === code)?.name ??
+    code.toUpperCase();
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -179,6 +185,11 @@ export default function WorkDetailPage() {
             {work.language && (
               <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full uppercase">
                 {work.language}
+              </span>
+            )}
+            {work.original_language && (
+              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+                Translated from {langName(work.original_language)}
               </span>
             )}
             {work.genres?.map((g) => (
