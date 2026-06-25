@@ -25,6 +25,7 @@ import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
 import PenNamesField, { type PenName } from "../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../lib/languages";
+import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
 
 type Tab = "book" | "person" | "publisher" | "series";
 
@@ -278,6 +279,7 @@ function BookForm() {
   const [editionLabel, setEditionLabel] = useState("");
   const [editionNotes, setEditionNotes] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
+  const [contentType, setContentType] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
@@ -286,6 +288,7 @@ function BookForm() {
       return volunteer.submitBook({
         title: title.trim(),
         description: description.trim() || null,
+        content_type: contentType || null,
         language,
         original_language: originalLanguage || null,
         publication_year: y,
@@ -353,6 +356,17 @@ function BookForm() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Work type</label>
+          <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
+            <option value="">Unspecified</option>
+            {WORK_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
