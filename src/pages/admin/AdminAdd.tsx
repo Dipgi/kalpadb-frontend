@@ -483,6 +483,7 @@ function StoryForm() {
   const [wordCount, setWordCount] = useState("");
   const [pageCount, setPageCount] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
+  const [translators, setTranslators] = useState<PickerItem[]>([]);
   // The anthology / collection / magazine-issue this story appears in (optional,
   // single-select). Stored as an array to reuse EntityPicker; only the last pick
   // is kept.
@@ -508,6 +509,7 @@ function StoryForm() {
           page_count: pageCount ? Number(pageCount) : null,
           book_id: collection[0]?.id ?? null,
           author_ids: authors.map((a) => a.id),
+          translator_ids: translators.map((t) => t.id),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         })
@@ -523,6 +525,7 @@ function StoryForm() {
       setWordCount("");
       setPageCount("");
       setAuthors([]);
+      setTranslators([]);
       setCollection([]);
       setGenreIds(new Set());
       setTagIds(new Set());
@@ -644,6 +647,16 @@ function StoryForm() {
         fetcher={(q) => catalogue.persons(q)}
         selected={authors}
         onChange={setAuthors}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Translators"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={translators}
+        onChange={setTranslators}
         onCreate={createPersonInline}
       />
 

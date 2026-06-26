@@ -94,9 +94,12 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [authors, setAuthors] = useState<PickerItem[]>(
     work.authors.map((a) => ({ id: a.id, name: a.name }))
   );
+  const [translators, setTranslators] = useState<PickerItem[]>(
+    (work.story?.translators ?? []).map((t) => ({ id: t.id, name: t.name }))
+  );
   const [collection, setCollection] = useState<PickerItem[]>(
     work.story?.book_id != null
-      ? [{ id: work.story.book_id, name: `Book #${work.story.book_id}` }]
+      ? [{ id: work.story.book_id, name: work.story.book_title ?? `Book #${work.story.book_id}` }]
       : []
   );
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
@@ -139,6 +142,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           page_count: pageCount ? Number(pageCount) : null,
           book_id: collection[0]?.id ?? null,
           author_ids: authors.map((a) => a.id),
+          translator_ids: translators.map((t) => t.id),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         },
@@ -316,6 +320,16 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={authors}
         onChange={setAuthors}
+        onCreate={isAdmin ? createPersonInline : undefined}
+      />
+
+      <EntityPicker
+        label="Translators"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={translators}
+        onChange={setTranslators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
 

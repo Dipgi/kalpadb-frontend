@@ -167,6 +167,8 @@ export interface StoryDetail {
   id: number;
   /** When the story appears inside an anthology/collection, the parent book id. */
   book_id: number | null;
+  /** Title of the parent anthology/collection (book_id), for display. */
+  book_title: string | null;
   original_title: string | null;
   page_count: number | null;
   word_count: number | null;
@@ -877,6 +879,7 @@ export interface StoryCreateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  translator_ids?: number[];
   /** When the story appears inside an anthology/collection, the parent book's work id. */
   book_id?: number | null;
   original_title?: string | null;
@@ -898,6 +901,7 @@ export interface StoryUpdateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  translator_ids?: number[];
   book_id?: number | null;
   original_title?: string | null;
   page_count?: number | null;

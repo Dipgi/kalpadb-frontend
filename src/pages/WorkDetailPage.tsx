@@ -257,28 +257,31 @@ export default function WorkDetailPage() {
           </div>
         )}
 
-        {work.story && (work.story.word_count != null || work.story.page_count != null || work.story.book_id != null) && (
-          <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Story details</h3>
-            <div className="text-sm text-gray-700 space-y-1">
-              {work.story.word_count != null && (
-                <p>Word count: {work.story.word_count.toLocaleString()}</p>
-              )}
-              {work.story.page_count != null && <p>Pages: {work.story.page_count}</p>}
-              {work.story.book_id != null && (
-                <p>
-                  Appears in:{" "}
-                  <Link
-                    to={`/works/${work.story.book_id}`}
-                    className="text-violet-700 hover:underline"
-                  >
-                    view collection
-                  </Link>
-                </p>
-              )}
+        {work.story &&
+          (work.story.word_count != null ||
+            work.story.page_count != null ||
+            work.story.book_id != null) && (
+            <div>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Story details</h3>
+              <div className="text-sm text-gray-700 space-y-1">
+                {work.story.word_count != null && (
+                  <p>Word count: {work.story.word_count.toLocaleString()}</p>
+                )}
+                {work.story.page_count != null && <p>Pages: {work.story.page_count}</p>}
+                {work.story.book_id != null && (
+                  <p>
+                    Appears in:{" "}
+                    <Link
+                      to={`/works/${work.story.book_id}`}
+                      className="text-violet-700 hover:underline"
+                    >
+                      {work.story.book_title ?? "view collection"}
+                    </Link>
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {work.story?.translators && work.story.translators.length > 0 && (
           <div>
