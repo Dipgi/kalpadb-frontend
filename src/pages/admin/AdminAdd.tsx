@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   admin,
   catalogue,
+  search,
   volunteer,
   getDuplicateError,
   type DuplicateError,
@@ -28,9 +29,9 @@ import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
-import { WORK_TYPE_OPTIONS } from "../../lib/workTypes";
+import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../../lib/workTypes";
 
-type Tab = "book" | "person" | "publisher";
+type Tab = "book" | "story" | "person" | "publisher";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -72,7 +73,7 @@ export default function AdminAdd() {
       <h1 className="text-xl font-bold text-gray-900 mb-6">Add Records</h1>
 
       <div className="flex gap-2 mb-6">
-        {(["book", "person", "publisher"] as Tab[]).map((t) => (
+        {(["book", "story", "person", "publisher"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -88,6 +89,7 @@ export default function AdminAdd() {
       </div>
 
       {tab === "book" && <BookForm />}
+      {tab === "story" && <StoryForm />}
       {tab === "person" && <PersonForm />}
       {tab === "publisher" && <PublisherForm />}
     </div>
@@ -457,6 +459,266 @@ function BookForm() {
       )}
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create book" />
+    </form>
+  );
+}
+
+// ── Story form ──────────────────────────────────────────────────────────────
+
+function StoryForm() {
+  const qc = useQueryClient();
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({
+    queryKey: ["all-languages"],
+    queryFn: catalogue.allLanguages,
+  });
+  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [language, setLanguage] = useState("bn");
+  const [storyType, setStoryType] = useState("shortstory");
+  const [originalLanguage, setOriginalLanguage] = useState("");
+  const [year, setYear] = useState("");
+  const [wordCount, setWordCount] = useState("");
+  const [pageCount, setPageCount] = useState("");
+  const [authors, setAuthors] = useState<PickerItem[]>([]);
+  // The anthology / collection / magazine-issue this story appears in (optional,
+  // single-select). Stored as an array to reuse EntityPicker; only the last pick
+  // is kept.
+  const [collection, setCollection] = useState<PickerItem[]>([]);
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [createdId, setCreatedId] = useState<number | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      const y = year ? Number(year) : null;
+      return submitAndApprove(() =>
+        volunteer.submitStory({
+          title: title.trim(),
+          description: description.trim() || null,
+          language,
+          original_language: originalLanguage || null,
+          publication_date: y ? `${y}-01-01` : null,
+          // story_length mirrors content_type on the LiteraryWork (see model).
+          content_type: storyType || null,
+          story_length: storyType || null,
+          word_count: wordCount ? Number(wordCount) : null,
+          page_count: pageCount ? Number(pageCount) : null,
+          book_id: collection[0]?.id ?? null,
+          author_ids: authors.map((a) => a.id),
+          genre_ids: [...genreIds],
+          tag_ids: [...tagIds],
+        })
+      );
+    },
+    onSuccess: (entry) => {
+      setCreatedId(entry.record_id);
+      qc.invalidateQueries({ queryKey: ["works"] });
+      setTitle("");
+      setDescription("");
+      setOriginalLanguage("");
+      setYear("");
+      setWordCount("");
+      setPageCount("");
+      setAuthors([]);
+      setCollection([]);
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (title.trim()) mutation.mutate();
+      }}
+      className="max-w-2xl space-y-4"
+    >
+      {createdId != null && (
+        <SuccessBanner message="Story created." link={`/works/${createdId}`} linkText="View story →" />
+      )}
+
+      <div>
+        <label className={labelCls}>Title * (native script preferred)</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        <p className="mt-1 text-xs text-gray-400">
+          A romanised title for search is generated automatically; override it later from the edit page.
+        </p>
+      </div>
+
+      <div>
+        <label className={labelCls}>Description / synopsis</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className={inputCls}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div>
+          <label className={labelCls}>Story type</label>
+          <select value={storyType} onChange={(e) => setStoryType(e.target.value)} className={inputCls}>
+            {STORY_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Language</label>
+          <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+            {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Original language (if translation)</label>
+          <select
+            value={originalLanguage}
+            onChange={(e) => setOriginalLanguage(e.target.value)}
+            className={inputCls}
+          >
+            <option value="">Not a translation</option>
+            <optgroup label="World languages">
+              {WORLD_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>{l.name}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Indian languages">
+              {(languages ?? [])
+                .filter((l) => !WORLD_LANGUAGES.some((w) => w.code === l.code))
+                .map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                  </option>
+                ))}
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Publication year</label>
+          <input
+            type="number"
+            min={1000}
+            max={2100}
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Word count</label>
+          <input
+            type="number"
+            min={1}
+            value={wordCount}
+            onChange={(e) => setWordCount(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Page count</label>
+          <input
+            type="number"
+            min={1}
+            value={pageCount}
+            onChange={(e) => setPageCount(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      <EntityPicker
+        label="Authors"
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={authors}
+        onChange={setAuthors}
+        onCreate={createPersonInline}
+      />
+
+      <EntityPicker
+        label="Appears in (anthology / collection — optional)"
+        placeholder="Search a book…"
+        fetchKey="picker-collection-books"
+        fetcher={(q) =>
+          search.query(q).then((r) => ({
+            items: r.works
+              .filter((w) => w.type === "BOOK")
+              .map((w) => ({ id: w.id, name: w.title })),
+          }))
+        }
+        selected={collection}
+        onChange={(items) => setCollection(items.slice(-1))}
+      />
+
+      <div>
+        <label className={labelCls}>Genres</label>
+        <div className="flex flex-wrap gap-2">
+          {(allGenres ?? []).map((g: GenreItem) => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() =>
+                setGenreIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(g.id)) next.delete(g.id);
+                  else next.add(g.id);
+                  return next;
+                })
+              }
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                genreIds.has(g.id)
+                  ? "bg-violet-700 text-white border-violet-700"
+                  : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+              }`}
+            >
+              {g.genre_name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {(allTags ?? []).length > 0 && (
+        <div>
+          <label className={labelCls}>Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {(allTags ?? []).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  setTagIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  tagIds.has(t.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {t.tag_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create story" />
     </form>
   );
 }

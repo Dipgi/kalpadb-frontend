@@ -157,7 +157,72 @@ export interface WorkDetail extends WorkSummary {
     illustrators: { id: number; name: string }[];
     cover_artists: { id: number; name: string }[];
   } | null;
-  story: { word_count: number | null } | null;
+  story: StoryDetail | null;
+  comic: ComicDetail | null;
+  media: MediaWorkDetail | null;
+  magazine_detail: MagazineDetail | null;
+}
+
+export interface StoryDetail {
+  id: number;
+  /** When the story appears inside an anthology/collection, the parent book id. */
+  book_id: number | null;
+  original_title: string | null;
+  page_count: number | null;
+  word_count: number | null;
+  story_length: string | null;
+  authors: PersonSummary[];
+  translators: PersonSummary[];
+}
+
+export interface ComicDetail {
+  id: number;
+  series_id: number | null;
+  series_position: number | null;
+  series_position_label: string | null;
+  is_color: boolean | null;
+  reading_direction: string | null;
+  page_count: number | null;
+  isbn: string | null;
+  collected_in_id: number | null;
+  writers: PersonSummary[];
+  artists: PersonSummary[];
+  inkers: PersonSummary[];
+  colorists: PersonSummary[];
+  letterers: PersonSummary[];
+  publishers: PublisherSummary[];
+}
+
+export interface MediaWorkDetail {
+  id: number;
+  runtime_minutes: number | null;
+  total_seasons: number | null;
+  total_episodes: number | null;
+  platform: string | null;
+  production_house: string | null;
+  country_of_origin: string | null;
+  age_rating: string | null;
+  source_lw_id: number | null;
+  credits: {
+    id: number;
+    stakeholder: PersonSummary;
+    role: string;
+    character_name: string | null;
+    is_primary: boolean;
+    notes: string | null;
+  }[];
+  adaptations: { id: number; source_work: WorkSummary; adaptation_type: string; notes: string | null }[];
+}
+
+export interface MagazineDetail {
+  id: number;
+  issn: string | null;
+  publication_frequency: string | null;
+  title: string;
+  description: string | null;
+  language: string | null;
+  localised: Record<string, Record<string, string>>;
+  issues: { m_issue_id: number; issue_number: string | null; publication_date: string | null; cover_image_url: string | null }[];
 }
 
 export interface Person {
@@ -802,6 +867,45 @@ export interface BookCreateIn {
   localised?: Record<string, Record<string, string>>;
 }
 
+export interface StoryCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  content_type?: string | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  author_ids?: number[];
+  /** When the story appears inside an anthology/collection, the parent book's work id. */
+  book_id?: number | null;
+  original_title?: string | null;
+  page_count?: number | null;
+  word_count?: number | null;
+  story_length?: string | null;
+  /** Optional manual localised overrides: { field: { lang: value } }, e.g. { title: { "bn-Latn": "…" } }. */
+  localised?: Record<string, Record<string, string>>;
+}
+
+export interface StoryUpdateIn {
+  title?: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  content_type?: string | null;
+  image_urls?: string[] | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  author_ids?: number[];
+  book_id?: number | null;
+  original_title?: string | null;
+  page_count?: number | null;
+  word_count?: number | null;
+  story_length?: string | null;
+  localised?: Record<string, Record<string, string>>;
+}
+
 export interface PersonCreateIn {
   name: string;
   bio?: string | null;
@@ -909,6 +1013,13 @@ export const volunteer = {
     request<EditSubmission>("/works/books", { method: "POST", body: JSON.stringify(data) }),
   updateBook: (work_id: number, data: BookUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/books/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitStory: (data: StoryCreateIn) =>
+    request<EditSubmission>("/works/stories", { method: "POST", body: JSON.stringify(data) }),
+  updateStory: (work_id: number, data: StoryUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/stories/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),

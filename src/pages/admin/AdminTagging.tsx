@@ -115,6 +115,7 @@ function GenreEditor({ workId, allGenres }: { workId: number; allGenres: GenreIt
   return (
     <GenreChecklist
       workId={workId}
+      workType={work.type}
       allGenres={allGenres}
       initialIds={work.genres.map((g) => g.id)}
     />
@@ -123,10 +124,12 @@ function GenreEditor({ workId, allGenres }: { workId: number; allGenres: GenreIt
 
 function GenreChecklist({
   workId,
+  workType,
   allGenres,
   initialIds,
 }: {
   workId: number;
+  workType: string;
   allGenres: GenreItem[];
   initialIds: number[];
 }) {
@@ -186,10 +189,10 @@ function GenreChecklist({
           <span className="text-xs text-red-500">Save failed — try again.</span>
         )}
         <Link
-          to={`/admin/edit/${workId}`}
+          to={workType === "STORY" ? `/admin/edit-story/${workId}` : `/admin/edit/${workId}`}
           className="text-xs text-violet-600 hover:underline ml-auto"
         >
-          Edit book ✎
+          {workType === "STORY" ? "Edit story ✎" : "Edit book ✎"}
         </Link>
         <Link
           to={`/works/${workId}`}

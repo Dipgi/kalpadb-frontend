@@ -112,6 +112,21 @@ export default function WorkDetailPage() {
     WORLD_LANGUAGES.find((l) => l.code === code)?.name ??
     code.toUpperCase();
 
+  // Edit destination depends on work type and role. Books support both an admin
+  // editor and a volunteer "suggest an edit" flow; stories currently have an
+  // admin editor only. Returns null when no editor exists for this type/role.
+  const role = me?.role.toLowerCase();
+  const isStaff = role === "admin" || role === "volunteer";
+  const editPath = !isStaff
+    ? null
+    : work.type === "BOOK"
+      ? role === "admin"
+        ? `/admin/edit/${work.id}`
+        : `/works/${work.id}/edit`
+      : work.type === "STORY" && role === "admin"
+        ? `/admin/edit-story/${work.id}`
+        : null;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       <div className="flex flex-col md:flex-row gap-8 mb-10">
@@ -133,20 +148,14 @@ export default function WorkDetailPage() {
         <div className="flex-1">
           <div className="flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">{work.title}</h1>
-            {me &&
-              ["admin", "volunteer"].includes(me.role.toLowerCase()) &&
-              work.type === "BOOK" && (
-                <Link
-                  to={
-                    me.role.toLowerCase() === "admin"
-                      ? `/admin/edit/${work.id}`
-                      : `/works/${work.id}/edit`
-                  }
-                  className="shrink-0 text-xs px-3 py-1.5 rounded-md border border-gray-300 text-gray-600 hover:border-violet-400 hover:text-violet-700 transition-colors"
-                >
-                  {me.role.toLowerCase() === "admin" ? "Edit ✎" : "Suggest an edit ✎"}
-                </Link>
-              )}
+            {editPath && (
+              <Link
+                to={editPath}
+                className="shrink-0 text-xs px-3 py-1.5 rounded-md border border-gray-300 text-gray-600 hover:border-violet-400 hover:text-violet-700 transition-colors"
+              >
+                {me!.role.toLowerCase() === "admin" ? "Edit ✎" : "Suggest an edit ✎"}
+              </Link>
+            )}
           </div>
           {romanisedTitle(work.localised, work.title, work.language) && (
             <p className="text-base text-gray-400 italic mb-1">
@@ -245,6 +254,38 @@ export default function WorkDetailPage() {
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Publishers</h3>
             <p className="text-sm text-gray-700">{publishers.map((p) => p.name).join(", ")}</p>
+          </div>
+        )}
+
+        {work.story && (work.story.word_count != null || work.story.page_count != null || work.story.book_id != null) && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Story details</h3>
+            <div className="text-sm text-gray-700 space-y-1">
+              {work.story.word_count != null && (
+                <p>Word count: {work.story.word_count.toLocaleString()}</p>
+              )}
+              {work.story.page_count != null && <p>Pages: {work.story.page_count}</p>}
+              {work.story.book_id != null && (
+                <p>
+                  Appears in:{" "}
+                  <Link
+                    to={`/works/${work.story.book_id}`}
+                    className="text-violet-700 hover:underline"
+                  >
+                    view collection
+                  </Link>
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {work.story?.translators && work.story.translators.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Translators</h3>
+            <p className="text-sm text-gray-700">
+              {work.story.translators.map((t) => t.name).join(", ")}
+            </p>
           </div>
         )}
 

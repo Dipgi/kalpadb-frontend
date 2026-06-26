@@ -33,6 +33,7 @@ import AdminVolunteerRequests from "./pages/admin/AdminVolunteerRequests";
 import AdminTagging from "./pages/admin/AdminTagging";
 import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
+import AdminEditStory from "./pages/admin/AdminEditStory";
 import AdminEditPerson from "./pages/admin/AdminEditPerson";
 import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
 import AdminEditSeries from "./pages/admin/AdminEditSeries";
@@ -152,6 +153,7 @@ export default function App() {
                   <Route path="audit" element={<AdminAudit />} />
                   <Route path="guide" element={<AdminGuide />} />
                   <Route path="edit/:id" element={<AdminEditBook />} />
+                  <Route path="edit-story/:id" element={<AdminEditStory />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
                   <Route path="edit-series/:id" element={<AdminEditSeries />} />

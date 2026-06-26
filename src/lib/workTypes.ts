@@ -10,3 +10,16 @@ export const WORK_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "poem", label: "Poetry" },
   { value: "graphic_novel", label: "Comics / Graphic Novel" },
 ];
+
+// ContentType values relevant to a standalone Story / short work.
+// Used for the story-type dropdown; `value` is the API enum value (lowercase).
+export const STORY_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "shortstory", label: "Short story" },
+  { value: "novelette", label: "Novelette" },
+  { value: "novella", label: "Novella" },
+  { value: "poem", label: "Poem" },
+  { value: "essay", label: "Essay" },
+  { value: "nonfiction", label: "Nonfiction" },
+  { value: "interview", label: "Interview" },
+  { value: "review", label: "Review" },
+];
