@@ -31,7 +31,7 @@ import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../../lib/workTypes";
 
-type Tab = "book" | "story" | "person" | "publisher";
+type Tab = "book" | "story" | "magazine" | "person" | "publisher";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -73,7 +73,7 @@ export default function AdminAdd() {
       <h1 className="text-xl font-bold text-gray-900 mb-6">Add Records</h1>
 
       <div className="flex gap-2 mb-6">
-        {(["book", "story", "person", "publisher"] as Tab[]).map((t) => (
+        {(["book", "story", "magazine", "person", "publisher"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -90,6 +90,7 @@ export default function AdminAdd() {
 
       {tab === "book" && <BookForm />}
       {tab === "story" && <StoryForm />}
+      {tab === "magazine" && <MagazineForm />}
       {tab === "person" && <PersonForm />}
       {tab === "publisher" && <PublisherForm />}
     </div>
@@ -732,6 +733,173 @@ function StoryForm() {
       )}
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create story" />
+    </form>
+  );
+}
+
+// ── Magazine form ─────────────────────────────────────────────────────────────
+
+function MagazineForm() {
+  const qc = useQueryClient();
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({
+    queryKey: ["all-languages"],
+    queryFn: catalogue.allLanguages,
+  });
+  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [language, setLanguage] = useState("bn");
+  const [issn, setIssn] = useState("");
+  const [frequency, setFrequency] = useState("");
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [createdId, setCreatedId] = useState<number | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      submitAndApprove(() =>
+        volunteer.submitMagazine({
+          title: title.trim(),
+          description: description.trim() || null,
+          language,
+          issn: issn.trim() || null,
+          publication_frequency: frequency.trim() || null,
+          genre_ids: [...genreIds],
+          tag_ids: [...tagIds],
+        })
+      ),
+    onSuccess: (entry) => {
+      setCreatedId(entry.record_id);
+      qc.invalidateQueries({ queryKey: ["works"] });
+      setTitle("");
+      setDescription("");
+      setIssn("");
+      setFrequency("");
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (title.trim()) mutation.mutate();
+      }}
+      className="max-w-2xl space-y-4"
+    >
+      {createdId != null && (
+        <SuccessBanner
+          message="Magazine created — you can now add its issues from the edit page."
+          link={`/works/${createdId}`}
+          linkText="View magazine →"
+        />
+      )}
+
+      <div>
+        <label className={labelCls}>Title * (native script preferred)</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        <p className="mt-1 text-xs text-gray-400">
+          The magazine title as a whole (e.g. আশ্চর্য!), not a single issue. A romanised title for
+          search is generated automatically.
+        </p>
+      </div>
+
+      <div>
+        <label className={labelCls}>Description</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className={inputCls}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div>
+          <label className={labelCls}>Language</label>
+          <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+            {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Frequency</label>
+          <input
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value)}
+            placeholder="e.g. monthly, quarterly"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>ISSN</label>
+          <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Genres</label>
+        <div className="flex flex-wrap gap-2">
+          {(allGenres ?? []).map((g: GenreItem) => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() =>
+                setGenreIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(g.id)) next.delete(g.id);
+                  else next.add(g.id);
+                  return next;
+                })
+              }
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                genreIds.has(g.id)
+                  ? "bg-violet-700 text-white border-violet-700"
+                  : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+              }`}
+            >
+              {g.genre_name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {(allTags ?? []).length > 0 && (
+        <div>
+          <label className={labelCls}>Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {(allTags ?? []).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  setTagIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  tagIds.has(t.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {t.tag_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create magazine" />
     </form>
   );
 }

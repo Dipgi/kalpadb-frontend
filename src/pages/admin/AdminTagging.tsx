@@ -189,10 +189,16 @@ function GenreChecklist({
           <span className="text-xs text-red-500">Save failed — try again.</span>
         )}
         <Link
-          to={workType === "STORY" ? `/admin/edit-story/${workId}` : `/admin/edit/${workId}`}
+          to={
+            workType === "STORY"
+              ? `/admin/edit-story/${workId}`
+              : workType === "MAGAZINE"
+                ? `/admin/edit-magazine/${workId}`
+                : `/admin/edit/${workId}`
+          }
           className="text-xs text-violet-600 hover:underline ml-auto"
         >
-          {workType === "STORY" ? "Edit story ✎" : "Edit book ✎"}
+          {workType === "STORY" ? "Edit story ✎" : workType === "MAGAZINE" ? "Edit magazine ✎" : "Edit book ✎"}
         </Link>
         <Link
           to={`/works/${workId}`}

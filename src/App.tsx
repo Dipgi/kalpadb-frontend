@@ -34,6 +34,8 @@ import AdminTagging from "./pages/admin/AdminTagging";
 import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditStory from "./pages/admin/AdminEditStory";
+import AdminEditMagazine from "./pages/admin/AdminEditMagazine";
+import AdminEditMagazineIssue from "./pages/admin/AdminEditMagazineIssue";
 import AdminEditPerson from "./pages/admin/AdminEditPerson";
 import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
 import AdminEditSeries from "./pages/admin/AdminEditSeries";
@@ -120,6 +122,30 @@ export default function App() {
                   }
                 />
                 <Route
+                  path="/works/:id/edit-magazine"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditMagazine />
+                    </div>
+                  }
+                />
+                <Route
+                  path="/magazines/:magId/issues/new"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditMagazineIssue />
+                    </div>
+                  }
+                />
+                <Route
+                  path="/magazines/:magId/issues/:issueId/edit"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditMagazineIssue />
+                    </div>
+                  }
+                />
+                <Route
                   path="/persons/:id/edit"
                   element={
                     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -162,6 +188,7 @@ export default function App() {
                   <Route path="guide" element={<AdminGuide />} />
                   <Route path="edit/:id" element={<AdminEditBook />} />
                   <Route path="edit-story/:id" element={<AdminEditStory />} />
+                  <Route path="edit-magazine/:id" element={<AdminEditMagazine />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
                   <Route path="edit-series/:id" element={<AdminEditSeries />} />

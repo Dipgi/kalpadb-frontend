@@ -434,6 +434,9 @@ export const works = {
 
   get: (id: number) => request<WorkDetail>(`/works/${id}`),
 
+  magazineIssues: (id: number) =>
+    request<MagazineIssueFull[]>(`/works/magazines/${id}/issues`),
+
   reviews: (id: number, page = 1, size = 20) =>
     request<Page<PublicReview>>(`/works/${id}/reviews?page=${page}&page_size=${size}`),
 
@@ -910,6 +913,90 @@ export interface StoryUpdateIn {
   localised?: Record<string, Record<string, string>>;
 }
 
+export interface MagazineCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  issn?: string | null;
+  publication_frequency?: string | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  localised?: Record<string, Record<string, string>>;
+}
+
+export interface MagazineUpdateIn {
+  title?: string;
+  description?: string | null;
+  language?: string | null;
+  image_urls?: string[] | null;
+  issn?: string | null;
+  publication_frequency?: string | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  localised?: Record<string, Record<string, string>>;
+}
+
+export interface ScanInput {
+  url: string;
+  archive_host?: string | null;
+  scan_type?: "full_issue" | "partial" | "text_only" | "cover_only" | null;
+  legal_status?: "open_access" | "public_domain" | "permission" | "unknown" | null;
+  quality_note?: string | null;
+}
+
+export interface MagazineIssueCreateIn {
+  magazine_id: number;
+  issue_number?: string | null;
+  synopsis?: string | null;
+  publication_date?: string | null;
+  cover_image_url?: string | null;
+  cover_artist_ids?: number[];
+  editor_ids?: number[];
+  illustrator_ids?: number[];
+  translator_ids?: number[];
+  publisher_ids?: number[];
+  scans?: ScanInput[];
+  stories?: { story_id: number; page_start?: number | null; page_end?: number | null }[];
+}
+
+export interface MagazineIssueUpdateIn {
+  issue_number?: string | null;
+  synopsis?: string | null;
+  publication_date?: string | null;
+  cover_image_url?: string | null;
+  cover_artist_ids?: number[];
+  editor_ids?: number[];
+  illustrator_ids?: number[];
+  translator_ids?: number[];
+  publisher_ids?: number[];
+  scans?: ScanInput[];
+  stories?: { story_id: number; page_start?: number | null; page_end?: number | null }[];
+}
+
+/** Full issue record returned by GET /magazines/:id/issues. */
+export interface MagazineIssueFull {
+  m_issue_id: number;
+  magazine_id: number | null;
+  issue_number: string | null;
+  synopsis: string | null;
+  publication_date: string | null;
+  cover_image_url: string | null;
+  cover_artists: PersonSummary[];
+  editors: PersonSummary[];
+  illustrators: PersonSummary[];
+  translators: PersonSummary[];
+  publishers: PublisherSummary[];
+  scans: {
+    id: number;
+    url: string;
+    archive_host: string | null;
+    scan_type: string | null;
+    legal_status: string | null;
+    quality_note: string | null;
+  }[];
+  stories: { story_id: number; title: string; page_start: number | null; page_end: number | null }[];
+}
+
 export interface PersonCreateIn {
   name: string;
   bio?: string | null;
@@ -1024,6 +1111,23 @@ export const volunteer = {
     request<EditSubmission>("/works/stories", { method: "POST", body: JSON.stringify(data) }),
   updateStory: (work_id: number, data: StoryUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/stories/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitMagazine: (data: MagazineCreateIn) =>
+    request<EditSubmission>("/works/magazines", { method: "POST", body: JSON.stringify(data) }),
+  updateMagazine: (work_id: number, data: MagazineUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/magazines/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitMagazineIssue: (data: MagazineIssueCreateIn) =>
+    request<EditSubmission>("/works/magazines/issues", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateMagazineIssue: (issue_id: number, data: MagazineIssueUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/magazines/issues/${issue_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),

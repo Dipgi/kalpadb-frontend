@@ -35,6 +35,12 @@ export default function WorkDetailPage() {
     enabled: !!id,
   });
 
+  const { data: magIssues } = useQuery({
+    queryKey: ["magazine-issues", Number(id)],
+    queryFn: () => works.magazineIssues(Number(id)),
+    enabled: !!id && work?.type === "MAGAZINE",
+  });
+
   const shelfMutation = useMutation({
     mutationFn: ({ status }: { status: string }) =>
       user.upsertShelf(work!.id, status),
@@ -127,7 +133,11 @@ export default function WorkDetailPage() {
         ? role === "admin"
           ? `/admin/edit-story/${work.id}`
           : `/works/${work.id}/edit-story`
-        : null;
+        : work.type === "MAGAZINE"
+          ? role === "admin"
+            ? `/admin/edit-magazine/${work.id}`
+            : `/works/${work.id}/edit-magazine`
+          : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -291,6 +301,95 @@ export default function WorkDetailPage() {
             <p className="text-sm text-gray-700">
               {work.story.translators.map((t) => t.name).join(", ")}
             </p>
+          </div>
+        )}
+
+        {work.magazine_detail && (
+          <div className="md:col-span-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Issues
+              <span className="ml-1 font-normal text-gray-300">
+                ({work.magazine_detail.issues.length})
+              </span>
+            </h3>
+            {(work.magazine_detail.issn || work.magazine_detail.publication_frequency) && (
+              <p className="text-xs text-gray-400 mb-2">
+                {work.magazine_detail.publication_frequency}
+                {work.magazine_detail.publication_frequency && work.magazine_detail.issn ? " · " : ""}
+                {work.magazine_detail.issn ? `ISSN ${work.magazine_detail.issn}` : ""}
+              </p>
+            )}
+            {work.magazine_detail.issues.length === 0 ? (
+              <p className="text-sm text-gray-400">No issues catalogued yet.</p>
+            ) : magIssues && magIssues.length > 0 ? (
+              <ul className="space-y-2">
+                {magIssues.map((i) => (
+                  <li key={i.m_issue_id} className="text-sm border border-gray-100 rounded-md px-3 py-2">
+                    <div className="font-medium text-gray-800">
+                      {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                      {i.publication_date ? (
+                        <span className="font-normal text-gray-400"> · {i.publication_date.slice(0, 4)}</span>
+                      ) : null}
+                    </div>
+                    {(i.editors.length > 0 || i.cover_artists.length > 0) && (
+                      <div className="text-xs text-gray-500 mt-0.5">
+                        {i.editors.length > 0 && <>Ed. {i.editors.map((e) => e.name).join(", ")}</>}
+                        {i.editors.length > 0 && i.cover_artists.length > 0 && " · "}
+                        {i.cover_artists.length > 0 && <>Cover: {i.cover_artists.map((c) => c.name).join(", ")}</>}
+                      </div>
+                    )}
+                    {i.stories.length > 0 && (
+                      <ul className="text-xs text-gray-600 mt-1 space-y-0.5">
+                        {i.stories.map((s) => (
+                          <li key={s.story_id}>
+                            <Link to={`/works/${s.story_id}`} className="text-violet-700 hover:underline">
+                              {s.title}
+                            </Link>
+                            {s.page_start != null && (
+                              <span className="text-gray-400">
+                                {" "}
+                                · p.{s.page_start}
+                                {s.page_end != null ? `–${s.page_end}` : ""}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {i.scans.length > 0 && (
+                      <div className="text-xs mt-1 flex flex-wrap gap-2">
+                        {i.scans.map((s) => (
+                          <a
+                            key={s.id}
+                            href={s.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-violet-700 hover:underline"
+                          >
+                            {s.archive_host ?? "scan"}
+                            {s.legal_status ? ` (${s.legal_status.replace(/_/g, " ")})` : ""}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="text-sm text-gray-700 grid grid-cols-2 sm:grid-cols-3 gap-1">
+                {work.magazine_detail.issues
+                  .slice()
+                  .sort((a, b) => (a.publication_date ?? "").localeCompare(b.publication_date ?? ""))
+                  .map((i) => (
+                    <li key={i.m_issue_id}>
+                      {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                      {i.publication_date ? (
+                        <span className="text-gray-400"> · {i.publication_date.slice(0, 4)}</span>
+                      ) : null}
+                    </li>
+                  ))}
+              </ul>
+            )}
           </div>
         )}
 

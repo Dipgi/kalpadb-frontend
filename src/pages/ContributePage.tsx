@@ -31,7 +31,7 @@ import CountrySelect from "../components/CountrySelect";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../lib/workTypes";
 
-type Tab = "book" | "story" | "person" | "publisher" | "series";
+type Tab = "book" | "story" | "magazine" | "person" | "publisher" | "series";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -78,7 +78,7 @@ export default function ContributePage() {
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {(["book", "story", "person", "publisher", "series"] as Tab[]).map((t) => (
+        {(["book", "story", "magazine", "person", "publisher", "series"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -95,6 +95,7 @@ export default function ContributePage() {
 
       {tab === "book" && <BookForm />}
       {tab === "story" && <StoryForm />}
+      {tab === "magazine" && <MagazineForm />}
       {tab === "person" && <PersonForm />}
       {tab === "publisher" && <PublisherForm />}
       {tab === "series" && <SeriesForm />}
@@ -808,6 +809,150 @@ function StoryForm() {
       )}
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit story" />
+    </form>
+  );
+}
+
+// ── Magazine ────────────────────────────────────────────────────────────────
+
+function MagazineForm() {
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
+  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [language, setLanguage] = useState("bn");
+  const [issn, setIssn] = useState("");
+  const [frequency, setFrequency] = useState("");
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      volunteer.submitMagazine({
+        title: title.trim(),
+        description: description.trim() || null,
+        language,
+        issn: issn.trim() || null,
+        publication_frequency: frequency.trim() || null,
+        genre_ids: [...genreIds],
+        tag_ids: [...tagIds],
+      }),
+    onSuccess: () => {
+      setSubmitted(true);
+      setTitle("");
+      setDescription("");
+      setIssn("");
+      setFrequency("");
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitted(false);
+        if (title.trim()) mutation.mutate();
+      }}
+      className="space-y-4"
+    >
+      {submitted && <PendingBanner />}
+
+      <div>
+        <label className={labelCls}>Title * (native script preferred)</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        <p className="mt-1 text-xs text-gray-400">
+          The magazine title as a whole (e.g. আশ্চর্য!), not a single issue.
+        </p>
+      </div>
+
+      <div>
+        <label className={labelCls}>Description</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div>
+          <label className={labelCls}>Language</label>
+          <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+            {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Frequency</label>
+          <input value={frequency} onChange={(e) => setFrequency(e.target.value)} placeholder="e.g. monthly" className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>ISSN</label>
+          <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Genres</label>
+        <div className="flex flex-wrap gap-2">
+          {(allGenres ?? []).map((g: GenreItem) => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() =>
+                setGenreIds((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(g.id)) next.delete(g.id);
+                  else next.add(g.id);
+                  return next;
+                })
+              }
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                genreIds.has(g.id)
+                  ? "bg-violet-700 text-white border-violet-700"
+                  : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+              }`}
+            >
+              {g.genre_name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {(allTags ?? []).length > 0 && (
+        <div>
+          <label className={labelCls}>Tags</label>
+          <div className="flex flex-wrap gap-2">
+            {(allTags ?? []).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() =>
+                  setTagIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(t.id)) next.delete(t.id);
+                    else next.add(t.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  tagIds.has(t.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {t.tag_name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit magazine" />
     </form>
   );
 }
