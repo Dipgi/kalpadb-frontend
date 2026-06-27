@@ -112,9 +112,9 @@ export default function WorkDetailPage() {
     WORLD_LANGUAGES.find((l) => l.code === code)?.name ??
     code.toUpperCase();
 
-  // Edit destination depends on work type and role. Books support both an admin
-  // editor and a volunteer "suggest an edit" flow; stories currently have an
-  // admin editor only. Returns null when no editor exists for this type/role.
+  // Edit destination depends on work type and role. Books and stories each
+  // support both an admin editor and a volunteer "suggest an edit" flow.
+  // Returns null when no editor exists for this type/role.
   const role = me?.role.toLowerCase();
   const isStaff = role === "admin" || role === "volunteer";
   const editPath = !isStaff
@@ -123,8 +123,10 @@ export default function WorkDetailPage() {
       ? role === "admin"
         ? `/admin/edit/${work.id}`
         : `/works/${work.id}/edit`
-      : work.type === "STORY" && role === "admin"
-        ? `/admin/edit-story/${work.id}`
+      : work.type === "STORY"
+        ? role === "admin"
+          ? `/admin/edit-story/${work.id}`
+          : `/works/${work.id}/edit-story`
         : null;
 
   return (
