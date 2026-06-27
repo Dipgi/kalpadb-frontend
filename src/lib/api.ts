@@ -175,6 +175,14 @@ export interface StoryDetail {
   story_length: string | null;
   authors: PersonSummary[];
   translators: PersonSummary[];
+  magazine_appearances: {
+    m_issue_id: number;
+    magazine_id: number | null;
+    magazine_title: string | null;
+    issue_number: string | null;
+    page_start: number | null;
+    page_end: number | null;
+  }[];
 }
 
 export interface ComicDetail {
@@ -879,12 +887,15 @@ export interface StoryCreateIn {
   original_language?: string | null;
   publication_date?: string | null;
   content_type?: string | null;
+  image_urls?: string[] | null;
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
   translator_ids?: number[];
   /** When the story appears inside an anthology/collection, the parent book's work id. */
   book_id?: number | null;
+  /** Magazine issues this story appears in. */
+  magazine_issue_ids?: number[];
   original_title?: string | null;
   page_count?: number | null;
   word_count?: number | null;
@@ -906,6 +917,7 @@ export interface StoryUpdateIn {
   author_ids?: number[];
   translator_ids?: number[];
   book_id?: number | null;
+  magazine_issue_ids?: number[];
   original_title?: string | null;
   page_count?: number | null;
   word_count?: number | null;
@@ -919,6 +931,7 @@ export interface MagazineCreateIn {
   language?: string | null;
   issn?: string | null;
   publication_frequency?: string | null;
+  image_urls?: string[] | null;
   genre_ids?: number[];
   tag_ids?: number[];
   localised?: Record<string, Record<string, string>>;

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import ContributorGate from "../../components/ContributorGate";
+import ImageUploadField from "../../components/ImageUploadField";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
@@ -62,6 +63,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [roman, setRoman] = useState(initialRoman);
   const [issn, setIssn] = useState(work.magazine_detail?.issn ?? "");
   const [frequency, setFrequency] = useState(work.magazine_detail?.publication_frequency ?? "");
+  const [logoUrl, setLogoUrl] = useState(work.image_urls?.[0] ?? "");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
   const [saved, setSaved] = useState(false);
@@ -96,6 +98,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           localised,
           issn: issn.trim() || null,
           publication_frequency: frequency.trim() || null,
+          image_urls: logoUrl.trim() ? [logoUrl.trim()] : [],
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         },
@@ -204,6 +207,13 @@ function EditForm({ work }: { work: WorkDetail }) {
           <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
         </div>
       </div>
+
+      <ImageUploadField
+        label="Cover / logo"
+        category="covers"
+        value={logoUrl}
+        onChange={(url) => setLogoUrl(url ?? "")}
+      />
 
       <div>
         <label className={labelCls}>Genres</label>

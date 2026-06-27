@@ -368,7 +368,7 @@ function IssueForm({
             ? isAdmin ? "Saving…" : "Submitting…"
             : isAdmin ? "Save issue" : "Submit for review"}
         </button>
-        <Link to={`/admin/edit-magazine/${magazineId}`} className="text-sm text-gray-500 hover:text-gray-700">
+        <Link to={`/works/${magazineId}`} className="text-sm text-gray-500 hover:text-gray-700">
           Cancel
         </Link>
         {mutation.isError && <span className="text-sm text-red-500">Save failed — try again.</span>}

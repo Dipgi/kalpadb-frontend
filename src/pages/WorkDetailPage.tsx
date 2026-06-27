@@ -304,6 +304,37 @@ export default function WorkDetailPage() {
           </div>
         )}
 
+        {work.story?.magazine_appearances && work.story.magazine_appearances.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Appeared in
+            </h3>
+            <ul className="text-sm space-y-1">
+              {work.story.magazine_appearances.map((a) => (
+                <li key={a.m_issue_id}>
+                  {a.magazine_id != null ? (
+                    <Link
+                      to={`/magazines/${a.magazine_id}/issues/${a.m_issue_id}`}
+                      className="text-violet-700 hover:underline"
+                    >
+                      {a.magazine_title ?? "Magazine"}
+                      {a.issue_number ? ` — ${a.issue_number}` : ""}
+                    </Link>
+                  ) : (
+                    <span>{a.magazine_title ?? "Magazine"}</span>
+                  )}
+                  {a.page_start != null && (
+                    <span className="text-gray-400">
+                      {" "}· p.{a.page_start}
+                      {a.page_end != null ? `–${a.page_end}` : ""}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {work.magazine_detail && (
           <div className="md:col-span-2">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
@@ -324,9 +355,24 @@ export default function WorkDetailPage() {
             ) : magIssues && magIssues.length > 0 ? (
               <ul className="space-y-2">
                 {magIssues.map((i) => (
-                  <li key={i.m_issue_id} className="text-sm border border-gray-100 rounded-md px-3 py-2">
+                  <li key={i.m_issue_id} className="text-sm border border-gray-100 rounded-md px-3 py-2 flex gap-3">
+                    {i.cover_image_url && (
+                      <Link to={`/magazines/${work.id}/issues/${i.m_issue_id}`} className="shrink-0">
+                        <img
+                          src={i.cover_image_url}
+                          alt=""
+                          className="w-12 h-16 object-cover rounded border border-gray-100"
+                        />
+                      </Link>
+                    )}
+                    <div className="min-w-0 flex-1">
                     <div className="font-medium text-gray-800">
-                      {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                      <Link
+                        to={`/magazines/${work.id}/issues/${i.m_issue_id}`}
+                        className="hover:text-violet-700"
+                      >
+                        {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                      </Link>
                       {i.publication_date ? (
                         <span className="font-normal text-gray-400"> · {i.publication_date.slice(0, 4)}</span>
                       ) : null}
@@ -372,6 +418,7 @@ export default function WorkDetailPage() {
                         ))}
                       </div>
                     )}
+                    </div>
                   </li>
                 ))}
               </ul>

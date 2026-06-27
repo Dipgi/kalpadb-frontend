@@ -11,6 +11,8 @@ import {
 } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import ImageUploadField from "../../components/ImageUploadField";
+import MagazineIssuePicker, { type IssueRef } from "../../components/MagazineIssuePicker";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
@@ -102,6 +104,13 @@ function EditForm({ work }: { work: WorkDetail }) {
       ? [{ id: work.story.book_id, name: work.story.book_title ?? `Book #${work.story.book_id}` }]
       : []
   );
+  const [headpieceUrl, setHeadpieceUrl] = useState(work.image_urls?.[0] ?? "");
+  const [magIssues, setMagIssues] = useState<IssueRef[]>(
+    (work.story?.magazine_appearances ?? []).map((a) => ({
+      m_issue_id: a.m_issue_id,
+      label: `${a.magazine_title ?? "Magazine"} — ${a.issue_number ?? `#${a.m_issue_id}`}`,
+    }))
+  );
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
   const [saved, setSaved] = useState(false);
@@ -140,7 +149,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           publication_date: y ? `${y}-01-01` : null,
           word_count: wordCount ? Number(wordCount) : null,
           page_count: pageCount ? Number(pageCount) : null,
+          image_urls: headpieceUrl.trim() ? [headpieceUrl.trim()] : [],
           book_id: collection[0]?.id ?? null,
+          magazine_issue_ids: magIssues.map((m) => m.m_issue_id),
           author_ids: authors.map((a) => a.id),
           translator_ids: translators.map((t) => t.id),
           genre_ids: [...genreIds],
@@ -346,6 +357,15 @@ function EditForm({ work }: { work: WorkDetail }) {
         }
         selected={collection}
         onChange={(items) => setCollection(items.slice(-1))}
+      />
+
+      <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
+
+      <ImageUploadField
+        label="Headpiece / illustration"
+        category="illustrations"
+        value={headpieceUrl}
+        onChange={(url) => setHeadpieceUrl(url ?? "")}
       />
 
       <div>

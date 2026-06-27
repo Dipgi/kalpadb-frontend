@@ -11,6 +11,7 @@ import BrowsePage from "./pages/BrowsePage";
 // lazyWithRetry recovers from stale chunk hashes after a redeploy (one-time reload).
 const ExplorePage = lazyWithRetry(() => import("./pages/ExplorePage"));
 import WorkDetailPage from "./pages/WorkDetailPage";
+import IssueDetailPage from "./pages/IssueDetailPage";
 import PersonDetailPage from "./pages/PersonDetailPage";
 import PublisherDetailPage from "./pages/PublisherDetailPage";
 import BrowsePersonsPage from "./pages/BrowsePersonsPage";
@@ -90,6 +91,7 @@ export default function App() {
                   }
                 />
                 <Route path="/works/:id" element={<WorkDetailPage />} />
+                <Route path="/magazines/:magId/issues/:issueId" element={<IssueDetailPage />} />
                 <Route path="/persons" element={<BrowsePersonsPage />} />
                 <Route path="/persons/:id" element={<PersonDetailPage />} />
                 <Route path="/publishers" element={<BrowsePublishersPage />} />

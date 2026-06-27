@@ -24,6 +24,7 @@ import SourceAttributionFields, {
 } from "../components/SourceAttributionFields";
 import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
+import MagazineIssuePicker, { type IssueRef } from "../components/MagazineIssuePicker";
 import PenNamesField, { type PenName } from "../components/PenNamesField";
 import PrimaryLanguageSelect from "../components/PrimaryLanguageSelect";
 import NativeNameField from "../components/NativeNameField";
@@ -602,9 +603,11 @@ function StoryForm() {
   const [year, setYear] = useState("");
   const [wordCount, setWordCount] = useState("");
   const [pageCount, setPageCount] = useState("");
+  const [headpieceUrl, setHeadpieceUrl] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
   const [translators, setTranslators] = useState<PickerItem[]>([]);
   const [collection, setCollection] = useState<PickerItem[]>([]);
+  const [magIssues, setMagIssues] = useState<IssueRef[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
@@ -622,7 +625,9 @@ function StoryForm() {
         story_length: storyType || null,
         word_count: wordCount ? Number(wordCount) : null,
         page_count: pageCount ? Number(pageCount) : null,
+        image_urls: headpieceUrl.trim() ? [headpieceUrl.trim()] : null,
         book_id: collection[0]?.id ?? null,
+        magazine_issue_ids: magIssues.map((m) => m.m_issue_id),
         author_ids: authors.map((a) => a.id),
         translator_ids: translators.map((t) => t.id),
         genre_ids: [...genreIds],
@@ -637,9 +642,11 @@ function StoryForm() {
       setYear("");
       setWordCount("");
       setPageCount("");
+      setHeadpieceUrl("");
       setAuthors([]);
       setTranslators([]);
       setCollection([]);
+      setMagIssues([]);
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -752,6 +759,15 @@ function StoryForm() {
         onChange={(items) => setCollection(items.slice(-1))}
       />
 
+      <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
+
+      <ImageUploadField
+        label="Headpiece / illustration"
+        category="illustrations"
+        value={headpieceUrl}
+        onChange={(url) => setHeadpieceUrl(url ?? "")}
+      />
+
       <div>
         <label className={labelCls}>Genres</label>
         <div className="flex flex-wrap gap-2">
@@ -825,6 +841,7 @@ function MagazineForm() {
   const [language, setLanguage] = useState("bn");
   const [issn, setIssn] = useState("");
   const [frequency, setFrequency] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
@@ -837,6 +854,7 @@ function MagazineForm() {
         language,
         issn: issn.trim() || null,
         publication_frequency: frequency.trim() || null,
+        image_urls: logoUrl.trim() ? [logoUrl.trim()] : null,
         genre_ids: [...genreIds],
         tag_ids: [...tagIds],
       }),
@@ -846,6 +864,7 @@ function MagazineForm() {
       setDescription("");
       setIssn("");
       setFrequency("");
+      setLogoUrl("");
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -895,6 +914,13 @@ function MagazineForm() {
           <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
         </div>
       </div>
+
+      <ImageUploadField
+        label="Cover / logo"
+        category="covers"
+        value={logoUrl}
+        onChange={(url) => setLogoUrl(url ?? "")}
+      />
 
       <div>
         <label className={labelCls}>Genres</label>
