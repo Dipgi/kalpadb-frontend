@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { search } from "../lib/api";
 import WorkCard from "../components/WorkCard";
+import MagazineCard from "../components/MagazineCard";
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,7 +23,13 @@ export default function SearchPage() {
     if (val) setSearchParams({ q: val });
   }
 
-  const hasWorks = (result?.works?.length ?? 0) > 0;
+  // Magazines are wide-logo serial titles — show them in their own landscape
+  // section rather than mixing aspect ratios into the portrait Works grid.
+  const allWorks = result?.works ?? [];
+  const works = allWorks.filter((w) => w.type !== "MAGAZINE");
+  const magazines = allWorks.filter((w) => w.type === "MAGAZINE");
+  const hasWorks = works.length > 0;
+  const hasMagazines = magazines.length > 0;
   const hasPersons = (result?.persons?.length ?? 0) > 0;
   const hasPublishers = (result?.publishers?.length ?? 0) > 0;
 
@@ -64,11 +71,24 @@ export default function SearchPage() {
             {hasWorks && (
               <div>
                 <h2 className="text-base font-semibold text-gray-700 mb-4">
-                  Works <span className="text-gray-400 font-normal">({result.works.length})</span>
+                  Works <span className="text-gray-400 font-normal">({works.length})</span>
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {result.works.map((w) => (
+                  {works.map((w) => (
                     <WorkCard key={w.id} work={w} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {hasMagazines && (
+              <div>
+                <h2 className="text-base font-semibold text-gray-700 mb-4">
+                  Magazines <span className="text-gray-400 font-normal">({magazines.length})</span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {magazines.map((w) => (
+                    <MagazineCard key={w.id} work={w} />
                   ))}
                 </div>
               </div>
