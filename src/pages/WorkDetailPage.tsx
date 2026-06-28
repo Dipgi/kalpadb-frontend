@@ -384,9 +384,12 @@ export default function WorkDetailPage() {
               {isStaff && (
                 <Link
                   to={`/magazines/${work.id}/issues/new`}
-                  className="text-xs font-medium text-violet-600 hover:text-violet-800"
+                  className="inline-flex items-center gap-1 bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm hover:bg-violet-800 transition-colors"
                 >
-                  + Add issue
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Add issue
                 </Link>
               )}
             </div>
