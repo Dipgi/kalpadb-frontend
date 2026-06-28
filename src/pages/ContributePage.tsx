@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import {
@@ -37,7 +37,17 @@ import CountrySelect from "../components/CountrySelect";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../lib/workTypes";
 
-type Tab = "book" | "story" | "magazine" | "person" | "publisher" | "series";
+type Tab = "book" | "story" | "magazine" | "issue" | "person" | "publisher" | "series";
+
+const TAB_LABELS: Record<Tab, string> = {
+  book: "Book",
+  story: "Story",
+  magazine: "Magazine",
+  issue: "Magazine issue",
+  person: "Person",
+  publisher: "Publisher",
+  series: "Series",
+};
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -84,17 +94,17 @@ export default function ContributePage() {
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {(["book", "story", "magazine", "person", "publisher", "series"] as Tab[]).map((t) => (
+        {(["book", "story", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`text-sm px-4 py-1.5 rounded-md border capitalize transition-colors ${
+            className={`text-sm px-4 py-1.5 rounded-md border transition-colors ${
               tab === t
                 ? "bg-violet-700 text-white border-violet-700"
                 : "border-gray-300 text-gray-600 hover:border-violet-400"
             }`}
           >
-            {t}
+            {TAB_LABELS[t]}
           </button>
         ))}
       </div>
@@ -102,6 +112,7 @@ export default function ContributePage() {
       {tab === "book" && <BookForm />}
       {tab === "story" && <StoryForm />}
       {tab === "magazine" && <MagazineForm />}
+      {tab === "issue" && <MagazineIssueChooser />}
       {tab === "person" && <PersonForm />}
       {tab === "publisher" && <PublisherForm />}
       {tab === "series" && <SeriesForm />}
@@ -840,6 +851,44 @@ function StoryForm() {
 }
 
 // ── Magazine ────────────────────────────────────────────────────────────────
+
+// Adding an issue needs a parent magazine, so pick one first, then hand off to
+// the existing add-issue page (which carries the magazine id in its route).
+function MagazineIssueChooser() {
+  const navigate = useNavigate();
+  const [mag, setMag] = useState<PickerItem[]>([]);
+  const magId = mag[0]?.id;
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500">
+        Adding an issue of an existing magazine. Pick the magazine, then continue to fill in the
+        issue. To add a brand-new magazine title instead, use the <strong>Magazine</strong> tab.
+      </p>
+      <EntityPicker
+        label="Magazine"
+        placeholder="Search a magazine…"
+        fetchKey="contribute-issue-magazine"
+        fetcher={(q) =>
+          search.query(q).then((r) => ({
+            items: r.works
+              .filter((w) => w.type === "MAGAZINE")
+              .map((w) => ({ id: w.id, name: w.title })),
+          }))
+        }
+        selected={mag}
+        onChange={(items) => setMag(items.slice(-1))}
+      />
+      <button
+        type="button"
+        disabled={!magId}
+        onClick={() => navigate(`/magazines/${magId}/issues/new`)}
+        className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
+      >
+        Continue
+      </button>
+    </div>
+  );
+}
 
 function MagazineForm() {
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });

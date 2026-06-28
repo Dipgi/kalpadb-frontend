@@ -374,12 +374,22 @@ export default function WorkDetailPage() {
 
         {work.magazine_detail && (
           <div className="md:col-span-2">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-              Issues
-              <span className="ml-1 font-normal text-gray-300">
-                ({work.magazine_detail.issues.length})
-              </span>
-            </h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Issues
+                <span className="ml-1 font-normal text-gray-300">
+                  ({work.magazine_detail.issues.length})
+                </span>
+              </h3>
+              {isStaff && (
+                <Link
+                  to={`/magazines/${work.id}/issues/new`}
+                  className="text-xs font-medium text-violet-600 hover:text-violet-800"
+                >
+                  + Add issue
+                </Link>
+              )}
+            </div>
             {(work.magazine_detail.issn || work.magazine_detail.publication_frequency) && (
               <p className="text-xs text-gray-400 mb-2">
                 {work.magazine_detail.publication_frequency}
