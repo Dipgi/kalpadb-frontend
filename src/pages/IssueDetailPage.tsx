@@ -120,6 +120,9 @@ export default function IssueDetailPage() {
                 <Link to={`/works/${s.story_id}`} className="text-violet-700 hover:underline">
                   {s.title}
                 </Link>
+                {s.authors.length > 0 && (
+                  <span className="text-gray-500"> — {s.authors.map((a) => a.name).join(", ")}</span>
+                )}
                 {s.page_start != null && (
                   <span className="text-gray-400">
                     {" "}· p.{s.page_start}
@@ -129,6 +132,11 @@ export default function IssueDetailPage() {
               </li>
             ))}
           </ul>
+          {issue.contributors.length > 0 && (
+            <div className="mt-4">
+              {credit("Contributors", issue.contributors)}
+            </div>
+          )}
         </div>
       )}
 

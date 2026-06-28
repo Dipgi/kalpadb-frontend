@@ -270,9 +270,7 @@ export default function WorkDetailPage() {
         )}
 
         {work.story &&
-          (work.story.word_count != null ||
-            work.story.page_count != null ||
-            work.story.book_id != null) && (
+          (work.story.word_count != null || work.story.page_count != null) && (
             <div>
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Story details</h3>
               <div className="text-sm text-gray-700 space-y-1">
@@ -280,17 +278,6 @@ export default function WorkDetailPage() {
                   <p>Word count: {work.story.word_count.toLocaleString()}</p>
                 )}
                 {work.story.page_count != null && <p>Pages: {work.story.page_count}</p>}
-                {work.story.book_id != null && (
-                  <p>
-                    Appears in:{" "}
-                    <Link
-                      to={`/works/${work.story.book_id}`}
-                      className="text-violet-700 hover:underline"
-                    >
-                      {work.story.book_title ?? "view collection"}
-                    </Link>
-                  </p>
-                )}
               </div>
             </div>
           )}
@@ -304,13 +291,63 @@ export default function WorkDetailPage() {
           </div>
         )}
 
-        {work.story?.magazine_appearances && work.story.magazine_appearances.length > 0 && (
+        {work.story?.first_published && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-              Appeared in
+              First published
+            </h3>
+            <p className="text-sm text-gray-700">
+              {work.story.first_published.book_id != null ? (
+                <Link
+                  to={`/works/${work.story.first_published.book_id}`}
+                  className="text-violet-700 hover:underline"
+                >
+                  {work.story.first_published.title ?? "Book"}
+                </Link>
+              ) : work.story.first_published.issue_id != null &&
+                work.story.first_published.magazine_id != null ? (
+                <Link
+                  to={`/magazines/${work.story.first_published.magazine_id}/issues/${work.story.first_published.issue_id}`}
+                  className="text-violet-700 hover:underline"
+                >
+                  {work.story.first_published.title ?? "Magazine issue"}
+                </Link>
+              ) : (
+                <span>{work.story.first_published.note ?? work.story.first_published.title}</span>
+              )}
+              {work.story.first_published.pub_date && (
+                <span className="text-gray-400">
+                  {" "}· {work.story.first_published.pub_date.slice(0, 4)}
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+
+        {((work.story?.book_appearances?.length ?? 0) > 0 ||
+          (work.story?.magazine_appearances?.length ?? 0) > 0) && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Appears in
             </h3>
             <ul className="text-sm space-y-1">
-              {work.story.magazine_appearances.map((a) => (
+              {work.story?.book_appearances?.map((b) => (
+                <li key={`b-${b.book_id}`}>
+                  <Link
+                    to={`/works/${b.book_id}`}
+                    className="text-violet-700 hover:underline"
+                  >
+                    {b.book_title ?? "Collection"}
+                  </Link>
+                  {b.page_start != null && (
+                    <span className="text-gray-400">
+                      {" "}· p.{b.page_start}
+                      {b.page_end != null ? `–${b.page_end}` : ""}
+                    </span>
+                  )}
+                </li>
+              ))}
+              {work.story?.magazine_appearances?.map((a) => (
                 <li key={a.m_issue_id}>
                   {a.magazine_id != null ? (
                     <Link
@@ -516,6 +553,53 @@ export default function WorkDetailPage() {
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Cover artists</h3>
             <p className="text-sm text-gray-700">{work.book.cover_artists.map((c) => c.name).join(", ")}</p>
+          </div>
+        )}
+
+        {work.book?.stories && work.book.stories.length > 0 && (
+          <div className="md:col-span-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Table of contents
+            </h3>
+            <ol className="text-sm space-y-1 list-decimal list-inside">
+              {work.book.stories.map((s) => (
+                <li key={s.story_id}>
+                  <Link to={`/works/${s.story_id}`} className="text-violet-700 hover:underline">
+                    {s.title}
+                  </Link>
+                  {s.authors.length > 0 && (
+                    <span className="text-gray-500"> — {s.authors.map((a) => a.name).join(", ")}</span>
+                  )}
+                  {s.page_start != null && (
+                    <span className="text-gray-400">
+                      {" "}· p.{s.page_start}
+                      {s.page_end != null ? `–${s.page_end}` : ""}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {work.book?.contributors && work.book.contributors.length > 0 && (
+          <div className="md:col-span-2">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Contributors
+            </h3>
+            <p className="text-sm text-gray-700">
+              {work.book.contributors.map((c, i) => (
+                <span key={c.id}>
+                  {i > 0 && ", "}
+                  <Link to={`/persons/${c.id}`} className="text-violet-700 hover:underline">
+                    {c.name}
+                  </Link>
+                  {c.roles && c.roles.includes("translator") && !c.roles.includes("author") && (
+                    <span className="text-gray-400"> (translator)</span>
+                  )}
+                </span>
+              ))}
+            </p>
           </div>
         )}
 

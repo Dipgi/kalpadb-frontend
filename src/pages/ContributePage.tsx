@@ -25,6 +25,11 @@ import SourceAttributionFields, {
 import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
 import MagazineIssuePicker, { type IssueRef } from "../components/MagazineIssuePicker";
+import FirstPublishedField, {
+  emptyFirstPublished,
+  firstPublishedPayload,
+  type FirstPublishedValue,
+} from "../components/FirstPublishedField";
 import PenNamesField, { type PenName } from "../components/PenNamesField";
 import PrimaryLanguageSelect from "../components/PrimaryLanguageSelect";
 import NativeNameField from "../components/NativeNameField";
@@ -608,6 +613,7 @@ function StoryForm() {
   const [translators, setTranslators] = useState<PickerItem[]>([]);
   const [collection, setCollection] = useState<PickerItem[]>([]);
   const [magIssues, setMagIssues] = useState<IssueRef[]>([]);
+  const [firstPub, setFirstPub] = useState<FirstPublishedValue>(emptyFirstPublished);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
@@ -626,8 +632,9 @@ function StoryForm() {
         word_count: wordCount ? Number(wordCount) : null,
         page_count: pageCount ? Number(pageCount) : null,
         image_urls: headpieceUrl.trim() ? [headpieceUrl.trim()] : null,
-        book_id: collection[0]?.id ?? null,
+        book_ids: collection.map((c) => c.id),
         magazine_issue_ids: magIssues.map((m) => m.m_issue_id),
+        ...firstPublishedPayload(firstPub),
         author_ids: authors.map((a) => a.id),
         translator_ids: translators.map((t) => t.id),
         genre_ids: [...genreIds],
@@ -647,6 +654,7 @@ function StoryForm() {
       setTranslators([]);
       setCollection([]);
       setMagIssues([]);
+      setFirstPub(emptyFirstPublished);
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -747,7 +755,7 @@ function StoryForm() {
       />
 
       <EntityPicker
-        label="Appears in (anthology / collection — optional)"
+        label="Appears in (anthologies / collections — optional)"
         placeholder="Search a book…"
         fetchKey="picker-collection-books"
         fetcher={(q) =>
@@ -756,10 +764,12 @@ function StoryForm() {
           }))
         }
         selected={collection}
-        onChange={(items) => setCollection(items.slice(-1))}
+        onChange={setCollection}
       />
 
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
+
+      <FirstPublishedField value={firstPub} onChange={setFirstPub} />
 
       <ImageUploadField
         label="Headpiece / illustration"

@@ -156,6 +156,16 @@ export interface WorkDetail extends WorkSummary {
     translators: { id: number; name: string }[];
     illustrators: { id: number; name: string }[];
     cover_artists: { id: number; name: string }[];
+    /** Table of contents for anthologies/collections. */
+    stories: {
+      story_id: number;
+      title: string;
+      authors: PersonSummary[];
+      page_start: number | null;
+      page_end: number | null;
+    }[];
+    /** Deduped roll-up of every contained story's author/translator credits. */
+    contributors: PersonSummary[];
   } | null;
   story: StoryDetail | null;
   comic: ComicDetail | null;
@@ -165,16 +175,28 @@ export interface WorkDetail extends WorkSummary {
 
 export interface StoryDetail {
   id: number;
-  /** When the story appears inside an anthology/collection, the parent book id. */
-  book_id: number | null;
-  /** Title of the parent anthology/collection (book_id), for display. */
-  book_title: string | null;
   original_title: string | null;
   page_count: number | null;
   word_count: number | null;
   story_length: string | null;
   authors: PersonSummary[];
   translators: PersonSummary[];
+  /** Book anthologies/collections this story appears in (story → book). */
+  book_appearances: {
+    book_id: number;
+    book_title: string | null;
+    page_start: number | null;
+    page_end: number | null;
+  }[];
+  /** Resolved original-publication venue (null when unknown). */
+  first_published: {
+    book_id: number | null;
+    issue_id: number | null;
+    magazine_id: number | null;
+    title: string | null;
+    note: string | null;
+    pub_date: string | null;
+  } | null;
   magazine_appearances: {
     m_issue_id: number;
     magazine_id: number | null;
@@ -892,14 +914,19 @@ export interface StoryCreateIn {
   tag_ids?: number[];
   author_ids?: number[];
   translator_ids?: number[];
-  /** When the story appears inside an anthology/collection, the parent book's work id. */
-  book_id?: number | null;
+  /** Book anthologies/collections this story appears in. */
+  book_ids?: number[];
   /** Magazine issues this story appears in. */
   magazine_issue_ids?: number[];
   original_title?: string | null;
   page_count?: number | null;
   word_count?: number | null;
   story_length?: string | null;
+  /** Structured "first published in" — set at most one of book/issue id. */
+  first_published_book_id?: number | null;
+  first_published_issue_id?: number | null;
+  first_published_note?: string | null;
+  first_published_date?: string | null;
   /** Optional manual localised overrides: { field: { lang: value } }, e.g. { title: { "bn-Latn": "…" } }. */
   localised?: Record<string, Record<string, string>>;
 }
@@ -916,12 +943,17 @@ export interface StoryUpdateIn {
   tag_ids?: number[];
   author_ids?: number[];
   translator_ids?: number[];
-  book_id?: number | null;
+  book_ids?: number[];
   magazine_issue_ids?: number[];
   original_title?: string | null;
   page_count?: number | null;
   word_count?: number | null;
   story_length?: string | null;
+  /** Structured "first published in" — set at most one of book/issue id. */
+  first_published_book_id?: number | null;
+  first_published_issue_id?: number | null;
+  first_published_note?: string | null;
+  first_published_date?: string | null;
   localised?: Record<string, Record<string, string>>;
 }
 
@@ -1007,7 +1039,15 @@ export interface MagazineIssueFull {
     legal_status: string | null;
     quality_note: string | null;
   }[];
-  stories: { story_id: number; title: string; page_start: number | null; page_end: number | null }[];
+  stories: {
+    story_id: number;
+    title: string;
+    authors: PersonSummary[];
+    page_start: number | null;
+    page_end: number | null;
+  }[];
+  /** Deduped roll-up of every contained story's author/translator credits. */
+  contributors: PersonSummary[];
 }
 
 export interface PersonCreateIn {

@@ -13,6 +13,11 @@ import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import ImageUploadField from "../../components/ImageUploadField";
 import MagazineIssuePicker, { type IssueRef } from "../../components/MagazineIssuePicker";
+import FirstPublishedField, {
+  firstPublishedFromDetail,
+  firstPublishedPayload,
+  type FirstPublishedValue,
+} from "../../components/FirstPublishedField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
@@ -100,9 +105,13 @@ function EditForm({ work }: { work: WorkDetail }) {
     (work.story?.translators ?? []).map((t) => ({ id: t.id, name: t.name }))
   );
   const [collection, setCollection] = useState<PickerItem[]>(
-    work.story?.book_id != null
-      ? [{ id: work.story.book_id, name: work.story.book_title ?? `Book #${work.story.book_id}` }]
-      : []
+    (work.story?.book_appearances ?? []).map((b) => ({
+      id: b.book_id,
+      name: b.book_title ?? `Book #${b.book_id}`,
+    }))
+  );
+  const [firstPub, setFirstPub] = useState<FirstPublishedValue>(
+    firstPublishedFromDetail(work.story?.first_published ?? null)
   );
   const [headpieceUrl, setHeadpieceUrl] = useState(work.image_urls?.[0] ?? "");
   const [magIssues, setMagIssues] = useState<IssueRef[]>(
@@ -150,8 +159,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           word_count: wordCount ? Number(wordCount) : null,
           page_count: pageCount ? Number(pageCount) : null,
           image_urls: headpieceUrl.trim() ? [headpieceUrl.trim()] : [],
-          book_id: collection[0]?.id ?? null,
+          book_ids: collection.map((c) => c.id),
           magazine_issue_ids: magIssues.map((m) => m.m_issue_id),
+          ...firstPublishedPayload(firstPub),
           author_ids: authors.map((a) => a.id),
           translator_ids: translators.map((t) => t.id),
           genre_ids: [...genreIds],
@@ -188,7 +198,6 @@ function EditForm({ work }: { work: WorkDetail }) {
         },
         { label: "Word count", previous: work.story?.word_count, next: wordCount ? Number(wordCount) : null },
         { label: "Page count", previous: work.story?.page_count, next: pageCount ? Number(pageCount) : null },
-        { label: "Appears in", previous: work.story?.book_id, next: collection[0]?.id ?? null },
       ]);
       if (cleared.length) {
         setPendingClears(cleared);
@@ -345,7 +354,7 @@ function EditForm({ work }: { work: WorkDetail }) {
       />
 
       <EntityPicker
-        label="Appears in (anthology / collection — optional)"
+        label="Appears in (anthologies / collections — optional)"
         placeholder="Search a book…"
         fetchKey="picker-collection-books"
         fetcher={(q) =>
@@ -356,10 +365,12 @@ function EditForm({ work }: { work: WorkDetail }) {
           }))
         }
         selected={collection}
-        onChange={(items) => setCollection(items.slice(-1))}
+        onChange={setCollection}
       />
 
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
+
+      <FirstPublishedField value={firstPub} onChange={setFirstPub} />
 
       <ImageUploadField
         label="Headpiece / illustration"
