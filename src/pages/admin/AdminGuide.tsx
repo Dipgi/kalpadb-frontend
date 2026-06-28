@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "23 June 2026";
+const LAST_UPDATED = "28 June 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -73,6 +73,50 @@ export default function AdminGuide() {
           both works’ pages at once. Use “Remove” to delete a link (admin only; immediate). If the
           original isn’t in the catalogue, use the book form’s “Based on an external work” field
           instead.
+        </p>
+      </Section>
+
+      <Section title="Stories, anthologies & magazine issues">
+        <p>
+          A story is a single record linked to every container it appears in. The same machinery
+          drives both the contributor forms and the read-only roll-ups, so it helps to know how the
+          links behave when you add/edit or approve a story.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Many-to-many links.</strong> A story can appear in any number of books{" "}
+            <em>and</em> magazine issues. The “Appears in (anthologies / collections)” picker is
+            multi-select, and the magazine-issue picker adds issues as chips. Both use{" "}
+            <strong>replace-semantics</strong> on save: the list you submit becomes the full set of
+            links for that story.{" "}
+            <em>Example:</em> if a story is linked to 3 books and you save with 2 in the picker, the
+            third link is removed. Existing page ranges on links you keep are preserved.
+          </li>
+          <li>
+            <strong>Table of contents &amp; Contributors are computed, not entered.</strong> A book’s
+            Table of contents and the Contributors list on books and magazine issues are{" "}
+            <em>derived</em> from the stories linked to that container and from those stories’ own
+            author/translator credits — de-duplicated automatically. There’s no field to hand-edit
+            them; to fix a contributor, fix the credit on the underlying story.
+          </li>
+          <li>
+            <strong>“First published in” is one venue at a time.</strong> A story’s original venue is
+            a catalogued book <em>or</em> a catalogued magazine issue <em>or</em> free text — never
+            two at once (enforced by a database constraint). Switching from one to another in the
+            form clears the previous link automatically on save, so you can’t leave a stale pointer
+            behind. Keep it distinct from “Appears in”: first-published = the single original venue;
+            appears-in = every reprint.
+          </li>
+          <li>
+            <strong>Page ranges.</strong> A story’s page range within a book/issue is stored per
+            link. The story-side pickers preserve ranges set elsewhere; the issue editor doesn’t edit
+            ranges yet (they’re kept on save, just not editable there).
+          </li>
+        </ul>
+        <p className="text-amber-700">
+          When approving a volunteer story edit, the container links show as a coarse “changed” in
+          the diff rather than field-by-field — confirm the picker selections match the submitter’s
+          note before approving.
         </p>
       </Section>
 

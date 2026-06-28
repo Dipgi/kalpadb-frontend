@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "24 June 2026";
+const LAST_UPDATED = "28 June 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -23,6 +23,8 @@ const TOC: { id: string; label: string }[] = [
   { id: "shelf", label: "Ratings, shelf & lists" },
   { id: "contributing", label: "Becoming a contributor" },
   { id: "adding", label: "Adding & editing records" },
+  { id: "work-types", label: "Work types" },
+  { id: "stories", label: "Stories, anthologies & magazines" },
   { id: "conventions", label: "Data conventions" },
   { id: "faq", label: "FAQ" },
   { id: "reuse", label: "Reuse & citation" },
@@ -173,6 +175,140 @@ export default function HelpPage() {
             cover artist) and attach publishers to editions.
           </li>
         </ul>
+      </Section>
+
+      <Section id="work-types" title="Work types">
+        <p>
+          Every record in the catalogue is a <strong>work</strong> of one of five types. The type
+          decides which fields and credit roles you’ll see on its add/edit form and detail page:
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Book</strong> — a standalone novel, an anthology, or a collection. Carries
+            editions, formats (hardcover/paperback/ebook…), and a series position.{" "}
+            <em>Example:</em> <em>Professor Shonku Samagra</em> (a collection), or{" "}
+            <em>Kalpabigyan Samagra</em> (an anthology of many authors’ stories).
+          </li>
+          <li>
+            <strong>Story</strong> — a single short story, novelette, or novella. A story usually
+            lives <em>inside</em> one or more books or magazine issues rather than on its own.{" "}
+            <em>Example:</em> Satyajit Ray’s “ব্যোমযাত্রীর ডায়রি” (<em>Byomjatrir Diary</em>).
+          </li>
+          <li>
+            <strong>Comic</strong> — a graphic work, with its own creator roles (writer, artist,
+            inker, colorist, letterer).
+          </li>
+          <li>
+            <strong>Magazine</strong> — a periodical <em>title</em> (e.g. <em>Sandesh</em>,{" "}
+            <em>Anandamela</em>). Individual published <strong>issues</strong> hang off it, and
+            stories appear inside those issues.
+          </li>
+          <li>
+            <strong>Media</strong> — screen, audio, or interactive SF (films, web series, audio
+            dramas, games), with seasons/episodes and screen credits.
+          </li>
+        </ul>
+        <p>
+          On the <Link to="/browse" className="text-violet-700 hover:underline">Browse</Link> page
+          you can filter by type to see only books, only stories, and so on.
+        </p>
+      </Section>
+
+      <Section id="stories" title="Stories, anthologies & magazines">
+        <p>
+          Indian SF has a deep magazine and anthology tradition: the <em>same</em> story is often
+          first printed in a magazine, then reprinted in one or more “best of” collections over the
+          years. KalpaDB models this so a story is recorded <strong>once</strong> and linked to every
+          place it appears.
+        </p>
+
+        <p className="font-medium text-gray-800 mt-3">Adding a story</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            Add a story from the <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link>{" "}
+            page (Story tab). Give it a title in its original script — a romanised title for search is
+            generated automatically.
+          </li>
+          <li>
+            Set the <strong>story type</strong> (short story, novelette, or novella) and, optionally,
+            a word/page count.
+          </li>
+          <li>
+            Credit its <strong>author(s)</strong>, and any <strong>translator(s)</strong> if it’s a
+            translated story (e.g. an Asimov story rendered into Bengali).
+          </li>
+        </ul>
+
+        <p className="font-medium text-gray-800 mt-3">“Appears in” — books and magazine issues</p>
+        <p>
+          A story can appear in <strong>any number</strong> of containers, and you record each one:
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Anthologies / collections (books):</strong> use the “Appears in (anthologies /
+            collections)” picker — it’s multi-select, so add every book the story is collected in.{" "}
+            <em>Example:</em> “ব্যোমযাত্রীর ডায়রি” appears in both <em>Professor Shonku Samagra</em>{" "}
+            and a school anthology — add both.
+          </li>
+          <li>
+            <strong>Magazine issues:</strong> use the magazine-issue picker — search the magazine,
+            then pick the specific issue.{" "}
+            <em>Example:</em> the story first ran in <em>Sandesh</em>, December 1965 — pick that
+            issue.
+          </li>
+          <li>
+            Each appearance can carry the story’s <strong>page range</strong> within that book/issue.
+          </li>
+        </ul>
+        <p>
+          On the story’s page these all show under <strong>“Appears in”</strong>, each linking to the
+          book or issue.
+        </p>
+
+        <p className="font-medium text-gray-800 mt-3">Table of contents (the book/issue side)</p>
+        <p>
+          Because stories are linked to their containers, the relationship is shown from{" "}
+          <em>both</em> directions. An anthology or collection’s page lists a{" "}
+          <strong>Table of contents</strong> — every story it contains, with the story’s author and
+          page range — and a magazine issue’s page shows the same as its <strong>Contents</strong>.
+          You build this simply by linking each story to the book/issue; nothing is typed twice.
+        </p>
+
+        <p className="font-medium text-gray-800 mt-3">Contributors (automatic roll-up)</p>
+        <p>
+          An anthology page also shows a <strong>Contributors</strong> list: everyone credited across
+          all of its stories, gathered automatically and de-duplicated.{" "}
+          <em>Example:</em> a 20-story anthology by 15 different authors shows all 15 under
+          Contributors without anyone entering them on the book — they come from the stories’ own
+          author/translator credits. (Translators are flagged as such.) The same roll-up appears on a
+          magazine issue.
+        </p>
+
+        <p className="font-medium text-gray-800 mt-3">“First published in” vs “Appears in”</p>
+        <p>
+          These are different on purpose. <strong>Appears in</strong> lists <em>every</em> place a
+          story has been printed. <strong>First published in</strong> records the <em>single
+          original</em> venue — where it appeared for the very first time. On the story form choose
+          one of:
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Catalogued book</strong> — pick the book, if the original venue is a book in
+            KalpaDB.
+          </li>
+          <li>
+            <strong>Magazine issue</strong> — search the magazine and pick the issue.{" "}
+            <em>Example:</em> first published in <em>Sandesh</em>, December 1965.
+          </li>
+          <li>
+            <strong>Other (free text)</strong> — for an original venue that isn’t in the catalogue,
+            type it (e.g. “<em>Desh</em> magazine, 1962”).
+          </li>
+        </ul>
+        <p>
+          You can add the first-publication <strong>date/year</strong> too. It’s one venue at a time:
+          a story is first published in exactly one place, even if it later appears in many.
+        </p>
       </Section>
 
       <Section id="conventions" title="Data conventions">
