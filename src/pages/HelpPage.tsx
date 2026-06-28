@@ -84,6 +84,12 @@ export default function HelpPage() {
             <Link to="/series" className="text-violet-700 hover:underline">Series</Link> — browse
             book and comic series; each series page lists its works in reading order.
           </li>
+          <li>
+            <Link to="/magazines" className="text-violet-700 hover:underline">Magazines</Link> —
+            browse magazine titles; open one to see its issues in date order, and each issue’s
+            contents. (Magazines have their own section because a magazine is a publication venue,
+            not a single work — so they aren’t mixed into the works browse.)
+          </li>
           <li>Every work, person, and publisher has its own detail page with full information.</li>
         </ul>
       </Section>
@@ -201,7 +207,10 @@ export default function HelpPage() {
           <li>
             <strong>Magazine</strong> — a periodical <em>title</em> (e.g. <em>Sandesh</em>,{" "}
             <em>Anandamela</em>). Individual published <strong>issues</strong> hang off it, and
-            stories appear inside those issues.
+            stories appear inside those issues. Because a magazine is a publication venue rather than
+            a single work, magazine titles live in their own{" "}
+            <Link to="/magazines" className="text-violet-700 hover:underline">Magazines</Link>{" "}
+            section, not in the works browse.
           </li>
           <li>
             <strong>Media</strong> — screen, audio, or interactive SF (films, web series, audio

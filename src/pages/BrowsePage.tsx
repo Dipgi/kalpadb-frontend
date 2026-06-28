@@ -5,7 +5,9 @@ import WorkCard from "../components/WorkCard";
 import Pagination from "../components/Pagination";
 import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
 
-const WORK_TYPES = ["BOOK", "STORY", "COMIC", "MAGAZINE", "MEDIA"];
+// Magazines are serial containers with their own index (/magazines), so they're
+// intentionally excluded from the general works browse.
+const WORK_TYPES = ["BOOK", "STORY", "COMIC", "MEDIA"];
 
 const SORT_OPTIONS = [
   { value: "added_desc", label: "Recently Added" },

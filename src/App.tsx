@@ -17,6 +17,7 @@ import PublisherDetailPage from "./pages/PublisherDetailPage";
 import BrowsePersonsPage from "./pages/BrowsePersonsPage";
 import BrowsePublishersPage from "./pages/BrowsePublishersPage";
 import BrowseSeriesPage from "./pages/BrowseSeriesPage";
+import BrowseMagazinesPage from "./pages/BrowseMagazinesPage";
 import SeriesDetailPage from "./pages/SeriesDetailPage";
 import SearchPage from "./pages/SearchPage";
 import LoginPage from "./pages/LoginPage";
@@ -91,6 +92,7 @@ export default function App() {
                   }
                 />
                 <Route path="/works/:id" element={<WorkDetailPage />} />
+                <Route path="/magazines" element={<BrowseMagazinesPage />} />
                 <Route path="/magazines/:magId/issues/:issueId" element={<IssueDetailPage />} />
                 <Route path="/persons" element={<BrowsePersonsPage />} />
                 <Route path="/persons/:id" element={<PersonDetailPage />} />

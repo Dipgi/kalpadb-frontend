@@ -23,6 +23,7 @@ export default function Navbar() {
           <Link to="/browse" className="hover:text-gray-900">Browse</Link>
           <Link to="/explore" className="hover:text-gray-900">Explore</Link>
           <Link to="/persons" className="hover:text-gray-900">People</Link>
+          <Link to="/magazines" className="hover:text-gray-900">Magazines</Link>
           <Link to="/publishers" className="hover:text-gray-900">Publishers</Link>
           <Link to="/series" className="hover:text-gray-900">Series</Link>
           <Link to="/search" className="hover:text-gray-900">Search</Link>
@@ -78,6 +79,7 @@ export default function Navbar() {
           <Link to="/browse" onClick={() => setMenuOpen(false)}>Browse</Link>
           <Link to="/explore" onClick={() => setMenuOpen(false)}>Explore</Link>
           <Link to="/persons" onClick={() => setMenuOpen(false)}>People</Link>
+          <Link to="/magazines" onClick={() => setMenuOpen(false)}>Magazines</Link>
           <Link to="/publishers" onClick={() => setMenuOpen(false)}>Publishers</Link>
           <Link to="/series" onClick={() => setMenuOpen(false)}>Series</Link>
           <Link to="/search" onClick={() => setMenuOpen(false)}>Search</Link>

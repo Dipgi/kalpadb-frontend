@@ -36,9 +36,12 @@ export default function WorkCard({ work }: { work: WorkSummary }) {
         {roman && (
           <p className="text-xs text-gray-400 italic leading-snug line-clamp-1">{roman}</p>
         )}
-        <p className="text-xs text-gray-500">
-          {author}{moreAuthors}
-        </p>
+        {/* Magazines are titles, not authored works — no author line. */}
+        {work.type !== "MAGAZINE" && (
+          <p className="text-xs text-gray-500">
+            {author}{moreAuthors}
+          </p>
+        )}
         <div className="flex items-center gap-2 mt-0.5">
           {work.avg_rating != null && work.rating_count > 0 && (
             <span className="text-xs text-amber-500 font-medium">
