@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, user, admin, catalogue, type Rating, type PublicReview } from "../lib/api";
@@ -856,14 +856,20 @@ function RatingSection({
   onRate: (rating: number, review?: string | null) => void;
   onClear: () => void;
 }) {
-  const [review, setReview] = useState(myRating?.review ?? "");
+  const serverReview = myRating?.review ?? "";
+  const [review, setReview] = useState(serverReview);
   const [showReview, setShowReview] = useState(!!myRating?.review);
 
-  useEffect(() => {
-    setReview(myRating?.review ?? "");
-  }, [myRating?.review]);
+  // Re-sync the editor to the server value when the saved review changes
+  // (e.g. after saving or refetch). Done during render rather than in an effect
+  // so it doesn't clobber in-progress typing or trigger a cascading render.
+  const [prevServerReview, setPrevServerReview] = useState(serverReview);
+  if (serverReview !== prevServerReview) {
+    setPrevServerReview(serverReview);
+    setReview(serverReview);
+  }
 
-  const reviewChanged = review.trim() !== (myRating?.review ?? "");
+  const reviewChanged = review.trim() !== serverReview;
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-100">
