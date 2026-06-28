@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { works } from "../lib/api";
-import WorkCard from "../components/WorkCard";
+import MagazineCard from "../components/MagazineCard";
 import Pagination from "../components/Pagination";
 
 const SORT_OPTIONS = [
@@ -67,10 +67,10 @@ export default function BrowseMagazinesPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {Array.from({ length: 10 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="aspect-[2/3] bg-gray-100 rounded-lg" />
+              <div className="aspect-[3/2] bg-gray-100 rounded-lg" />
               <div className="h-3 bg-gray-100 rounded mt-2 w-3/4" />
             </div>
           ))}
@@ -80,9 +80,9 @@ export default function BrowseMagazinesPage() {
           <p className="text-sm text-gray-400 mb-4">
             {result.total.toLocaleString()} magazines · page {result.page} of {result.pages}
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {result.items.map((w) => (
-              <WorkCard key={w.id} work={w} />
+              <MagazineCard key={w.id} work={w} />
             ))}
           </div>
           <Pagination page={result.page} pages={result.pages} onChange={setPage} />
