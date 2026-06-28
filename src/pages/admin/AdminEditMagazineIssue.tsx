@@ -371,7 +371,11 @@ function IssueForm({
         <Link to={`/works/${magazineId}`} className="text-sm text-gray-500 hover:text-gray-700">
           Cancel
         </Link>
-        {mutation.isError && <span className="text-sm text-red-500">Save failed — try again.</span>}
+        {mutation.isError && (
+          <span className="text-sm text-red-500">
+            {(mutation.error as Error)?.message || "Save failed — try again."}
+          </span>
+        )}
       </div>
     </form>
   );
