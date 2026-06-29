@@ -444,6 +444,17 @@ export const auth = {
 
 // ── Works ──────────────────────────────────────────────────────────────────
 
+/** One row in the global magazine-issue browse (GET /works/magazines/issues). */
+export interface IssueBrowseItem {
+  m_issue_id: number;
+  magazine_id: number | null;
+  magazine_title: string | null;
+  issue_number: string | null;
+  publication_date: string | null;
+  cover_image_url: string | null;
+  story_count: number;
+}
+
 export const works = {
   list: (params: {
     type?: string;
@@ -469,6 +480,18 @@ export const works = {
 
   magazineIssues: (id: number) =>
     request<MagazineIssueFull[]>(`/works/magazines/${id}/issues`),
+
+  browseIssues: (
+    params: { q?: string; magazine_id?: number; sort?: string; page?: number; page_size?: number } = {}
+  ) => {
+    const p = new URLSearchParams();
+    if (params.q) p.set("q", params.q);
+    if (params.magazine_id) p.set("magazine_id", String(params.magazine_id));
+    if (params.sort) p.set("sort", params.sort);
+    p.set("page", String(params.page ?? 1));
+    p.set("page_size", String(params.page_size ?? 25));
+    return request<Page<IssueBrowseItem>>(`/works/magazines/issues?${p}`);
+  },
 
   reviews: (id: number, page = 1, size = 20) =>
     request<Page<PublicReview>>(`/works/${id}/reviews?page=${page}&page_size=${size}`),

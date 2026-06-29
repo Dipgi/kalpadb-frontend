@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 const BROWSE_LINKS = [
   { to: "/browse", label: "Works" },
   { to: "/magazines", label: "Magazines" },
+  { to: "/issues", label: "Issues" },
   { to: "/series", label: "Series" },
   { to: "/persons", label: "People" },
   { to: "/publishers", label: "Publishers" },
