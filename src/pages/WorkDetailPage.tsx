@@ -758,11 +758,17 @@ export default function WorkDetailPage() {
           </div>
         )}
 
-        {work.related_works?.length > 0 && (
+        {(() => {
+          // continues/continued_by are shown in the magazine "Related titles"
+          // block above, so exclude them here to avoid showing the link twice.
+          const generic = work.related_works.filter(
+            (r) => r.relation_type !== "continues" && r.relation_type !== "continued_by"
+          );
+          return generic.length > 0 ? (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Related Works</h3>
             <ul className="text-sm space-y-1">
-              {work.related_works.map((r) => (
+              {generic.map((r) => (
                 <li key={r.id}>
                   <Link to={`/works/${r.work.id}`} className="text-violet-700 hover:underline">
                     {r.work.title}
@@ -775,7 +781,8 @@ export default function WorkDetailPage() {
               ))}
             </ul>
           </div>
-        )}
+          ) : null;
+        })()}
 
         {work.external_links?.length > 0 && (
           <div>
