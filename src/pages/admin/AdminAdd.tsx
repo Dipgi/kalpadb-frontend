@@ -10,6 +10,7 @@ import {
   type DuplicateError,
   type EditSubmission,
   type GenreItem,
+  type MagazineStatus,
 } from "../../lib/api";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import FormatsEditor, {
@@ -777,6 +778,10 @@ function MagazineForm() {
   const [language, setLanguage] = useState("bn");
   const [issn, setIssn] = useState("");
   const [frequency, setFrequency] = useState("");
+  const [foundedYear, setFoundedYear] = useState("");
+  const [ceasedYear, setCeasedYear] = useState("");
+  const [statusVal, setStatusVal] = useState<MagazineStatus | "">("");
+  const [place, setPlace] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
@@ -791,6 +796,10 @@ function MagazineForm() {
           language,
           issn: issn.trim() || null,
           publication_frequency: frequency.trim() || null,
+          founded_year: foundedYear.trim() ? Number(foundedYear) : null,
+          ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
+          status: statusVal || null,
+          place_of_publication: place.trim() || null,
           image_urls: logoUrl.trim() ? [logoUrl.trim()] : null,
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
@@ -803,6 +812,10 @@ function MagazineForm() {
       setDescription("");
       setIssn("");
       setFrequency("");
+      setFoundedYear("");
+      setCeasedYear("");
+      setStatusVal("");
+      setPlace("");
       setLogoUrl("");
       setGenreIds(new Set());
       setTagIds(new Set());
@@ -867,6 +880,56 @@ function MagazineForm() {
         <div>
           <label className={labelCls}>ISSN</label>
           <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div>
+          <label className={labelCls}>Founded (year)</label>
+          <input
+            type="number"
+            value={foundedYear}
+            onChange={(e) => setFoundedYear(e.target.value)}
+            min={1800}
+            max={2100}
+            placeholder="e.g. 1963"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Ceased (year)</label>
+          <input
+            type="number"
+            value={ceasedYear}
+            onChange={(e) => setCeasedYear(e.target.value)}
+            min={1800}
+            max={2100}
+            placeholder="blank if running"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Status</label>
+          <select
+            value={statusVal}
+            onChange={(e) => setStatusVal(e.target.value as MagazineStatus | "")}
+            className={inputCls}
+          >
+            <option value="">—</option>
+            <option value="active">Active</option>
+            <option value="ceased">Ceased</option>
+            <option value="hiatus">Hiatus</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Place of publication</label>
+          <input
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+            placeholder="e.g. Kolkata"
+            className={inputCls}
+          />
         </div>
       </div>
 

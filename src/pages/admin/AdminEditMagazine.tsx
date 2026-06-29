@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
+import {
+  admin,
+  catalogue,
+  volunteer,
+  works,
+  type MagazineStatus,
+  type WorkDetail,
+} from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import ContributorGate from "../../components/ContributorGate";
 import ImageUploadField from "../../components/ImageUploadField";
@@ -63,6 +70,16 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [roman, setRoman] = useState(initialRoman);
   const [issn, setIssn] = useState(work.magazine_detail?.issn ?? "");
   const [frequency, setFrequency] = useState(work.magazine_detail?.publication_frequency ?? "");
+  const [foundedYear, setFoundedYear] = useState(
+    work.magazine_detail?.founded_year?.toString() ?? ""
+  );
+  const [ceasedYear, setCeasedYear] = useState(
+    work.magazine_detail?.ceased_year?.toString() ?? ""
+  );
+  const [statusVal, setStatusVal] = useState<MagazineStatus | "">(
+    work.magazine_detail?.status ?? ""
+  );
+  const [place, setPlace] = useState(work.magazine_detail?.place_of_publication ?? "");
   const [logoUrl, setLogoUrl] = useState(work.image_urls?.[0] ?? "");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
@@ -98,6 +115,10 @@ function EditForm({ work }: { work: WorkDetail }) {
           localised,
           issn: issn.trim() || null,
           publication_frequency: frequency.trim() || null,
+          founded_year: foundedYear.trim() ? Number(foundedYear) : null,
+          ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
+          status: statusVal || null,
+          place_of_publication: place.trim() || null,
           image_urls: logoUrl.trim() ? [logoUrl.trim()] : [],
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
@@ -128,6 +149,11 @@ function EditForm({ work }: { work: WorkDetail }) {
           label: "Frequency",
           previous: work.magazine_detail?.publication_frequency,
           next: frequency.trim() || null,
+        },
+        {
+          label: "Place of publication",
+          previous: work.magazine_detail?.place_of_publication,
+          next: place.trim() || null,
         },
       ]);
       if (cleared.length) {
@@ -205,6 +231,56 @@ function EditForm({ work }: { work: WorkDetail }) {
         <div>
           <label className={labelCls}>ISSN</label>
           <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div>
+          <label className={labelCls}>Founded (year)</label>
+          <input
+            type="number"
+            value={foundedYear}
+            onChange={(e) => setFoundedYear(e.target.value)}
+            min={1800}
+            max={2100}
+            placeholder="e.g. 1963"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Ceased (year)</label>
+          <input
+            type="number"
+            value={ceasedYear}
+            onChange={(e) => setCeasedYear(e.target.value)}
+            min={1800}
+            max={2100}
+            placeholder="blank if running"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Status</label>
+          <select
+            value={statusVal}
+            onChange={(e) => setStatusVal(e.target.value as MagazineStatus | "")}
+            className={inputCls}
+          >
+            <option value="">—</option>
+            <option value="active">Active</option>
+            <option value="ceased">Ceased</option>
+            <option value="hiatus">Hiatus</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Place of publication</label>
+          <input
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+            placeholder="e.g. Kolkata"
+            className={inputCls}
+          />
         </div>
       </div>
 

@@ -14,6 +14,22 @@ const SHELF_STATUSES: { value: string; label: string }[] = [
   { value: "abandoned", label: "Dropped" },
 ];
 
+/** Human lifespan for a magazine title, e.g. "1963–1973", "1963–present", "1963–?". */
+function magazineLifespan(md: {
+  founded_year: number | null;
+  ceased_year: number | null;
+  status: string | null;
+}): string {
+  if (!md.founded_year && !md.ceased_year) return "";
+  const start = md.founded_year ?? "?";
+  let end: string | number;
+  if (md.ceased_year) end = md.ceased_year;
+  else if (md.status === "active") end = "present";
+  else if (md.status === "ceased") end = "?";
+  else end = "";
+  return end === "" ? `${start}–` : `${start}–${end}`;
+}
+
 export default function WorkDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user: me } = useAuth();
@@ -393,6 +409,21 @@ export default function WorkDetailPage() {
                 </Link>
               )}
             </div>
+            {(() => {
+              const md = work.magazine_detail;
+              const span = magazineLifespan(md);
+              const bits = [span, md.place_of_publication].filter(Boolean);
+              return bits.length > 0 ? (
+                <p className="text-xs text-gray-500 mb-1 flex items-center gap-2">
+                  <span>{bits.join(" · ")}</span>
+                  {md.status && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 capitalize">
+                      {md.status}
+                    </span>
+                  )}
+                </p>
+              ) : null;
+            })()}
             {(work.magazine_detail.issn || work.magazine_detail.publication_frequency) && (
               <p className="text-xs text-gray-400 mb-2">
                 {work.magazine_detail.publication_frequency}

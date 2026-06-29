@@ -246,10 +246,16 @@ export interface MediaWorkDetail {
   adaptations: { id: number; source_work: WorkSummary; adaptation_type: string; notes: string | null }[];
 }
 
+export type MagazineStatus = "active" | "ceased" | "hiatus" | "unknown";
+
 export interface MagazineDetail {
   id: number;
   issn: string | null;
   publication_frequency: string | null;
+  founded_year: number | null;
+  ceased_year: number | null;
+  status: MagazineStatus | null;
+  place_of_publication: string | null;
   title: string;
   description: string | null;
   language: string | null;
@@ -989,6 +995,10 @@ export interface MagazineCreateIn {
   language?: string | null;
   issn?: string | null;
   publication_frequency?: string | null;
+  founded_year?: number | null;
+  ceased_year?: number | null;
+  status?: MagazineStatus | null;
+  place_of_publication?: string | null;
   image_urls?: string[] | null;
   genre_ids?: number[];
   tag_ids?: number[];
@@ -1002,6 +1012,10 @@ export interface MagazineUpdateIn {
   image_urls?: string[] | null;
   issn?: string | null;
   publication_frequency?: string | null;
+  founded_year?: number | null;
+  ceased_year?: number | null;
+  status?: MagazineStatus | null;
+  place_of_publication?: string | null;
   genre_ids?: number[];
   tag_ids?: number[];
   localised?: Record<string, Record<string, string>>;
