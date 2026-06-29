@@ -248,6 +248,21 @@ export interface MediaWorkDetail {
 
 export type MagazineStatus = "active" | "ceased" | "hiatus" | "unknown";
 
+export interface MagazineEditorshipInput {
+  stakeholder_id: number;
+  start_year?: number | null;
+  end_year?: number | null;
+  role?: string | null;
+}
+
+export interface MagazineEditorshipOut {
+  id: number;
+  start_year: number | null;
+  end_year: number | null;
+  role: string | null;
+  stakeholder: PersonSummary;
+}
+
 export interface MagazineDetail {
   id: number;
   issn: string | null;
@@ -260,6 +275,7 @@ export interface MagazineDetail {
   description: string | null;
   language: string | null;
   localised: Record<string, Record<string, string>>;
+  editorships: MagazineEditorshipOut[];
   issues: { m_issue_id: number; issue_number: string | null; publication_date: string | null; cover_image_url: string | null }[];
 }
 
@@ -999,6 +1015,7 @@ export interface MagazineCreateIn {
   ceased_year?: number | null;
   status?: MagazineStatus | null;
   place_of_publication?: string | null;
+  editorships?: MagazineEditorshipInput[];
   image_urls?: string[] | null;
   genre_ids?: number[];
   tag_ids?: number[];
@@ -1016,6 +1033,8 @@ export interface MagazineUpdateIn {
   ceased_year?: number | null;
   status?: MagazineStatus | null;
   place_of_publication?: string | null;
+  /** Replace-semantics: a present list (even []) replaces all editorships. */
+  editorships?: MagazineEditorshipInput[];
   genre_ids?: number[];
   tag_ids?: number[];
   localised?: Record<string, Record<string, string>>;

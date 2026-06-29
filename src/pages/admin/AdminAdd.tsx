@@ -13,6 +13,10 @@ import {
   type MagazineStatus,
 } from "../../lib/api";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import MagazineEditorshipEditor, {
+  editorshipsToPayload,
+  type EditorshipRow,
+} from "../../components/MagazineEditorshipEditor";
 import FormatsEditor, {
   type FormatRow,
   emptyFormatRow,
@@ -782,6 +786,7 @@ function MagazineForm() {
   const [ceasedYear, setCeasedYear] = useState("");
   const [statusVal, setStatusVal] = useState<MagazineStatus | "">("");
   const [place, setPlace] = useState("");
+  const [editorships, setEditorships] = useState<EditorshipRow[]>([]);
   const [logoUrl, setLogoUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
@@ -800,6 +805,7 @@ function MagazineForm() {
           ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
           status: statusVal || null,
           place_of_publication: place.trim() || null,
+          editorships: editorshipsToPayload(editorships),
           image_urls: logoUrl.trim() ? [logoUrl.trim()] : null,
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
@@ -816,6 +822,7 @@ function MagazineForm() {
       setCeasedYear("");
       setStatusVal("");
       setPlace("");
+      setEditorships([]);
       setLogoUrl("");
       setGenreIds(new Set());
       setTagIds(new Set());
@@ -932,6 +939,8 @@ function MagazineForm() {
           />
         </div>
       </div>
+
+      <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
 
       <ImageUploadField
         label="Cover / logo"

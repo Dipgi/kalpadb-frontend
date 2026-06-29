@@ -15,6 +15,10 @@ import ImageUploadField from "../../components/ImageUploadField";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
+import MagazineEditorshipEditor, {
+  editorshipsToPayload,
+  type EditorshipRow,
+} from "../../components/MagazineEditorshipEditor";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 
 const inputCls =
@@ -80,6 +84,14 @@ function EditForm({ work }: { work: WorkDetail }) {
     work.magazine_detail?.status ?? ""
   );
   const [place, setPlace] = useState(work.magazine_detail?.place_of_publication ?? "");
+  const [editorships, setEditorships] = useState<EditorshipRow[]>(
+    (work.magazine_detail?.editorships ?? []).map((e) => ({
+      person: { id: e.stakeholder.id, name: e.stakeholder.name },
+      start_year: e.start_year?.toString() ?? "",
+      end_year: e.end_year?.toString() ?? "",
+      role: e.role ?? "",
+    }))
+  );
   const [logoUrl, setLogoUrl] = useState(work.image_urls?.[0] ?? "");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
@@ -119,6 +131,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
           status: statusVal || null,
           place_of_publication: place.trim() || null,
+          editorships: editorshipsToPayload(editorships),
           image_urls: logoUrl.trim() ? [logoUrl.trim()] : [],
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
@@ -283,6 +296,8 @@ function EditForm({ work }: { work: WorkDetail }) {
           />
         </div>
       </div>
+
+      <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
 
       <ImageUploadField
         label="Cover / logo"

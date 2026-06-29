@@ -431,6 +431,34 @@ export default function WorkDetailPage() {
                 {work.magazine_detail.issn ? `ISSN ${work.magazine_detail.issn}` : ""}
               </p>
             )}
+            {work.magazine_detail.editorships.length > 0 && (
+              <div className="mb-3">
+                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">
+                  Editors
+                </p>
+                <ul className="text-sm text-gray-700 space-y-0.5">
+                  {work.magazine_detail.editorships.map((e) => {
+                    const years =
+                      e.start_year || e.end_year
+                        ? `${e.start_year ?? "?"}–${e.end_year ?? ""}`
+                        : "";
+                    return (
+                      <li key={e.id}>
+                        <Link to={`/persons/${e.stakeholder.id}`} className="hover:text-violet-700">
+                          {e.stakeholder.name}
+                        </Link>
+                        {(e.role || years) && (
+                          <span className="text-gray-400 text-xs">
+                            {" — "}
+                            {[e.role, years].filter(Boolean).join(", ")}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
             {work.magazine_detail.issues.length === 0 ? (
               <p className="text-sm text-gray-400">No issues catalogued yet.</p>
             ) : magIssues && magIssues.length > 0 ? (
