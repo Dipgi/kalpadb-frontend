@@ -28,6 +28,7 @@ export default function AdminDashboard() {
     { label: "Works", value: s.total_works, to: "/browse" },
     { label: "Authors", value: s.total_authors, to: "/persons" },
     { label: "Books", value: s.total_books, to: "/browse" },
+    { label: "Magazine Issues", value: s.total_magazine_issues, to: "/browse" },
     { label: "Publishers", value: s.total_publishers, to: "/publishers" },
     { label: "Languages", value: s.total_languages, to: "/browse" },
     { label: "Users", value: s.total_users, to: "/admin/users" },
@@ -78,7 +79,7 @@ export default function AdminDashboard() {
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 7 }).map((_, i) => (
             <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
           ))}
         </div>

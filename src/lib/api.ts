@@ -290,6 +290,8 @@ export interface StatsOut {
     total_authors?: number;
     total_books?: number;
     total_stories?: number;
+    total_magazines?: number;
+    total_magazine_issues?: number;
     total_publishers?: number;
     total_languages?: number;
     total_users?: number;
@@ -306,6 +308,7 @@ export interface InsightItem {
 
 export interface InsightsOut {
   total_works: number;
+  total_magazine_issues: number;
   by_genre: InsightItem[];
   top_publishers: InsightItem[];
   top_authors: InsightItem[];

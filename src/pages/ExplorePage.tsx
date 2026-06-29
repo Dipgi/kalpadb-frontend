@@ -99,8 +99,13 @@ export default function ExplorePage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Explore the catalogue</h1>
         <p className="text-sm text-gray-500">
-          {data ? `${data.total_works.toLocaleString()} works` : "Loading"} · click a bar to drill
-          in
+          {data
+            ? `${data.total_works.toLocaleString()} works` +
+              (data.total_magazine_issues
+                ? ` · ${data.total_magazine_issues.toLocaleString()} magazine issues`
+                : "")
+            : "Loading"}{" "}
+          · click a bar to drill in
         </p>
       </div>
 
