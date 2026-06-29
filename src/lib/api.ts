@@ -263,6 +263,12 @@ export interface MagazineEditorshipOut {
   stakeholder: PersonSummary;
 }
 
+export interface MagazineRelationshipInput {
+  other_work_id: number;
+  direction: "continues" | "continued_by";
+  notes?: string | null;
+}
+
 export interface MagazineDetail {
   id: number;
   issn: string | null;
@@ -880,6 +886,11 @@ export const admin = {
       request(`/works/translations/${linkId}`, { method: "DELETE" }),
   },
 
+  relationships: {
+    delete: (relId: number) =>
+      request(`/works/relationships/${relId}`, { method: "DELETE" }),
+  },
+
   reviews: {
     delete: (id: number) => request(`/admin/reviews/${id}`, { method: "DELETE" }),
   },
@@ -1267,6 +1278,11 @@ export const volunteer = {
     request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
   addTranslation: (workId: number, data: TranslationLinkInput) =>
     request<EditSubmission>(`/works/${workId}/translations`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addMagazineRelationship: (workId: number, data: MagazineRelationshipInput) =>
+    request<EditSubmission>(`/works/${workId}/relationships`, {
       method: "POST",
       body: JSON.stringify(data),
     }),

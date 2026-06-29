@@ -459,6 +459,30 @@ export default function WorkDetailPage() {
                 </ul>
               </div>
             )}
+            {(() => {
+              const links = work.related_works.filter(
+                (r) => r.relation_type === "continues" || r.relation_type === "continued_by"
+              );
+              return links.length > 0 ? (
+                <div className="mb-3">
+                  <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">
+                    Related titles
+                  </p>
+                  <ul className="text-sm text-gray-700 space-y-0.5">
+                    {links.map((r) => (
+                      <li key={r.id}>
+                        <span className="text-gray-400">
+                          {r.relation_type === "continues" ? "Continues: " : "Continued by: "}
+                        </span>
+                        <Link to={`/works/${r.work.id}`} className="hover:text-violet-700">
+                          {r.work.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null;
+            })()}
             {work.magazine_detail.issues.length === 0 ? (
               <p className="text-sm text-gray-400">No issues catalogued yet.</p>
             ) : magIssues && magIssues.length > 0 ? (

@@ -19,6 +19,7 @@ import MagazineEditorshipEditor, {
   editorshipsToPayload,
   type EditorshipRow,
 } from "../../components/MagazineEditorshipEditor";
+import MagazineRelationshipsEditor from "../../components/MagazineRelationshipsEditor";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 
 const inputCls =
@@ -298,6 +299,8 @@ function EditForm({ work }: { work: WorkDetail }) {
       </div>
 
       <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
+
+      <MagazineRelationshipsEditor work={work} />
 
       <ImageUploadField
         label="Cover / logo"
