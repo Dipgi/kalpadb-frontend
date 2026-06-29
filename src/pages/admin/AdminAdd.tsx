@@ -17,6 +17,7 @@ import MagazineEditorshipEditor, {
   editorshipsToPayload,
   type EditorshipRow,
 } from "../../components/MagazineEditorshipEditor";
+import FormSection from "../../components/FormSection";
 import FormatsEditor, {
   type FormatRow,
   emptyFormatRow,
@@ -835,7 +836,7 @@ function MagazineForm() {
         e.preventDefault();
         if (title.trim()) mutation.mutate();
       }}
-      className="max-w-2xl space-y-4"
+      className="max-w-3xl space-y-5"
     >
       {createdId != null && (
         <SuccessBanner
@@ -845,6 +846,7 @@ function MagazineForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title * (native script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -863,7 +865,9 @@ function MagazineForm() {
           className={inputCls}
         />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Language</label>
@@ -939,9 +943,16 @@ function MagazineForm() {
           />
         </div>
       </div>
+      </FormSection>
 
-      <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
+      <FormSection
+        title="Editors"
+        hint="Who edited the magazine as a whole, and when — distinct from per-issue editor credits."
+      >
+        <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
+      </FormSection>
 
+      <FormSection title="Cover & classification">
       <ImageUploadField
         label="Cover / logo"
         category="covers"
@@ -1004,6 +1015,7 @@ function MagazineForm() {
           </div>
         </div>
       )}
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create magazine" />
     </form>

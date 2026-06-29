@@ -37,12 +37,6 @@ export default function MagazineEditorshipEditor({
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-gray-500 mb-1">
-        Editors (title-level tenure)
-      </label>
-      <p className="text-xs text-gray-400 mb-2">
-        Who edited the magazine as a whole, and when — distinct from per-issue editor credits.
-      </p>
       <div className="space-y-3">
         {rows.map((row, i) => (
           <div key={i} className="border border-gray-100 rounded-md p-3 space-y-2 bg-gray-50/50">

@@ -20,6 +20,7 @@ import MagazineEditorshipEditor, {
   type EditorshipRow,
 } from "../../components/MagazineEditorshipEditor";
 import MagazineRelationshipsEditor from "../../components/MagazineRelationshipsEditor";
+import FormSection from "../../components/FormSection";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 
 const inputCls =
@@ -184,7 +185,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         e.preventDefault();
         attemptSave();
       }}
-      className="max-w-2xl space-y-4"
+      className="max-w-3xl space-y-5"
     >
       <h1 className="text-xl font-bold text-gray-900">
         Edit Magazine
@@ -195,6 +196,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         <EditSavedBanner isAdmin={!!isAdmin} viewHref={`/works/${work.id}`} viewLabel="View magazine" />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title *</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -221,7 +223,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           className={inputCls}
         />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Language</label>
@@ -297,11 +301,23 @@ function EditForm({ work }: { work: WorkDetail }) {
           />
         </div>
       </div>
+      </FormSection>
 
-      <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
+      <FormSection
+        title="Editors"
+        hint="Who edited the magazine as a whole, and when — distinct from per-issue editor credits."
+      >
+        <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
+      </FormSection>
 
-      <MagazineRelationshipsEditor work={work} />
+      <FormSection
+        title="Related magazines"
+        hint="Link titles that renamed or merged — e.g. this continues an earlier magazine."
+      >
+        <MagazineRelationshipsEditor work={work} />
+      </FormSection>
 
+      <FormSection title="Cover & classification">
       <ImageUploadField
         label="Cover / logo"
         category="covers"
@@ -364,6 +380,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           </div>
         </div>
       )}
+      </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
 

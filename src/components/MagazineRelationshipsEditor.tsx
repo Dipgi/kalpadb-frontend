@@ -60,13 +60,6 @@ export default function MagazineRelationshipsEditor({ work }: { work: WorkDetail
 
   return (
     <div>
-      <label className="block text-xs font-semibold text-gray-500 mb-1">
-        Predecessor / successor magazines
-      </label>
-      <p className="text-xs text-gray-400 mb-2">
-        Link titles that renamed or merged — e.g. this magazine continues an earlier one.
-      </p>
-
       {existing.length > 0 && (
         <ul className="text-sm divide-y divide-gray-100 border border-gray-100 rounded-md mb-3">
           {existing.map((r) => (
