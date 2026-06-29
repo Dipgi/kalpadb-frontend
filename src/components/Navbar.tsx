@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
+import { admin } from "../lib/api";
 
 const BROWSE_LINKS = [
   { to: "/browse", label: "Works" },
@@ -20,6 +22,34 @@ function Chevron() {
   );
 }
 
+/** Admin-only pill: a short label + a count bubble, linking straight to the
+ *  page where the pending items are actioned. */
+function PendingPill({
+  to,
+  label,
+  count,
+  onClick,
+}: {
+  to: string;
+  label: string;
+  count: number;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      title={`${count} pending ${label.toLowerCase()} — click to review`}
+      className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100 transition-colors"
+    >
+      {label}
+      <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-amber-500 text-white text-[11px] font-semibold leading-none">
+        {count}
+      </span>
+    </Link>
+  );
+}
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -36,6 +66,18 @@ export default function Navbar() {
 
   const isAdmin = user?.role.toLowerCase() === "admin";
   const isContributor = user && ["admin", "volunteer"].includes(user.role.toLowerCase());
+
+  // Admins see live pending-work counts at the top level so they don't have to
+  // dig into the dashboard. Polls periodically so new items surface without a reload.
+  const { data: pending } = useQuery({
+    queryKey: ["admin-pending-counts"],
+    queryFn: admin.pendingCounts,
+    enabled: !!isAdmin,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const pendingEdits = isAdmin ? (pending?.edit_queue ?? 0) : 0;
+  const pendingRequests = isAdmin ? (pending?.volunteer_requests ?? 0) : 0;
 
   return (
     <>
@@ -81,6 +123,19 @@ export default function Navbar() {
             <Link to="/contribute" onClick={() => setOpen(null)} className="hover:text-gray-900">Contribute</Link>
           )}
           <Link to="/help" onClick={() => setOpen(null)} className="hover:text-gray-900">Help</Link>
+
+          {/* Admin-only pending-work badges — top level so they're seen at a glance */}
+          {pendingEdits > 0 && (
+            <PendingPill to="/admin/queue" label="Edits" count={pendingEdits} onClick={() => setOpen(null)} />
+          )}
+          {pendingRequests > 0 && (
+            <PendingPill
+              to="/admin/volunteer-requests"
+              label="Requests"
+              count={pendingRequests}
+              onClick={() => setOpen(null)}
+            />
+          )}
 
           {user ? (
             /* Account — personal links grouped behind an avatar */
@@ -135,9 +190,13 @@ export default function Navbar() {
 
         {/* Mobile menu toggle */}
         <button
-          className="md:hidden p-2 text-gray-600"
+          className="md:hidden relative p-2 text-gray-600"
           onClick={() => setMenuOpen((o) => !o)}
-          aria-label="Toggle menu"
+          aria-label={
+            pendingEdits + pendingRequests > 0
+              ? `Toggle menu — ${pendingEdits + pendingRequests} pending admin items`
+              : "Toggle menu"
+          }
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {menuOpen
@@ -145,6 +204,9 @@ export default function Navbar() {
               : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             }
           </svg>
+          {!menuOpen && pendingEdits + pendingRequests > 0 && (
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white" />
+          )}
         </button>
       </div>
 
@@ -165,6 +227,21 @@ export default function Navbar() {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                   {user.username}
                 </p>
+                {(pendingEdits > 0 || pendingRequests > 0) && (
+                  <div className="flex flex-wrap gap-2 pl-2">
+                    {pendingEdits > 0 && (
+                      <PendingPill to="/admin/queue" label="Edits" count={pendingEdits} onClick={() => setMenuOpen(false)} />
+                    )}
+                    {pendingRequests > 0 && (
+                      <PendingPill
+                        to="/admin/volunteer-requests"
+                        label="Requests"
+                        count={pendingRequests}
+                        onClick={() => setMenuOpen(false)}
+                      />
+                    )}
+                  </div>
+                )}
                 <Link to="/contribute" onClick={() => setMenuOpen(false)} className="pl-2">Contribute</Link>
                 <Link to="/shelf" onClick={() => setMenuOpen(false)} className="pl-2">My Shelf</Link>
                 {isContributor && (
