@@ -323,6 +323,7 @@ export interface StatsOut {
     total_publishers?: number;
     total_languages?: number;
     total_users?: number;
+    visitor_count?: number;
     [key: string]: number | undefined;
   };
   refreshed_at: string | null;
@@ -696,6 +697,8 @@ export const uploads = {
 export const stats = {
   get: () => request<StatsOut>("/stats"),
   insights: () => request<InsightsOut>("/stats/insights"),
+  recordVisit: () =>
+    request<{ visitor_count: number }>("/stats/visit", { method: "POST" }),
 };
 
 export const news = {

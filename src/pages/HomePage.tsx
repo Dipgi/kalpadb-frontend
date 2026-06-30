@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { stats, works, news } from "../lib/api";
 import WorkCard from "../components/WorkCard";
 
 export default function HomePage() {
+  const queryClient = useQueryClient();
   const { data: siteStats } = useQuery({ queryKey: ["stats"], queryFn: stats.get });
   const { data: recent } = useQuery({
     queryKey: ["recent-works"],
@@ -13,6 +15,16 @@ export default function HomePage() {
     queryKey: ["news"],
     queryFn: () => news.list(1, 3),
   });
+
+  // Count one visit per browser session, then refresh the displayed total.
+  useEffect(() => {
+    if (sessionStorage.getItem("kalpa_visited")) return;
+    sessionStorage.setItem("kalpa_visited", "1");
+    stats
+      .recordVisit()
+      .then(() => queryClient.invalidateQueries({ queryKey: ["stats"] }))
+      .catch(() => {});
+  }, [queryClient]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -62,6 +74,14 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+      )}
+
+      {/* Visitor count */}
+      {siteStats?.stats.visitor_count != null && (
+        <p className="text-center text-sm text-gray-400 -mt-8 mb-12">
+          <span aria-hidden="true">👁 </span>
+          {siteStats.stats.visitor_count.toLocaleString()} visitors
+        </p>
       )}
 
       {/* Recent works */}
