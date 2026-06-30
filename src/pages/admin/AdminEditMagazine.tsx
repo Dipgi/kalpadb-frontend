@@ -9,6 +9,7 @@ import {
   type MagazineStatus,
   type WorkDetail,
 } from "../../lib/api";
+import { issueDisplay } from "../../lib/issues";
 import { useAuth } from "../../hooks/useAuth";
 import ContributorGate from "../../components/ContributorGate";
 import ImageUploadField from "../../components/ImageUploadField";
@@ -458,7 +459,7 @@ function EditForm({ work }: { work: WorkDetail }) {
             {issues.map((i) => (
               <li key={i.m_issue_id} className="flex items-center justify-between px-3 py-2">
                 <span className="text-gray-700">
-                  {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                  {issueDisplay(i) ?? `Issue #${i.m_issue_id}`}
                   {i.publication_date ? (
                     <span className="text-gray-400"> · {i.publication_date.slice(0, 4)}</span>
                   ) : null}

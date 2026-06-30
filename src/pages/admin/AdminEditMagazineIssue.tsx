@@ -10,6 +10,7 @@ import {
   type MagazineIssueFull,
   type ScanInput,
 } from "../../lib/api";
+import { ISSUE_TYPE_OPTIONS, composeIssueLabel } from "../../lib/issues";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import ImageUploadField from "../../components/ImageUploadField";
@@ -77,6 +78,7 @@ export default function AdminEditMagazineIssue() {
         key={existing?.m_issue_id ?? "new"}
         magazineId={magazineId}
         magazineTitle={magazine.title}
+        magazineLanguage={magazine.language ?? null}
         existing={existing}
       />
     </ContributorGate>
@@ -86,10 +88,12 @@ export default function AdminEditMagazineIssue() {
 function IssueForm({
   magazineId,
   magazineTitle,
+  magazineLanguage,
   existing,
 }: {
   magazineId: number;
   magazineTitle: string;
+  magazineLanguage: string | null;
   existing: MagazineIssueFull | null;
 }) {
   const qc = useQueryClient();
@@ -98,7 +102,21 @@ function IssueForm({
   const navigate = useNavigate();
   const [note, setNote] = useState("");
 
-  const [issueNumber, setIssueNumber] = useState(existing?.issue_number ?? "");
+  const isBengali = (magazineLanguage ?? "").toLowerCase().startsWith("bn");
+  // Structured issue identity. issue_number/volume_number are integers; issue_type
+  // is a controlled vocabulary; issue_label is the human display (auto-composed from
+  // the parts + a free-text period, but kept directly editable).
+  const [volumeNumber, setVolumeNumber] = useState(
+    existing?.volume_number != null ? String(existing.volume_number) : ""
+  );
+  const [issueNumberInt, setIssueNumberInt] = useState(
+    existing?.issue_number != null ? String(existing.issue_number) : ""
+  );
+  const [issueType, setIssueType] = useState(existing?.issue_type ?? "regular");
+  const [specialTitle, setSpecialTitle] = useState(existing?.special_title ?? "");
+  // Period is not stored (it lives inside issue_label); used only to (re)compose.
+  const [period, setPeriod] = useState("");
+  const [issueLabel, setIssueLabel] = useState(existing?.issue_label ?? "");
   const [pubDate, setPubDate] = useState(existing?.publication_date ?? "");
   const [coverUrl, setCoverUrl] = useState(existing?.cover_image_url ?? "");
   const [synopsis, setSynopsis] = useState(existing?.synopsis ?? "");
@@ -131,6 +149,18 @@ function IssueForm({
     setScans((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
   }
 
+  function composeLabel() {
+    setIssueLabel(
+      composeIssueLabel({
+        period,
+        volumeNumber: volumeNumber === "" ? null : Number(volumeNumber),
+        issueNumber: issueNumberInt === "" ? null : Number(issueNumberInt),
+        specialTitle: specialTitle || null,
+        bengali: isBengali,
+      })
+    );
+  }
+
   const mutation = useMutation({
     mutationFn: async () => {
       const cleanScans = scans
@@ -143,7 +173,11 @@ function IssueForm({
           quality_note: s.quality_note?.trim() || null,
         }));
       const payload = {
-        issue_number: issueNumber.trim() || null,
+        volume_number: volumeNumber === "" ? null : Number(volumeNumber),
+        issue_number: issueNumberInt === "" ? null : Number(issueNumberInt),
+        issue_type: issueType || null,
+        special_title: specialTitle.trim() || null,
+        issue_label: issueLabel.trim() || null,
         publication_date: pubDate || null,
         cover_image_url: coverUrl.trim() || null,
         synopsis: synopsis.trim() || null,
@@ -195,19 +229,92 @@ function IssueForm({
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div>
-          <label className={labelCls}>Issue number / label</label>
+          <label className={labelCls}>Volume (বর্ষ)</label>
           <input
-            value={issueNumber}
-            onChange={(e) => setIssueNumber(e.target.value)}
-            placeholder="e.g. Vol.3 No.7, Puja 1978"
+            type="number"
+            min={0}
+            value={volumeNumber}
+            onChange={(e) => setVolumeNumber(e.target.value)}
+            placeholder="e.g. 55"
             className={inputCls}
           />
         </div>
         <div>
+          <label className={labelCls}>Issue no. (সংখ্যা)</label>
+          <input
+            type="number"
+            min={0}
+            value={issueNumberInt}
+            onChange={(e) => setIssueNumberInt(e.target.value)}
+            placeholder="e.g. 4"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Issue type</label>
+          <select
+            value={issueType}
+            onChange={(e) => setIssueType(e.target.value as typeof issueType)}
+            className={inputCls}
+          >
+            {ISSUE_TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className={labelCls}>Cover date</label>
           <input type="date" value={pubDate} onChange={(e) => setPubDate(e.target.value)} className={inputCls} />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Special / theme title (optional)</label>
+        <input
+          value={specialTitle}
+          onChange={(e) => setSpecialTitle(e.target.value)}
+          placeholder="e.g. কল্পলোকের ৯ গল্প"
+          className={inputCls}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Period (month/season + year)</label>
+          <input
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            placeholder={isBengali ? "e.g. নভেম্বর ১৯৮৭ or শারদীয়া ১৪২৬" : "e.g. November 1987"}
+            className={inputCls}
+          />
+          <p className="mt-1 text-[11px] text-gray-400">
+            The free part (season name, Bengali-San year) that the structured fields
+            can't express. Used to compose the display label.
+          </p>
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className={labelCls + " mb-0"}>Display label</label>
+            <button
+              type="button"
+              onClick={composeLabel}
+              className="text-xs text-violet-600 hover:underline"
+            >
+              Compose from parts ↻
+            </button>
+          </div>
+          <input
+            value={issueLabel}
+            onChange={(e) => setIssueLabel(e.target.value)}
+            placeholder={isBengali ? "নভেম্বর ১৯৮৭ - বর্ষ ৫৫, সংখ্যা ৪" : "November 1987 - Vol 55, No 4"}
+            className={inputCls}
+          />
+          <p className="mt-1 text-[11px] text-gray-400">
+            Shown to readers in native script. Auto-composed from the parts above; edit
+            freely if needed.
+          </p>
         </div>
       </div>
 

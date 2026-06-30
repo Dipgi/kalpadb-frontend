@@ -9,6 +9,7 @@ import {
   works,
   type WorkDetail,
 } from "../../lib/api";
+import { issueDisplay } from "../../lib/issues";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import ImageUploadField from "../../components/ImageUploadField";
@@ -117,7 +118,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [magIssues, setMagIssues] = useState<IssueRef[]>(
     (work.story?.magazine_appearances ?? []).map((a) => ({
       m_issue_id: a.m_issue_id,
-      label: `${a.magazine_title ?? "Magazine"} — ${a.issue_number ?? `#${a.m_issue_id}`}`,
+      label: `${a.magazine_title ?? "Magazine"} — ${a.issue_label ?? `#${a.m_issue_id}`}`,
     }))
   );
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));

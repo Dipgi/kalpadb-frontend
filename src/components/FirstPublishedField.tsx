@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { search, works, type StoryDetail } from "../lib/api";
+import { issueDisplay } from "../lib/issues";
 import EntityPicker, { type PickerItem } from "./EntityPicker";
 
 export type FirstPublishedMode = "none" | "book" | "issue" | "note";
@@ -166,7 +167,7 @@ export default function FirstPublishedField({
                 <option value="">Select an issue…</option>
                 {(issues ?? []).map((i) => (
                   <option key={i.m_issue_id} value={i.m_issue_id}>
-                    {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                    {issueDisplay(i) ?? `Issue #${i.m_issue_id}`}
                     {i.publication_date ? ` (${i.publication_date.slice(0, 4)})` : ""}
                   </option>
                 ))}
@@ -180,7 +181,7 @@ export default function FirstPublishedField({
                     ...value,
                     issue: {
                       m_issue_id: iss.m_issue_id,
-                      label: `${mag[0].name} — ${iss.issue_number ?? `#${iss.m_issue_id}`}`,
+                      label: `${mag[0].name} — ${issueDisplay(iss) ?? `#${iss.m_issue_id}`}`,
                     },
                   });
                   setSel("");

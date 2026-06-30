@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { works } from "../lib/api";
+import { ISSUE_TYPE_LABELS, issueDisplay } from "../lib/issues";
 import { useAuth } from "../hooks/useAuth";
 
 export default function IssueDetailPage() {
@@ -65,7 +66,7 @@ export default function IssueDetailPage() {
           {issue.cover_image_url ? (
             <img
               src={issue.cover_image_url}
-              alt={issue.issue_number ?? "Issue cover"}
+              alt={issueDisplay(issue) ?? "Issue cover"}
               className="w-full rounded-lg shadow-md"
             />
           ) : (
@@ -78,7 +79,7 @@ export default function IssueDetailPage() {
         <div className="flex-1">
           <div className="flex items-start justify-between gap-3">
             <h1 className="text-2xl font-bold text-gray-900 mb-1">
-              {issue.issue_number ?? `Issue #${issue.m_issue_id}`}
+              {issueDisplay(issue) ?? `Issue #${issue.m_issue_id}`}
             </h1>
             {editPath && (
               <Link
@@ -89,8 +90,28 @@ export default function IssueDetailPage() {
               </Link>
             )}
           </div>
-          {issue.publication_date && (
-            <p className="text-gray-500 mb-3">{issue.publication_date}</p>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {(issue.volume_number != null || issue.issue_number != null) && (
+              <span className="text-sm text-gray-500">
+                {[
+                  issue.volume_number != null ? `Vol ${issue.volume_number}` : null,
+                  issue.issue_number != null ? `No ${issue.issue_number}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            )}
+            {issue.issue_type && issue.issue_type !== "regular" && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
+                {ISSUE_TYPE_LABELS[issue.issue_type]}
+              </span>
+            )}
+            {issue.publication_date && (
+              <span className="text-gray-500 text-sm">{issue.publication_date}</span>
+            )}
+          </div>
+          {issue.special_title && (
+            <p className="text-gray-700 italic mb-3">{issue.special_title}</p>
           )}
           {issue.synopsis && (
             <p className="text-gray-600 text-sm leading-relaxed mb-4">{issue.synopsis}</p>

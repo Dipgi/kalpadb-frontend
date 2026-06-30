@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, user, admin, catalogue, type Rating, type PublicReview } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
+import { issueDisplay } from "../lib/issues";
 import { romanisedTitle } from "../lib/title";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
@@ -369,7 +370,7 @@ export default function WorkDetailPage() {
                       className="text-violet-700 hover:underline"
                     >
                       {a.magazine_title ?? "Magazine"}
-                      {a.issue_number ? ` — ${a.issue_number}` : ""}
+                      {a.issue_label ? ` — ${a.issue_label}` : ""}
                     </Link>
                   ) : (
                     <span>{a.magazine_title ?? "Magazine"}</span>
@@ -502,7 +503,7 @@ export default function WorkDetailPage() {
                         to={`/magazines/${work.id}/issues/${i.m_issue_id}`}
                         className="hover:text-violet-700"
                       >
-                        {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                        {issueDisplay(i) ?? `Issue #${i.m_issue_id}`}
                       </Link>
                       {i.publication_date ? (
                         <span className="font-normal text-gray-400"> · {i.publication_date.slice(0, 4)}</span>
@@ -560,7 +561,7 @@ export default function WorkDetailPage() {
                   .sort((a, b) => (a.publication_date ?? "").localeCompare(b.publication_date ?? ""))
                   .map((i) => (
                     <li key={i.m_issue_id}>
-                      {i.issue_number ?? `Issue #${i.m_issue_id}`}
+                      {issueDisplay(i) ?? `Issue #${i.m_issue_id}`}
                       {i.publication_date ? (
                         <span className="text-gray-400"> · {i.publication_date.slice(0, 4)}</span>
                       ) : null}

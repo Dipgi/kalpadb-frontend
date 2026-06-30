@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { works, type IssueBrowseItem } from "../lib/api";
+import { ISSUE_TYPE_LABELS, issueDisplay } from "../lib/issues";
 import Pagination from "../components/Pagination";
 
 const SORT_OPTIONS = [
   { value: "date_desc", label: "Newest First" },
   { value: "date_asc", label: "Oldest First" },
+  { value: "volume_desc", label: "Volume (high→low)" },
+  { value: "volume_asc", label: "Volume (low→high)" },
   { value: "added_desc", label: "Recently Added" },
 ];
 
@@ -32,7 +35,7 @@ function IssueCard({ issue }: { issue: IssueBrowseItem }) {
         {issue.cover_image_url ? (
           <img
             src={issue.cover_image_url}
-            alt={`${issue.magazine_title ?? "Magazine"} ${issue.issue_number ?? ""}`}
+            alt={`${issue.magazine_title ?? "Magazine"} ${issueDisplay(issue) ?? ""}`}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform"
             onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
@@ -49,11 +52,16 @@ function IssueCard({ issue }: { issue: IssueBrowseItem }) {
           {issue.magazine_title ?? "Untitled magazine"}
         </p>
         <p className="text-xs text-gray-600 leading-snug line-clamp-1">
-          {issue.issue_number || "Issue"}
+          {issueDisplay(issue) || "Issue"}
           {issueDate(issue.publication_date) && (
             <span className="text-gray-400"> · {issueDate(issue.publication_date)}</span>
           )}
         </p>
+        {issue.issue_type && issue.issue_type !== "regular" && (
+          <span className="self-start text-[10px] px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
+            {ISSUE_TYPE_LABELS[issue.issue_type]}
+          </span>
+        )}
         {issue.story_count > 0 && (
           <p className="text-xs text-gray-400">
             {issue.story_count} {issue.story_count === 1 ? "story" : "stories"}
@@ -123,7 +131,7 @@ export default function BrowseIssuesPage() {
           type="search"
           value={term}
           onChange={(e) => setTerm(e.target.value)}
-          placeholder="Search by issue number or magazine…"
+          placeholder="Search by issue label, theme, or magazine…"
           className="flex-1 min-w-[200px] border border-gray-200 rounded-md px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
         />
         <select

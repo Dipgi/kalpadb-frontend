@@ -201,10 +201,29 @@ export interface StoryDetail {
     m_issue_id: number;
     magazine_id: number | null;
     magazine_title: string | null;
-    issue_number: string | null;
+    issue_label: string | null;
     page_start: number | null;
     page_end: number | null;
   }[];
+}
+
+/** Controlled vocabulary for a magazine issue's character. */
+export type IssueType =
+  | "regular"
+  | "special"
+  | "annual"
+  | "puja_annual"
+  | "double"
+  | "anniversary";
+
+/** Structured issue-identity fields shared across issue summaries/records. */
+export interface IssueIdentity {
+  volume_number: number | null;
+  issue_number: number | null;
+  issue_type: IssueType | null;
+  special_title: string | null;
+  /** Human display string (native script) — period + volume/number. */
+  issue_label: string | null;
 }
 
 export interface ComicDetail {
@@ -282,7 +301,11 @@ export interface MagazineDetail {
   language: string | null;
   localised: Record<string, Record<string, string>>;
   editorships: MagazineEditorshipOut[];
-  issues: { m_issue_id: number; issue_number: string | null; publication_date: string | null; cover_image_url: string | null }[];
+  issues: (IssueIdentity & {
+    m_issue_id: number;
+    publication_date: string | null;
+    cover_image_url: string | null;
+  })[];
 }
 
 export interface Person {
@@ -474,11 +497,10 @@ export const auth = {
 // ── Works ──────────────────────────────────────────────────────────────────
 
 /** One row in the global magazine-issue browse (GET /works/magazines/issues). */
-export interface IssueBrowseItem {
+export interface IssueBrowseItem extends IssueIdentity {
   m_issue_id: number;
   magazine_id: number | null;
   magazine_title: string | null;
-  issue_number: string | null;
   publication_date: string | null;
   cover_image_url: string | null;
   story_count: number;
@@ -1064,7 +1086,11 @@ export interface ScanInput {
 
 export interface MagazineIssueCreateIn {
   magazine_id: number;
-  issue_number?: string | null;
+  volume_number?: number | null;
+  issue_number?: number | null;
+  issue_type?: IssueType | null;
+  special_title?: string | null;
+  issue_label?: string | null;
   synopsis?: string | null;
   publication_date?: string | null;
   cover_image_url?: string | null;
@@ -1078,7 +1104,11 @@ export interface MagazineIssueCreateIn {
 }
 
 export interface MagazineIssueUpdateIn {
-  issue_number?: string | null;
+  volume_number?: number | null;
+  issue_number?: number | null;
+  issue_type?: IssueType | null;
+  special_title?: string | null;
+  issue_label?: string | null;
   synopsis?: string | null;
   publication_date?: string | null;
   cover_image_url?: string | null;
@@ -1092,10 +1122,9 @@ export interface MagazineIssueUpdateIn {
 }
 
 /** Full issue record returned by GET /magazines/:id/issues. */
-export interface MagazineIssueFull {
+export interface MagazineIssueFull extends IssueIdentity {
   m_issue_id: number;
   magazine_id: number | null;
-  issue_number: string | null;
   synopsis: string | null;
   publication_date: string | null;
   cover_image_url: string | null;
