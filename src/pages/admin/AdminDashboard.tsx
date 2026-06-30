@@ -28,7 +28,7 @@ export default function AdminDashboard() {
     { label: "Works", value: s.total_works, to: "/browse" },
     { label: "Authors", value: s.total_authors, to: "/persons" },
     { label: "Books", value: s.total_books, to: "/browse" },
-    { label: "Magazine Issues", value: s.total_magazine_issues, to: "/browse" },
+    { label: "Magazine Issues", value: s.total_magazine_issues, to: "/issues" },
     { label: "Publishers", value: s.total_publishers, to: "/publishers" },
     { label: "Languages", value: s.total_languages, to: "/browse" },
     { label: "Users", value: s.total_users, to: "/admin/users" },
