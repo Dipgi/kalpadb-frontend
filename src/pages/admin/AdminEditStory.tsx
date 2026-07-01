@@ -9,7 +9,6 @@ import {
   works,
   type WorkDetail,
 } from "../../lib/api";
-import { issueDisplay } from "../../lib/issues";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import ImageUploadField from "../../components/ImageUploadField";
