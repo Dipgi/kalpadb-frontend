@@ -282,16 +282,41 @@ export interface MagazineEditorshipOut {
   stakeholder: PersonSummary;
 }
 
+export interface MagazineFrequencyInput {
+  frequency: string;
+  start_year?: number | null;
+  end_year?: number | null;
+}
+
 export interface MagazineRelationshipInput {
   other_work_id: number;
   direction: "continues" | "continued_by";
   notes?: string | null;
 }
 
+/** Controlled vocabulary for a magazine's release cadence. */
+export type PublicationFrequency =
+  | "weekly"
+  | "fortnightly"
+  | "monthly"
+  | "bimonthly"
+  | "quarterly"
+  | "biannual"
+  | "annual"
+  | "irregular";
+
+/** One cadence period in a magazine's frequency history. */
+export interface MagazineFrequencyOut {
+  id: number;
+  frequency: PublicationFrequency;
+  start_year: number | null;
+  end_year: number | null;
+}
+
 export interface MagazineDetail {
   id: number;
   issn: string | null;
-  publication_frequency: string | null;
+  frequencies: MagazineFrequencyOut[];
   founded_year: number | null;
   ceased_year: number | null;
   status: MagazineStatus | null;
@@ -1047,12 +1072,12 @@ export interface MagazineCreateIn {
   description?: string | null;
   language?: string | null;
   issn?: string | null;
-  publication_frequency?: string | null;
   founded_year?: number | null;
   ceased_year?: number | null;
   status?: MagazineStatus | null;
   place_of_publication?: string | null;
   editorships?: MagazineEditorshipInput[];
+  frequencies?: MagazineFrequencyInput[];
   image_urls?: string[] | null;
   genre_ids?: number[];
   tag_ids?: number[];
@@ -1065,13 +1090,13 @@ export interface MagazineUpdateIn {
   language?: string | null;
   image_urls?: string[] | null;
   issn?: string | null;
-  publication_frequency?: string | null;
   founded_year?: number | null;
   ceased_year?: number | null;
   status?: MagazineStatus | null;
   place_of_publication?: string | null;
-  /** Replace-semantics: a present list (even []) replaces all editorships. */
+  /** Replace-semantics: a present list (even []) replaces all editorships / frequencies. */
   editorships?: MagazineEditorshipInput[];
+  frequencies?: MagazineFrequencyInput[];
   genre_ids?: number[];
   tag_ids?: number[];
   localised?: Record<string, Record<string, string>>;

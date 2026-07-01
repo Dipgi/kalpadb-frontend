@@ -17,6 +17,10 @@ import MagazineEditorshipEditor, {
   editorshipsToPayload,
   type EditorshipRow,
 } from "../../components/MagazineEditorshipEditor";
+import MagazineFrequencyEditor, {
+  frequenciesToPayload,
+  type FrequencyRow,
+} from "../../components/MagazineFrequencyEditor";
 import FormSection from "../../components/FormSection";
 import FormatsEditor, {
   type FormatRow,
@@ -823,7 +827,7 @@ function MagazineForm() {
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
   const [issn, setIssn] = useState("");
-  const [frequency, setFrequency] = useState("");
+  const [frequencies, setFrequencies] = useState<FrequencyRow[]>([]);
   const [foundedYear, setFoundedYear] = useState("");
   const [ceasedYear, setCeasedYear] = useState("");
   const [statusVal, setStatusVal] = useState<MagazineStatus | "">("");
@@ -842,7 +846,7 @@ function MagazineForm() {
           description: description.trim() || null,
           language,
           issn: issn.trim() || null,
-          publication_frequency: frequency.trim() || null,
+          frequencies: frequenciesToPayload(frequencies),
           founded_year: foundedYear.trim() ? Number(foundedYear) : null,
           ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
           status: statusVal || null,
@@ -859,7 +863,7 @@ function MagazineForm() {
       setTitle("");
       setDescription("");
       setIssn("");
-      setFrequency("");
+      setFrequencies([]);
       setFoundedYear("");
       setCeasedYear("");
       setStatusVal("");
@@ -909,7 +913,7 @@ function MagazineForm() {
       </FormSection>
 
       <FormSection title="Publication details">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
@@ -919,15 +923,6 @@ function MagazineForm() {
               </option>
             ))}
           </select>
-        </div>
-        <div>
-          <label className={labelCls}>Frequency</label>
-          <input
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value)}
-            placeholder="e.g. monthly, quarterly"
-            className={inputCls}
-          />
         </div>
         <div>
           <label className={labelCls}>ISSN</label>
@@ -984,6 +979,13 @@ function MagazineForm() {
           />
         </div>
       </div>
+      </FormSection>
+
+      <FormSection
+        title="Frequency"
+        hint="Release cadence over time. Add a period per cadence if it changed (years optional)."
+      >
+        <MagazineFrequencyEditor rows={frequencies} onChange={setFrequencies} />
       </FormSection>
 
       <FormSection

@@ -16,6 +16,10 @@ import ImageUploadField from "../../components/ImageUploadField";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
+import MagazineFrequencyEditor, {
+  frequenciesToPayload,
+  type FrequencyRow,
+} from "../../components/MagazineFrequencyEditor";
 import MagazineEditorshipEditor, {
   editorshipsToPayload,
   type EditorshipRow,
@@ -76,7 +80,13 @@ function EditForm({ work }: { work: WorkDetail }) {
   const initialRoman = work.localised?.title?.[`${work.language ?? "bn"}-Latn`] ?? "";
   const [roman, setRoman] = useState(initialRoman);
   const [issn, setIssn] = useState(work.magazine_detail?.issn ?? "");
-  const [frequency, setFrequency] = useState(work.magazine_detail?.publication_frequency ?? "");
+  const [frequencies, setFrequencies] = useState<FrequencyRow[]>(
+    (work.magazine_detail?.frequencies ?? []).map((f) => ({
+      frequency: f.frequency,
+      start_year: f.start_year?.toString() ?? "",
+      end_year: f.end_year?.toString() ?? "",
+    }))
+  );
   const [foundedYear, setFoundedYear] = useState(
     work.magazine_detail?.founded_year?.toString() ?? ""
   );
@@ -129,7 +139,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           language,
           localised,
           issn: issn.trim() || null,
-          publication_frequency: frequency.trim() || null,
+          frequencies: frequenciesToPayload(frequencies),
           founded_year: foundedYear.trim() ? Number(foundedYear) : null,
           ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
           status: statusVal || null,
@@ -161,11 +171,6 @@ function EditForm({ work }: { work: WorkDetail }) {
       const cleared = findClearedFields([
         { label: "Description", previous: work.description, next: description.trim() || null },
         { label: "ISSN", previous: work.magazine_detail?.issn, next: issn.trim() || null },
-        {
-          label: "Frequency",
-          previous: work.magazine_detail?.publication_frequency,
-          next: frequency.trim() || null,
-        },
         {
           label: "Place of publication",
           previous: work.magazine_detail?.place_of_publication,
@@ -227,7 +232,7 @@ function EditForm({ work }: { work: WorkDetail }) {
       </FormSection>
 
       <FormSection title="Publication details">
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
@@ -237,15 +242,6 @@ function EditForm({ work }: { work: WorkDetail }) {
               </option>
             ))}
           </select>
-        </div>
-        <div>
-          <label className={labelCls}>Frequency</label>
-          <input
-            value={frequency}
-            onChange={(e) => setFrequency(e.target.value)}
-            placeholder="e.g. monthly, quarterly"
-            className={inputCls}
-          />
         </div>
         <div>
           <label className={labelCls}>ISSN</label>
@@ -302,6 +298,13 @@ function EditForm({ work }: { work: WorkDetail }) {
           />
         </div>
       </div>
+      </FormSection>
+
+      <FormSection
+        title="Frequency"
+        hint="Release cadence over time. Add a period per cadence if it changed (years optional)."
+      >
+        <MagazineFrequencyEditor rows={frequencies} onChange={setFrequencies} />
       </FormSection>
 
       <FormSection

@@ -25,6 +25,10 @@ import SourceAttributionFields, {
 import DuplicateMatchPrompt from "../components/DuplicateMatchPrompt";
 import ImageUploadField from "../components/ImageUploadField";
 import MagazineIssuePicker, { type IssueRef } from "../components/MagazineIssuePicker";
+import MagazineFrequencyEditor, {
+  type FrequencyRow,
+  frequenciesToPayload,
+} from "../components/MagazineFrequencyEditor";
 import FirstPublishedField, {
   emptyFirstPublished,
   firstPublishedPayload,
@@ -899,7 +903,7 @@ function MagazineForm() {
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
   const [issn, setIssn] = useState("");
-  const [frequency, setFrequency] = useState("");
+  const [frequencies, setFrequencies] = useState<FrequencyRow[]>([]);
   const [logoUrl, setLogoUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
@@ -912,7 +916,7 @@ function MagazineForm() {
         description: description.trim() || null,
         language,
         issn: issn.trim() || null,
-        publication_frequency: frequency.trim() || null,
+        frequencies: frequenciesToPayload(frequencies),
         image_urls: logoUrl.trim() ? [logoUrl.trim()] : null,
         genre_ids: [...genreIds],
         tag_ids: [...tagIds],
@@ -922,7 +926,7 @@ function MagazineForm() {
       setTitle("");
       setDescription("");
       setIssn("");
-      setFrequency("");
+      setFrequencies([]);
       setLogoUrl("");
       setGenreIds(new Set());
       setTagIds(new Set());
@@ -953,7 +957,7 @@ function MagazineForm() {
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Language</label>
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
@@ -965,13 +969,17 @@ function MagazineForm() {
           </select>
         </div>
         <div>
-          <label className={labelCls}>Frequency</label>
-          <input value={frequency} onChange={(e) => setFrequency(e.target.value)} placeholder="e.g. monthly" className={inputCls} />
-        </div>
-        <div>
           <label className={labelCls}>ISSN</label>
           <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
         </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Frequency</label>
+        <p className="text-xs text-gray-400 mb-2">
+          Release cadence. Add a period per cadence if it changed over time (years optional).
+        </p>
+        <MagazineFrequencyEditor rows={frequencies} onChange={setFrequencies} />
       </div>
 
       <ImageUploadField

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, user, admin, catalogue, type Rating, type PublicReview } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import { issueDisplay } from "../lib/issues";
+import { frequencyLabel } from "../lib/frequencies";
 import { romanisedTitle } from "../lib/title";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
@@ -423,10 +424,10 @@ export default function WorkDetailPage() {
                 </p>
               ) : null;
             })()}
-            {(work.magazine_detail.issn || work.magazine_detail.publication_frequency) && (
+            {(work.magazine_detail.issn || work.magazine_detail.frequencies.length > 0) && (
               <p className="text-xs text-gray-400 mb-2">
-                {work.magazine_detail.publication_frequency}
-                {work.magazine_detail.publication_frequency && work.magazine_detail.issn ? " · " : ""}
+                {work.magazine_detail.frequencies.map(frequencyLabel).join(" · ")}
+                {work.magazine_detail.frequencies.length > 0 && work.magazine_detail.issn ? " · " : ""}
                 {work.magazine_detail.issn ? `ISSN ${work.magazine_detail.issn}` : ""}
               </p>
             )}
