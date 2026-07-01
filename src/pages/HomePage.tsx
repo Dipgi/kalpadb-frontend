@@ -55,9 +55,11 @@ export default function HomePage() {
 
       {/* Stats bar */}
       {siteStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
           {[
             { label: "Works", value: siteStats.stats.total_works, to: "/browse" },
+            { label: "Magazines", value: siteStats.stats.total_magazines, to: "/magazines" },
+            { label: "Issues", value: siteStats.stats.total_magazine_issues, to: "/issues" },
             { label: "Authors", value: siteStats.stats.total_authors, to: "/persons" },
             { label: "Publishers", value: siteStats.stats.total_publishers, to: "/publishers" },
             { label: "Languages", value: siteStats.stats.total_languages, to: "/browse" },
