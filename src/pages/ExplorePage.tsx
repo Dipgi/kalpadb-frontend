@@ -121,6 +121,13 @@ export default function ExplorePage() {
             />
           </ChartCard>
 
+          <ChartCard title="Works by language" subtitle="Click to browse that language">
+            <HBar
+              items={data.by_language}
+              onPick={(i) => navigate(`/browse?lang=${i.id}`)}
+            />
+          </ChartCard>
+
           <ChartCard title="Top publishers" subtitle="By number of works · top 15">
             <HBar
               items={data.top_publishers}

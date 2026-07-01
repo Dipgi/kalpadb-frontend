@@ -362,6 +362,7 @@ export interface InsightsOut {
   total_works: number;
   total_magazine_issues: number;
   by_genre: InsightItem[];
+  by_language: InsightItem[];
   top_publishers: InsightItem[];
   top_authors: InsightItem[];
   by_content_type: InsightItem[];
