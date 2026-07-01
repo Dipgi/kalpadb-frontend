@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   admin,
@@ -43,7 +43,7 @@ import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../../lib/workTypes";
 
-type Tab = "book" | "story" | "magazine" | "person" | "publisher";
+type Tab = "book" | "story" | "magazine" | "issue" | "person" | "publisher";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -85,7 +85,7 @@ export default function AdminAdd() {
       <h1 className="text-xl font-bold text-gray-900 mb-6">Add Records</h1>
 
       <div className="flex gap-2 mb-6">
-        {(["book", "story", "magazine", "person", "publisher"] as Tab[]).map((t) => (
+        {(["book", "story", "magazine", "issue", "person", "publisher"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -103,6 +103,7 @@ export default function AdminAdd() {
       {tab === "book" && <BookForm />}
       {tab === "story" && <StoryForm />}
       {tab === "magazine" && <MagazineForm />}
+      {tab === "issue" && <MagazineIssueChooser />}
       {tab === "person" && <PersonForm />}
       {tab === "publisher" && <PublisherForm />}
     </div>
@@ -764,6 +765,46 @@ function StoryForm() {
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create story" />
     </form>
+  );
+}
+
+// ── Magazine issue chooser ────────────────────────────────────────────────────
+
+// Adding an issue needs a parent magazine, so pick one first, then hand off to
+// the magazine-scoped add-issue page (which carries the magazine id in its route).
+function MagazineIssueChooser() {
+  const navigate = useNavigate();
+  const [mag, setMag] = useState<PickerItem[]>([]);
+  const magId = mag[0]?.id;
+  return (
+    <div className="space-y-4 max-w-xl">
+      <p className="text-sm text-gray-500">
+        Adding an issue of an existing magazine. Pick the magazine, then continue to fill in the
+        issue. To add a brand-new magazine title instead, use the <strong>Magazine</strong> tab.
+      </p>
+      <EntityPicker
+        label="Magazine"
+        placeholder="Search a magazine…"
+        fetchKey="admin-add-issue-magazine"
+        fetcher={(q) =>
+          search.query(q).then((r) => ({
+            items: r.works
+              .filter((w) => w.type === "MAGAZINE")
+              .map((w) => ({ id: w.id, name: w.title })),
+          }))
+        }
+        selected={mag}
+        onChange={(items) => setMag(items.slice(-1))}
+      />
+      <button
+        type="button"
+        disabled={!magId}
+        onClick={() => navigate(`/magazines/${magId}/issues/new`)}
+        className="bg-violet-700 text-white text-sm px-5 py-2 rounded-md font-medium hover:bg-violet-800 disabled:opacity-40 transition-colors"
+      >
+        Continue
+      </button>
+    </div>
   );
 }
 
