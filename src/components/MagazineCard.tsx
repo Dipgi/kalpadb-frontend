@@ -15,7 +15,12 @@ export default function MagazineCard({ work }: { work: WorkSummary }) {
       to={`/works/${work.id}`}
       className="group flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
     >
-      <div className="aspect-[3/2] bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
+      <div className="relative aspect-[3/2] bg-gray-50 flex items-center justify-center p-4 overflow-hidden">
+        {work.issue_count > 0 && (
+          <span className="absolute top-2 right-2 z-10 text-xs font-medium px-2 py-0.5 rounded-full bg-violet-700/90 text-white shadow-sm">
+            {work.issue_count} {work.issue_count === 1 ? "issue" : "issues"}
+          </span>
+        )}
         {work.cover_image_url ? (
           <img
             src={work.cover_image_url}

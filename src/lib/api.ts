@@ -107,6 +107,8 @@ export interface WorkSummary {
   authors: { id: number; name: string; image_url: string | null }[];
   avg_rating: number | null;
   rating_count: number;
+  /** Catalogued issue count — only meaningful for type=MAGAZINE (0 otherwise). */
+  issue_count: number;
   localised: Record<string, Record<string, string>>;
 }
 
