@@ -60,7 +60,7 @@ export default function HomePage() {
             { label: "Works", value: siteStats.stats.total_works, to: "/browse" },
             { label: "Magazines", value: siteStats.stats.total_magazines, to: "/magazines" },
             { label: "Issues", value: siteStats.stats.total_magazine_issues, to: "/issues" },
-            { label: "Authors", value: siteStats.stats.total_authors, to: "/persons" },
+            { label: "People", value: siteStats.stats.total_authors, to: "/persons" },
             { label: "Publishers", value: siteStats.stats.total_publishers, to: "/publishers" },
             { label: "Languages", value: siteStats.stats.total_languages, to: "/browse" },
           ].map(({ label, value, to }) => (
