@@ -34,6 +34,7 @@ import AdminNews from "./pages/admin/AdminNews";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminVolunteerRequests from "./pages/admin/AdminVolunteerRequests";
 import AdminTagging from "./pages/admin/AdminTagging";
+import AdminTags from "./pages/admin/AdminTags";
 import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditStory from "./pages/admin/AdminEditStory";
@@ -188,6 +189,7 @@ export default function App() {
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="volunteer-requests" element={<AdminVolunteerRequests />} />
                   <Route path="tagging" element={<AdminTagging />} />
+                  <Route path="tags" element={<AdminTags />} />
                   <Route path="add" element={<AdminAdd />} />
                   <Route path="catalogue" element={<AdminCatalogue />} />
                   <Route path="audit" element={<AdminAudit />} />

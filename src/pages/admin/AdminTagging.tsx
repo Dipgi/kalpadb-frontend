@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { works, search, catalogue, admin, type GenreItem, type WorkSummary } from "../../lib/api";
+import {
+  works,
+  search,
+  catalogue,
+  admin,
+  type GenreItem,
+  type TagNode,
+  type WorkSummary,
+} from "../../lib/api";
 
 export default function AdminTagging() {
   const [page, setPage] = useState(1);
@@ -11,6 +19,7 @@ export default function AdminTagging() {
   const searching = q.trim().length >= 2;
 
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: tagTree } = useQuery({ queryKey: ["tag-tree"], queryFn: catalogue.tagTree });
 
   const { data: listData, isLoading: listLoading } = useQuery({
     queryKey: ["tagging-works", page],
@@ -30,7 +39,7 @@ export default function AdminTagging() {
   return (
     <div>
       <h1 className="text-xl font-bold text-gray-900 mb-6">
-        Genre Tagging
+        Genre &amp; Tag Tagging
         {!searching && listData && (
           <span className="ml-2 text-sm font-normal text-gray-400">{listData.total} works</span>
         )}
@@ -73,7 +82,7 @@ export default function AdminTagging() {
                 </span>
               </button>
               {expandedId === w.id && allGenres && (
-                <GenreEditor workId={w.id} allGenres={allGenres} />
+                <TaxonomyEditor workId={w.id} allGenres={allGenres} tagTree={tagTree ?? []} />
               )}
             </div>
           ))}
@@ -103,22 +112,37 @@ export default function AdminTagging() {
   );
 }
 
-function GenreEditor({ workId, allGenres }: { workId: number; allGenres: GenreItem[] }) {
+function TaxonomyEditor({
+  workId,
+  allGenres,
+  tagTree,
+}: {
+  workId: number;
+  allGenres: GenreItem[];
+  tagTree: TagNode[];
+}) {
   const { data: work, isLoading } = useQuery({
     queryKey: ["work", String(workId)],
     queryFn: () => works.get(workId),
   });
 
   if (isLoading || !work) {
-    return <div className="px-4 py-3 bg-gray-50 text-sm text-gray-400">Loading genres…</div>;
+    return <div className="px-4 py-3 bg-gray-50 text-sm text-gray-400">Loading…</div>;
   }
   return (
-    <GenreChecklist
-      workId={workId}
-      workType={work.type}
-      allGenres={allGenres}
-      initialIds={work.genres.map((g) => g.id)}
-    />
+    <div className="bg-gray-50 border-t border-gray-100 divide-y divide-gray-200">
+      <GenreChecklist
+        workId={workId}
+        workType={work.type}
+        allGenres={allGenres}
+        initialIds={work.genres.map((g) => g.id)}
+      />
+      <TagChecklist
+        workId={workId}
+        tagTree={tagTree}
+        initialIds={work.tags.map((t) => t.id)}
+      />
+    </div>
   );
 }
 
@@ -160,7 +184,8 @@ function GenreChecklist({
     selected.size !== initialIds.length || initialIds.some((id) => !selected.has(id));
 
   return (
-    <div className="px-4 py-3 bg-gray-50 border-t border-gray-100">
+    <div className="px-4 py-3">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Genres</p>
       <div className="flex flex-wrap gap-2 mb-3">
         {allGenres.map((g) => (
           <button
@@ -207,6 +232,89 @@ function GenreChecklist({
         >
           View work ↗
         </Link>
+      </div>
+    </div>
+  );
+}
+
+function TagChecklist({
+  workId,
+  tagTree,
+  initialIds,
+}: {
+  workId: number;
+  tagTree: TagNode[];
+  initialIds: number[];
+}) {
+  const qc = useQueryClient();
+  const [selected, setSelected] = useState<Set<number>>(() => new Set(initialIds));
+  const [saved, setSaved] = useState(false);
+
+  const saveMutation = useMutation({
+    mutationFn: () => admin.works.setTags(workId, [...selected]),
+    onSuccess: () => {
+      setSaved(true);
+      qc.invalidateQueries({ queryKey: ["work", String(workId)] });
+    },
+  });
+
+  function toggle(id: number) {
+    setSaved(false);
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const dirty =
+    selected.size !== initialIds.length || initialIds.some((id) => !selected.has(id));
+
+  return (
+    <div className="px-4 py-3">
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Tags (subgenres)</p>
+      {tagTree.length === 0 ? (
+        <p className="text-xs text-gray-400 mb-3">
+          No tags defined yet — create them in{" "}
+          <Link to="/admin/tags" className="text-violet-600 hover:underline">Tag Management</Link>.
+        </p>
+      ) : (
+        <div className="space-y-2 mb-3">
+          {tagTree.map((parent) => (
+            <div key={parent.id}>
+              <span className="text-[11px] text-gray-400 mr-2">{parent.tag_name}:</span>
+              <span className="inline-flex flex-wrap gap-1.5">
+                {(parent.children ?? []).map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => toggle(t.id)}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                      selected.has(t.id)
+                        ? "bg-teal-700 text-white border-teal-700"
+                        : "bg-white border-gray-300 text-gray-600 hover:border-teal-400"
+                    }`}
+                  >
+                    {t.tag_name}
+                  </button>
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => saveMutation.mutate()}
+          disabled={saveMutation.isPending || tagTree.length === 0 || (!dirty && !saveMutation.isError)}
+          className="text-xs px-3 py-1.5 rounded-md bg-teal-700 text-white disabled:opacity-40 hover:bg-teal-800 transition-colors"
+        >
+          {saveMutation.isPending ? "Saving…" : "Save tags"}
+        </button>
+        {saved && !dirty && <span className="text-xs text-green-600">Saved ✓</span>}
+        {saveMutation.isError && (
+          <span className="text-xs text-red-500">Save failed — try again.</span>
+        )}
       </div>
     </div>
   );

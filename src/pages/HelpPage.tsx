@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "28 June 2026";
+const LAST_UPDATED = "1 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -64,7 +64,8 @@ export default function HelpPage() {
         <ul className="list-disc pl-5 space-y-1">
           <li>
             <Link to="/browse" className="text-violet-700 hover:underline">Browse</Link> — page
-            through the whole catalogue and filter by type, language, and genre.
+            through the whole catalogue and filter by type, language, genre, and subgenre tag
+            (e.g. Cyberpunk, Kalpavigyan).
           </li>
           <li>
             <Link to="/explore" className="text-violet-700 hover:underline">Explore</Link> — visual

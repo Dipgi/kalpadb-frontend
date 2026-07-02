@@ -23,20 +23,23 @@ export default function BrowsePage() {
   const contentType = searchParams.get("content_type") ?? "";
   const lang = searchParams.get("lang") ?? "";
   const genreSlug = searchParams.get("genre_slug") ?? "";
+  const tagSlug = searchParams.get("tag_slug") ?? "";
   const sort = searchParams.get("sort") ?? "added_desc";
   const page = Number(searchParams.get("page") ?? 1);
 
   const { data: genres } = useQuery({ queryKey: ["genres"], queryFn: catalogue.genres });
+  const { data: tagTree } = useQuery({ queryKey: ["tag-tree"], queryFn: catalogue.tagTree });
   const { data: languages } = useQuery({ queryKey: ["languages"], queryFn: catalogue.languages });
 
   const { data: result, isLoading } = useQuery({
-    queryKey: ["works", type, contentType, lang, genreSlug, sort, page],
+    queryKey: ["works", type, contentType, lang, genreSlug, tagSlug, sort, page],
     queryFn: () =>
       works.list({
         type: type || undefined,
         content_type: contentType || undefined,
         lang: lang || undefined,
         genre_slug: genreSlug || undefined,
+        tag_slug: tagSlug || undefined,
         sort,
         page,
         page_size: 25,
@@ -61,7 +64,7 @@ export default function BrowsePage() {
     });
   }
 
-  const hasFilters = !!(type || contentType || lang || genreSlug);
+  const hasFilters = !!(type || contentType || lang || genreSlug || tagSlug);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -121,6 +124,25 @@ export default function BrowsePage() {
               <option key={g.id} value={g.slug}>
                 {g.genre_name}
               </option>
+            ))}
+          </select>
+        )}
+
+        {tagTree && tagTree.length > 0 && (
+          <select
+            value={tagSlug}
+            onChange={(e) => set("tag_slug", e.target.value)}
+            className="border border-gray-200 rounded-md px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+          >
+            <option value="">All tags (subgenres)</option>
+            {tagTree.map((parent) => (
+              <optgroup key={parent.id} label={parent.tag_name}>
+                {(parent.children ?? []).map((t) => (
+                  <option key={t.id} value={t.slug}>
+                    {t.tag_name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         )}

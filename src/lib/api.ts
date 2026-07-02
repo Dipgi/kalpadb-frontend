@@ -540,6 +540,7 @@ export const works = {
     content_type?: string;
     lang?: string;
     genre_slug?: string;
+    tag_slug?: string;
     sort?: string;
     page?: number;
     page_size?: number;
@@ -549,6 +550,7 @@ export const works = {
     if (params.content_type) q.set("content_type", params.content_type);
     if (params.lang) q.set("lang", params.lang);
     if (params.genre_slug) q.set("genre_slug", params.genre_slug);
+    if (params.tag_slug) q.set("tag_slug", params.tag_slug);
     if (params.sort) q.set("sort", params.sort);
     q.set("page", String(params.page ?? 1));
     q.set("page_size", String(params.page_size ?? 25));
@@ -640,6 +642,8 @@ export interface TagNode {
   id: number;
   tag_name: string;
   slug: string;
+  parent_tag_id?: number | null;
+  localised?: Record<string, Record<string, string>>;
   children?: TagNode[];
 }
 
@@ -680,6 +684,7 @@ export const catalogue = {
   allGenres: () => request<GenreItem[]>("/genres"),
   allTags: () =>
     request<{ id: number; tag_name: string; slug: string }[]>("/tags?flat=true"),
+  tagTree: () => request<TagNode[]>("/tags"),
   series: () => request<Page<{ id: number; name: string }>>("/series?page_size=100"),
   // Browse listing + detail for the public Series pages.
   seriesList: (params: { q?: string; page?: number } = {}) => {
@@ -918,6 +923,11 @@ export const admin = {
         method: "PUT",
         body: JSON.stringify({ genre_ids }),
       }),
+    setTags: (lw_id: number, tag_ids: number[]) =>
+      request<{ id: number; tag_name: string; slug: string }[]>(
+        `/admin/works/${lw_id}/tags`,
+        { method: "PUT", body: JSON.stringify({ tag_ids }) }
+      ),
     delete: (lw_id: number) =>
       request(`/admin/works/${lw_id}`, { method: "DELETE" }),
   },
@@ -966,6 +976,7 @@ export const admin = {
         method: "POST",
         body: JSON.stringify(data),
       }),
+    delete: (id: number) => request(`/tags/${id}`, { method: "DELETE" }),
   },
 };
 

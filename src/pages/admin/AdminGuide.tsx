@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "28 June 2026";
+const LAST_UPDATED = "1 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -137,11 +137,18 @@ export default function AdminGuide() {
         </p>
       </Section>
 
-      <Section title="Genre tagging">
+      <Section title="Genre & tag tagging">
         <p>
-          <Link to="/admin/tagging" className="text-violet-700 hover:underline">Genre Tagging</Link>{" "}
-          is a fast workflow for assigning genres/tags to works in bulk — useful for back-filling
-          taxonomy across the catalogue.
+          <Link to="/admin/tagging" className="text-violet-700 hover:underline">Genre &amp; Tag Tagging</Link>{" "}
+          is a fast workflow for assigning both <strong>genres</strong> (the coarse primary
+          classification) and <strong>tags</strong> (fine-grained subgenres like Cyberpunk or
+          Kalpavigyan) to works in bulk — expand a work to edit each set independently.
+        </p>
+        <p>
+          <Link to="/admin/tags" className="text-violet-700 hover:underline">Tag Management</Link>{" "}
+          is where you build the tag vocabulary itself: create tags under a parent (a two-level
+          tree), or delete unused ones. A tag can only be deleted once it has no child tags and is
+          no longer assigned to any work.
         </p>
       </Section>
 
