@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "1 July 2026";
+const LAST_UPDATED = "4 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -113,7 +113,11 @@ export default function HelpPage() {
             Search is <strong>fuzzy</strong>: spelling variants still hit (e.g. “roy” finds “Ray”,
             “orthotrishna” still finds “arthatrishna”). Don’t worry about exact spelling.
           </li>
-          <li>People &amp; publishers match on their English name and any native-script name.</li>
+          <li>
+            People &amp; publishers match on their English name, any native-script name, and any
+            recorded <strong>alias or pen name</strong> — searching <em>Ranin</em> finds Goutam
+            Mandal.
+          </li>
         </ul>
       </Section>
 
@@ -354,6 +358,13 @@ export default function HelpPage() {
             <em>isn’t</em> in the catalogue (e.g. a Bengali transcreation of a foreign novel),
             record it instead in the “Based on an external work” box (relationship + original title
             &amp; author).
+          </li>
+          <li>
+            <strong>Pen names &amp; bylines:</strong> every real person has <em>one</em> record —
+            pen names are listed on that record as aliases, never entered as a separate person. If
+            a work was <em>printed</em> under a different name, credit the real person and put the
+            printed name in the optional <em>credited as</em> field under the author/translator
+            picker; the page then shows “Name (as byline)”.
           </li>
           <li>
             <strong>Genres vs tags:</strong> genres are broad categories (e.g. Hard SF); tags are
