@@ -38,7 +38,7 @@ export default function DuplicateMatchPrompt({
             </Link>
             <span className="text-xs text-gray-400">
               {Math.round(c.similarity * 100)}% match
-              {c.localised_match ? " · localised" : ""}
+              {c.alias_match ? " · alias/pen name" : c.localised_match ? " · localised" : ""}
             </span>
           </li>
         ))}

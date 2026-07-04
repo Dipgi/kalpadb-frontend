@@ -64,6 +64,7 @@ export interface DuplicateCandidate {
   name: string;
   similarity: number;
   localised_match: boolean;
+  alias_match?: boolean;
 }
 
 export interface DuplicateError {
