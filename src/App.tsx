@@ -45,6 +45,7 @@ import AdminEditPublisher from "./pages/admin/AdminEditPublisher";
 import AdminEditSeries from "./pages/admin/AdminEditSeries";
 import AdminCatalogue from "./pages/admin/AdminCatalogue";
 import AdminAudit from "./pages/admin/AdminAudit";
+import AdminDuplicates from "./pages/admin/AdminDuplicates";
 import ContributePage from "./pages/ContributePage";
 import MySubmissionsPage from "./pages/MySubmissionsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
@@ -193,6 +194,7 @@ export default function App() {
                   <Route path="add" element={<AdminAdd />} />
                   <Route path="catalogue" element={<AdminCatalogue />} />
                   <Route path="audit" element={<AdminAudit />} />
+                  <Route path="duplicates" element={<AdminDuplicates />} />
                   <Route path="guide" element={<AdminGuide />} />
                   <Route path="edit/:id" element={<AdminEditBook />} />
                   <Route path="edit-story/:id" element={<AdminEditStory />} />

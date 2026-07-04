@@ -15,6 +15,7 @@ const NAV: NavItem[] = [
   { to: "/admin/tags", label: "Tag Management" },
   { to: "/admin/add", label: "Add Records" },
   { to: "/admin/catalogue", label: "Catalogue" },
+  { to: "/admin/duplicates", label: "Find Duplicates" },
   { to: "/admin/audit", label: "Activity Log" },
   { to: "/admin/guide", label: "Admin Guide" },
 ];

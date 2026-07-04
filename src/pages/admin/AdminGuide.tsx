@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "1 July 2026";
+const LAST_UPDATED = "4 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -166,10 +166,46 @@ export default function AdminGuide() {
         </p>
       </Section>
 
+      <Section title="Find Duplicates — scan & merge">
+        <p>
+          <Link to="/admin/duplicates" className="text-violet-700 hover:underline">Find Duplicates</Link>{" "}
+          scans a whole category (people, publishers, books, stories, magazines, issues) for records
+          that look like the same thing entered twice. Matching is fuzzy and cross-script: honorifics
+          (ড., শ্রী, Dr.) and byline labels (মূল রচনা:, অনুবাদ:) are ignored, and Bengali names are
+          compared against romanised ones. A scan can take up to a minute.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            Every record in a cluster is a <strong>clickable link</strong> (opens in a new tab) — check
+            details before deciding. The <em>Links</em> column counts how many credits/links point at
+            each version.
+          </li>
+          <li>
+            <strong>Merge</strong>: pick the version to keep (radio), tick the ones to merge in, and
+            confirm. All credits, links, ratings and bookmarks move to the keeper; its blank fields
+            are filled from the merged records; a merged person’s other names are kept as aliases.
+            The merged records are then deleted — <span className="text-amber-700">this cannot be
+            undone</span>.
+          </li>
+          <li>
+            <strong>Not duplicates</strong>: permanently rules the cluster’s records as distinct —
+            future scans skip them (undo at the bottom of the page).
+          </li>
+          <li>
+            <strong>Ignore for now</strong>: just hides the cluster on this device until you clear it.
+          </li>
+          <li>
+            Amber badges (⚠ surname/given name/authors differ) mean the match is probably two
+            different people or works with similar names — check before merging.
+          </li>
+        </ul>
+      </Section>
+
       <Section title="Activity log">
         <p>
           <Link to="/admin/audit" className="text-violet-700 hover:underline">Activity Log</Link>{" "}
           records who changed what and when — use it to audit recent edits and trace mistakes.
+          Merges appear as <em>duplicates_merged</em> with a full breakdown of repointed links.
         </p>
       </Section>
 

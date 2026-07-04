@@ -866,6 +866,73 @@ export interface PendingCounts {
   edit_queue: number;
 }
 
+// ── Duplicate finder (admin) ──────────────────────────────────────────────
+
+/** Category tabs offered by the scanner. */
+export type DuplicateScanKind =
+  | "person"
+  | "publisher"
+  | "book"
+  | "story"
+  | "magazine"
+  | "issue";
+
+/** Id namespace used by merge/dismiss (all work types share "work"). */
+export type DuplicateMergeKind = "person" | "publisher" | "work" | "issue";
+
+export interface DuplicateMember {
+  id: number;
+  label: string;
+  native: string | null;
+  ref_count: number;
+  has_image: boolean;
+  detail: string;
+  language: string | null;
+  year: number | null;
+  authors: string[];
+  content_type: string | null;
+  magazine_id: number | null;
+}
+
+export interface DuplicatePair {
+  a: number;
+  b: number;
+  score: number;
+  flags: string[];
+}
+
+export interface DuplicateCluster {
+  members: DuplicateMember[];
+  pairs: DuplicatePair[];
+}
+
+export interface DuplicateScanResult {
+  kind: DuplicateScanKind;
+  merge_kind: DuplicateMergeKind;
+  clusters: DuplicateCluster[];
+  scanned: number;
+  dismissed_pairs: number;
+}
+
+export interface DuplicateMergeResult {
+  kept_id: number;
+  merged_ids: number[];
+  repointed: Record<string, number>;
+  dropped_conflicts: number;
+  filled_fields: string[];
+  aliases_added: number;
+}
+
+export interface DismissedPair {
+  id: number;
+  entity_kind: DuplicateMergeKind;
+  low_id: number;
+  high_id: number;
+  low_label: string | null;
+  high_label: string | null;
+  created_at: string | null;
+}
+
 // ── Admin API ─────────────────────────────────────────────────────────────
 
 export const admin = {
@@ -956,6 +1023,28 @@ export const admin = {
 
   reviews: {
     delete: (id: number) => request(`/admin/reviews/${id}`, { method: "DELETE" }),
+  },
+
+  duplicates: {
+    // The full-catalogue fuzzy scan can take up to ~1 min on the bigger kinds.
+    scan: (kind: DuplicateScanKind) =>
+      request<DuplicateScanResult>(`/admin/duplicates?kind=${kind}`),
+    merge: (merge_kind: DuplicateMergeKind, keep_id: number, merge_ids: number[]) =>
+      request<DuplicateMergeResult>("/admin/duplicates/merge", {
+        method: "POST",
+        body: JSON.stringify({ merge_kind, keep_id, merge_ids }),
+      }),
+    dismiss: (merge_kind: DuplicateMergeKind, ids: number[]) =>
+      request<DismissedPair[]>("/admin/duplicates/dismiss", {
+        method: "POST",
+        body: JSON.stringify({ merge_kind, ids }),
+      }),
+    listDismissed: (merge_kind?: DuplicateMergeKind) =>
+      request<DismissedPair[]>(
+        `/admin/duplicates/dismissed${merge_kind ? `?merge_kind=${merge_kind}` : ""}`
+      ),
+    undismiss: (id: number) =>
+      request(`/admin/duplicates/dismissed/${id}`, { method: "DELETE" }),
   },
 
   audit: {
