@@ -105,7 +105,7 @@ export interface WorkSummary {
   language: string | null;
   publication_date: string | null;
   cover_image_url: string | null;
-  authors: { id: number; name: string; image_url: string | null }[];
+  authors: { id: number; name: string; image_url: string | null; credited_as?: string | null }[];
   avg_rating: number | null;
   rating_count: number;
   /** Catalogued issue count — only meaningful for type=MAGAZINE (0 otherwise). */
@@ -417,6 +417,8 @@ export interface PersonSummary {
   /** Roles derived from real credits across all work types. */
   roles?: string[];
   localised?: Record<string, Record<string, string>>;
+  /** Byline as printed on this credit (pen name); null/absent = canonical name. */
+  credited_as?: string | null;
 }
 
 export interface PublisherSummary {
@@ -1088,6 +1090,8 @@ export interface BookCreateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} for author/translator credits. */
+  credited_as?: Record<number, string>;
   editor_ids?: number[];
   illustrator_ids?: number[];
   translator_ids?: number[];
@@ -1126,6 +1130,8 @@ export interface StoryCreateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} for author/translator credits. */
+  credited_as?: Record<number, string>;
   translator_ids?: number[];
   /** Book anthologies/collections this story appears in. */
   book_ids?: number[];
@@ -1155,6 +1161,8 @@ export interface StoryUpdateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} for author/translator credits. */
+  credited_as?: Record<number, string>;
   translator_ids?: number[];
   book_ids?: number[];
   magazine_issue_ids?: number[];
@@ -1329,6 +1337,8 @@ export interface BookUpdateIn {
   genre_ids?: number[];
   tag_ids?: number[];
   author_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} for author/translator credits. */
+  credited_as?: Record<number, string>;
   editor_ids?: number[];
   illustrator_ids?: number[];
   translator_ids?: number[];

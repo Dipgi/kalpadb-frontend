@@ -11,6 +11,7 @@ import {
 } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import BylineFields, { bylinePayload } from "../../components/BylineFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import MagazineIssuePicker, { type IssueRef } from "../../components/MagazineIssuePicker";
 import FirstPublishedField, {
@@ -104,6 +105,13 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [translators, setTranslators] = useState<PickerItem[]>(
     (work.story?.translators ?? []).map((t) => ({ id: t.id, name: t.name }))
   );
+  // Byline overrides per credited person ("credited as", e.g. a pen name).
+  const [bylines, setBylines] = useState<Record<number, string>>(() => {
+    const init: Record<number, string> = {};
+    for (const a of work.authors) if (a.credited_as) init[a.id] = a.credited_as;
+    for (const t of work.story?.translators ?? []) if (t.credited_as) init[t.id] = t.credited_as;
+    return init;
+  });
   const [collection, setCollection] = useState<PickerItem[]>(
     (work.story?.book_appearances ?? []).map((b) => ({
       id: b.book_id,
@@ -164,6 +172,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           ...firstPublishedPayload(firstPub),
           author_ids: authors.map((a) => a.id),
           translator_ids: translators.map((t) => t.id),
+          credited_as: bylinePayload([...authors, ...translators], bylines),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         },
@@ -342,6 +351,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setAuthors}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Translators"
@@ -352,6 +362,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setTranslators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"

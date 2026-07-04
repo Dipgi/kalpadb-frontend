@@ -93,6 +93,15 @@ export default function AdminGuide() {
             third link is removed. Existing page ranges on links you keep are preserved.
           </li>
           <li>
+            <strong>“Credited as” bylines (pen names).</strong> Under the Authors / Translators
+            pickers on book and story forms, each selected person gets an optional{" "}
+            <em>credited as</em> field — fill it with the name <em>as printed</em> when it differs
+            from the canonical record (e.g. a story bylined <em>রনিন</em> credited to Goutam
+            Mandal). Leave blank for the canonical name. Detail pages and tables of contents show
+            “Name (as byline)”. Always credit the real person; never create a separate pen-name
+            person record.
+          </li>
+          <li>
             <strong>Table of contents &amp; Contributors are computed, not entered.</strong> A book’s
             Table of contents and the Contributors list on books and magazine issues are{" "}
             <em>derived</em> from the stories linked to that container and from those stories’ own

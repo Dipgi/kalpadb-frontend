@@ -195,6 +195,9 @@ export default function WorkDetailPage() {
               <span key={a.id}>
                 {i > 0 && ", "}
                 <Link to={`/persons/${a.id}`} className="hover:text-violet-700">{a.name}</Link>
+                {a.credited_as && (
+                  <span className="text-gray-400 text-sm"> (as {a.credited_as})</span>
+                )}
               </span>
             ))}
             {publicationYear && <span> · {publicationYear}</span>}
@@ -302,7 +305,9 @@ export default function WorkDetailPage() {
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Translators</h3>
             <p className="text-sm text-gray-700">
-              {work.story.translators.map((t) => t.name).join(", ")}
+              {work.story.translators
+                .map((t) => (t.credited_as ? `${t.name} (as ${t.credited_as})` : t.name))
+                .join(", ")}
             </p>
           </div>
         )}
@@ -664,7 +669,9 @@ export default function WorkDetailPage() {
                     {s.title}
                   </Link>
                   {s.authors.length > 0 && (
-                    <span className="text-gray-500"> — {s.authors.map((a) => a.name).join(", ")}</span>
+                    <span className="text-gray-500"> — {s.authors
+                      .map((a) => (a.credited_as ? `${a.name} (as ${a.credited_as})` : a.name))
+                      .join(", ")}</span>
                   )}
                   {s.page_start != null && (
                     <span className="text-gray-400">

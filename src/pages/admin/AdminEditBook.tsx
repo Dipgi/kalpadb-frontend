@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail, type BookUpdateIn } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import BylineFields, { bylinePayload } from "../../components/BylineFields";
 import FormatsEditor, {
   type FormatRow,
   formatRowsFromExisting,
@@ -105,6 +106,12 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [authors, setAuthors] = useState<PickerItem[]>(
     work.authors.map((a) => ({ id: a.id, name: a.name }))
   );
+  // Byline overrides per credited author ("credited as", e.g. a pen name).
+  const [bylines, setBylines] = useState<Record<number, string>>(() => {
+    const init: Record<number, string> = {};
+    for (const a of work.authors) if (a.credited_as) init[a.id] = a.credited_as;
+    return init;
+  });
   const [editors, setEditors] = useState<PickerItem[]>(
     (work.book?.editors ?? []).map((p) => ({ id: p.id, name: p.name }))
   );
@@ -183,6 +190,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         publication_year: y,
         publication_date: y ? `${y}-01-01` : null,
         author_ids: authors.map((a) => a.id),
+        credited_as: bylinePayload(authors, bylines),
         editor_ids: editors.map((e) => e.id),
         illustrator_ids: illustrators.map((i) => i.id),
         translator_ids: translators.map((t) => t.id),
@@ -435,6 +443,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setAuthors}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Editors"

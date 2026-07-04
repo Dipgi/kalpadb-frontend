@@ -12,6 +12,7 @@ import {
   type GenreItem,
 } from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
+import BylineFields, { bylinePayload } from "../components/BylineFields";
 import FormatsEditor, {
   type FormatRow,
   emptyFormatRow,
@@ -292,6 +293,7 @@ function BookForm() {
   const [originalLanguage, setOriginalLanguage] = useState("");
   const [year, setYear] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
+  const [bylines, setBylines] = useState<Record<number, string>>({});
   const [editors, setEditors] = useState<PickerItem[]>([]);
   const [illustrators, setIllustrators] = useState<PickerItem[]>([]);
   const [translators, setTranslators] = useState<PickerItem[]>([]);
@@ -329,6 +331,7 @@ function BookForm() {
         ...sourceAttributionPayload(source),
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
         author_ids: authors.map((a) => a.id),
+        credited_as: bylinePayload(authors, bylines),
         editor_ids: editors.map((e) => e.id),
         illustrator_ids: illustrators.map((i) => i.id),
         translator_ids: translators.map((t) => t.id),
@@ -501,6 +504,7 @@ function BookForm() {
         selected={authors}
         onChange={setAuthors}
       />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Editors"
@@ -625,6 +629,7 @@ function StoryForm() {
   const [pageCount, setPageCount] = useState("");
   const [headpieceUrl, setHeadpieceUrl] = useState("");
   const [authors, setAuthors] = useState<PickerItem[]>([]);
+  const [bylines, setBylines] = useState<Record<number, string>>({});
   const [translators, setTranslators] = useState<PickerItem[]>([]);
   const [collection, setCollection] = useState<PickerItem[]>([]);
   const [magIssues, setMagIssues] = useState<IssueRef[]>([]);
@@ -652,6 +657,7 @@ function StoryForm() {
         ...firstPublishedPayload(firstPub),
         author_ids: authors.map((a) => a.id),
         translator_ids: translators.map((t) => t.id),
+        credited_as: bylinePayload([...authors, ...translators], bylines),
         genre_ids: [...genreIds],
         tag_ids: [...tagIds],
       });
@@ -759,6 +765,7 @@ function StoryForm() {
         selected={authors}
         onChange={setAuthors}
       />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Translators"
@@ -768,6 +775,7 @@ function StoryForm() {
         selected={translators}
         onChange={setTranslators}
       />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"

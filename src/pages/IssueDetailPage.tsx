@@ -142,7 +142,9 @@ export default function IssueDetailPage() {
                   {s.title}
                 </Link>
                 {s.authors.length > 0 && (
-                  <span className="text-gray-500"> — {s.authors.map((a) => a.name).join(", ")}</span>
+                  <span className="text-gray-500"> — {s.authors
+                    .map((a) => (a.credited_as ? `${a.name} (as ${a.credited_as})` : a.name))
+                    .join(", ")}</span>
                 )}
                 {s.page_start != null && (
                   <span className="text-gray-400">
