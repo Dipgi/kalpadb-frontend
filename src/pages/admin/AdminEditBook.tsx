@@ -443,7 +443,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setAuthors}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
-      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Editors"

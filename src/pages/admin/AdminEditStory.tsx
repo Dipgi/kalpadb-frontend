@@ -351,7 +351,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setAuthors}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
-      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Translators"
@@ -362,7 +362,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setTranslators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
-      <BylineFields people={translators} bylines={bylines} onChange={setBylines} />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"

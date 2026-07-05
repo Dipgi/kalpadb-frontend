@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "4 July 2026";
+const LAST_UPDATED = "5 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -99,7 +99,12 @@ export default function AdminGuide() {
             from the canonical record (e.g. a story bylined <em>রনিন</em> credited to Goutam
             Mandal). Leave blank for the canonical name. Detail pages and tables of contents show
             “Name (as byline)”. Always credit the real person; never create a separate pen-name
-            person record.
+            person record. The field suggests the person’s recorded aliases and name forms as you
+            type; a byline that matches none of them gets a gentle hint to also record it as a pen
+            name on the person (nothing is added automatically — follow the link and add it if
+            it’s genuine, ignore it if the byline is a one-off). Bylines are searchable either
+            way: person search and the duplicate scanner match them even when they were never
+            formalised as aliases.
           </li>
           <li>
             <strong>Table of contents &amp; Contributors are computed, not entered.</strong> A book’s

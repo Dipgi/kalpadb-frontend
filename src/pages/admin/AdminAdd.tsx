@@ -372,7 +372,7 @@ function BookForm() {
         onChange={setAuthors}
         onCreate={createPersonInline}
       />
-      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Editors"
@@ -680,7 +680,7 @@ function StoryForm() {
         onChange={setAuthors}
         onCreate={createPersonInline}
       />
-      <BylineFields people={authors} bylines={bylines} onChange={setBylines} />
+      <BylineFields people={authors} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Translators"
@@ -691,7 +691,7 @@ function StoryForm() {
         onChange={setTranslators}
         onCreate={createPersonInline}
       />
-      <BylineFields people={translators} bylines={bylines} onChange={setBylines} />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"
