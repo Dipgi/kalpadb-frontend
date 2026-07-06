@@ -49,6 +49,7 @@ import AdminDuplicates from "./pages/admin/AdminDuplicates";
 import ContributePage from "./pages/ContributePage";
 import MySubmissionsPage from "./pages/MySubmissionsPage";
 import NewsDetailPage from "./pages/NewsDetailPage";
+import NewsListPage from "./pages/NewsListPage";
 import LicensePage from "./pages/LicensePage";
 import CitePage from "./pages/CitePage";
 import HelpPage from "./pages/HelpPage";
@@ -177,6 +178,7 @@ export default function App() {
                     </div>
                   }
                 />
+                <Route path="/news" element={<NewsListPage />} />
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
                 <Route path="/license" element={<LicensePage />} />
                 <Route path="/cite" element={<CitePage />} />

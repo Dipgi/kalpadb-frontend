@@ -38,8 +38,8 @@ export default function NewsDetailPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <Link to="/" className="text-sm text-gray-400 hover:text-gray-700 mb-6 inline-block">
-        ← Home
+      <Link to="/news" className="text-sm text-gray-400 hover:text-gray-700 mb-6 inline-block">
+        ← All news
       </Link>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-2">{post.title}</h1>

@@ -102,7 +102,12 @@ export default function HomePage() {
       {/* News */}
       {newsFeed && newsFeed.items.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">News</h2>
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">News</h2>
+            <Link to="/news" className="text-sm text-violet-700 hover:underline">
+              All news →
+            </Link>
+          </div>
           <div className="flex flex-col gap-4">
             {newsFeed.items.map((item) => (
               <Link
