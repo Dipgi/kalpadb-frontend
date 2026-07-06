@@ -54,7 +54,7 @@ export default function SeriesDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">{series.name}</h1>
           {nativeName && <p className="text-lg text-gray-600 mb-1">{nativeName}</p>}
           {series.description && (
-            <p className="text-sm text-gray-600 leading-relaxed mt-3 max-w-2xl">
+            <p className="text-sm text-gray-600 leading-relaxed mt-3 max-w-2xl whitespace-pre-line">
               {series.description}
             </p>
           )}

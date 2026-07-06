@@ -245,7 +245,7 @@ export default function WorkDetailPage() {
           </div>
 
           {work.description && (
-            <p className="text-gray-600 text-sm leading-relaxed mb-4">{work.description}</p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4 whitespace-pre-line">{work.description}</p>
           )}
 
           {me && (

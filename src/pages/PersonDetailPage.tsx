@@ -123,7 +123,7 @@ export default function PersonDetailPage() {
           )}
 
           {person.bio && (
-            <p className="text-sm text-gray-600 leading-relaxed">{person.bio}</p>
+            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{person.bio}</p>
           )}
 
           {person.external_links.length > 0 && (

@@ -69,7 +69,7 @@ export default function PublisherDetailPage() {
             </a>
           )}
           {publisher.description && (
-            <p className="text-sm text-gray-600 leading-relaxed mt-3 max-w-2xl">{publisher.description}</p>
+            <p className="text-sm text-gray-600 leading-relaxed mt-3 max-w-2xl whitespace-pre-line">{publisher.description}</p>
           )}
           </div>
         </div>
