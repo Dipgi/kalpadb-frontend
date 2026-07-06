@@ -97,6 +97,7 @@ function EditForm({ work }: { work: WorkDetail }) {
     work.magazine_detail?.status ?? ""
   );
   const [place, setPlace] = useState(work.magazine_detail?.place_of_publication ?? "");
+  const [websiteUrl, setWebsiteUrl] = useState(work.magazine_detail?.website_url ?? "");
   const [editorships, setEditorships] = useState<EditorshipRow[]>(
     (work.magazine_detail?.editorships ?? []).map((e) => ({
       person: { id: e.stakeholder.id, name: e.stakeholder.name },
@@ -144,6 +145,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
           status: statusVal || null,
           place_of_publication: place.trim() || null,
+          website_url: websiteUrl.trim() || null,
           editorships: editorshipsToPayload(editorships),
           image_urls: logoUrl.trim() ? [logoUrl.trim()] : [],
           genre_ids: [...genreIds],
@@ -175,6 +177,11 @@ function EditForm({ work }: { work: WorkDetail }) {
           label: "Place of publication",
           previous: work.magazine_detail?.place_of_publication,
           next: place.trim() || null,
+        },
+        {
+          label: "Official website",
+          previous: work.magazine_detail?.website_url,
+          next: websiteUrl.trim() || null,
         },
       ]);
       if (cleared.length) {
@@ -294,6 +301,16 @@ function EditForm({ work }: { work: WorkDetail }) {
             value={place}
             onChange={(e) => setPlace(e.target.value)}
             placeholder="e.g. Kolkata"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Official website URL</label>
+          <input
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://…"
             className={inputCls}
           />
         </div>

@@ -324,6 +324,7 @@ export interface MagazineDetail {
   ceased_year: number | null;
   status: MagazineStatus | null;
   place_of_publication: string | null;
+  website_url: string | null;
   title: string;
   description: string | null;
   language: string | null;
@@ -1187,6 +1188,7 @@ export interface MagazineCreateIn {
   ceased_year?: number | null;
   status?: MagazineStatus | null;
   place_of_publication?: string | null;
+  website_url?: string | null;
   editorships?: MagazineEditorshipInput[];
   frequencies?: MagazineFrequencyInput[];
   image_urls?: string[] | null;
@@ -1205,6 +1207,7 @@ export interface MagazineUpdateIn {
   ceased_year?: number | null;
   status?: MagazineStatus | null;
   place_of_publication?: string | null;
+  website_url?: string | null;
   /** Replace-semantics: a present list (even []) replaces all editorships / frequencies. */
   editorships?: MagazineEditorshipInput[];
   frequencies?: MagazineFrequencyInput[];

@@ -840,6 +840,7 @@ function MagazineForm() {
   const [ceasedYear, setCeasedYear] = useState("");
   const [statusVal, setStatusVal] = useState<MagazineStatus | "">("");
   const [place, setPlace] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
   const [editorships, setEditorships] = useState<EditorshipRow[]>([]);
   const [logoUrl, setLogoUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
@@ -859,6 +860,7 @@ function MagazineForm() {
           ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
           status: statusVal || null,
           place_of_publication: place.trim() || null,
+          website_url: websiteUrl.trim() || null,
           editorships: editorshipsToPayload(editorships),
           image_urls: logoUrl.trim() ? [logoUrl.trim()] : null,
           genre_ids: [...genreIds],
@@ -983,6 +985,16 @@ function MagazineForm() {
             value={place}
             onChange={(e) => setPlace(e.target.value)}
             placeholder="e.g. Kolkata"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Official website URL</label>
+          <input
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://…"
             className={inputCls}
           />
         </div>

@@ -436,6 +436,21 @@ export default function WorkDetailPage() {
                 {work.magazine_detail.issn ? `ISSN ${work.magazine_detail.issn}` : ""}
               </p>
             )}
+            {work.magazine_detail.website_url && (
+              <p className="text-sm mb-2">
+                <a
+                  href={work.magazine_detail.website_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-violet-700 hover:underline inline-flex items-center gap-1"
+                >
+                  Official website
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </p>
+            )}
             {work.magazine_detail.editorships.length > 0 && (
               <div className="mb-3">
                 <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">
