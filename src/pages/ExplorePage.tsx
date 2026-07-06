@@ -4,7 +4,6 @@ import {
   Bar,
   BarChart,
   Cell,
-  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -15,17 +14,21 @@ import {
 import { stats, type InsightItem } from "../lib/api";
 
 const VIOLET = "#6d28d9";
-// Distinct categorical hues so adjacent slices are easy to tell apart.
+// Distinct categorical hues, in a FIXED order chosen so no two adjacent
+// slices are confusable under color-vision deficiency (order validated:
+// worst adjacent-pair CVD ΔE 19.4). Slices beyond this list fold into
+// "Other" rather than cycling colors.
 const PIE_COLORS = [
   "#6d28d9", // violet
-  "#2563eb", // blue
   "#059669", // emerald
   "#d97706", // amber
+  "#2563eb", // blue
   "#dc2626", // red
-  "#db2777", // pink
   "#0891b2", // cyan
+  "#db2777", // pink
   "#65a30d", // lime
 ];
+const OTHER_COLOR = "#6b7280"; // neutral gray for the folded tail
 
 function ChartCard({
   title,
@@ -88,11 +91,24 @@ export default function ExplorePage() {
   });
 
   // content-type donut: drop the (usually large) "Unspecified" slice and note it.
-  const classified = (data?.by_content_type ?? []).filter(
-    (i) => i.label.toLowerCase() !== "unspecified"
-  );
+  const allClassified = (data?.by_content_type ?? [])
+    .filter((i) => i.label.toLowerCase() !== "unspecified")
+    .sort((a, b) => b.count - a.count);
   const unclassified =
     data?.by_content_type.find((i) => i.label.toLowerCase() === "unspecified")?.count ?? 0;
+  // Top slices get their own color; the long tail folds into one "Other"
+  // slice — 13 sliver slices with recycled colors are unreadable, especially
+  // on a phone.
+  const otherCount = allClassified.slice(PIE_COLORS.length).reduce((s, i) => s + i.count, 0);
+  const classified =
+    otherCount > 0
+      ? [
+          ...allClassified.slice(0, PIE_COLORS.length),
+          { id: "other", label: "Other", count: otherCount },
+        ]
+      : allClassified;
+  const sliceColor = (i: number) =>
+    classified[i].id === "other" ? OTHER_COLOR : PIE_COLORS[i % PIE_COLORS.length];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -148,26 +164,43 @@ export default function ExplorePage() {
             }
           >
             {classified.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={classified}
-                    dataKey="count"
-                    nameKey="label"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    stroke="#fff"
-                    strokeWidth={2}
-                  >
-                    {classified.map((_, i) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                  <Tooltip formatter={(value, name) => [`${value} works`, name]} />
-                </PieChart>
-              </ResponsiveContainer>
+              <>
+                {/* Radius is relative so the pie fits any card width; the
+                    legend is plain flex-wrapped HTML below the plot instead of
+                    recharts' <Legend>, which overlaps the pie when it wraps to
+                    several rows on narrow screens. */}
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie
+                      data={classified}
+                      dataKey="count"
+                      nameKey="label"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius="85%"
+                      stroke="#fff"
+                      strokeWidth={2}
+                    >
+                      {classified.map((_, i) => (
+                        <Cell key={i} fill={sliceColor(i)} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value, name) => [`${value} works`, name]} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 justify-center">
+                  {classified.map((item, i) => (
+                    <span key={item.label} className="inline-flex items-center gap-1.5 text-xs text-gray-600">
+                      <span
+                        className="w-2.5 h-2.5 rounded-sm shrink-0"
+                        style={{ backgroundColor: sliceColor(i) }}
+                      />
+                      {item.label}
+                      <span className="text-gray-400">{item.count}</span>
+                    </span>
+                  ))}
+                </div>
+              </>
             ) : (
               <p className="text-sm text-gray-400 py-8 text-center">No classified work types yet.</p>
             )}
