@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "4 July 2026";
+const LAST_UPDATED = "6 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -90,6 +90,10 @@ export default function HelpPage() {
             browse magazine titles; open one to see its issues in date order, and each issue’s
             contents. (Magazines have their own section because a magazine is a publication venue,
             not a single work — so they aren’t mixed into the works browse.)
+          </li>
+          <li>
+            <Link to="/news" className="text-violet-700 hover:underline">News</Link> — all site
+            announcements and updates; the latest three also appear on the home page.
           </li>
           <li>Every work, person, and publisher has its own detail page with full information.</li>
         </ul>
