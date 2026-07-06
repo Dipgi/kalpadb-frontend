@@ -10,6 +10,7 @@ import {
   getDuplicateError,
   type DuplicateError,
   type GenreItem,
+  type MagazineStatus,
 } from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
 import BylineFields, { bylinePayload } from "../components/BylineFields";
@@ -30,6 +31,10 @@ import MagazineFrequencyEditor, {
   type FrequencyRow,
   frequenciesToPayload,
 } from "../components/MagazineFrequencyEditor";
+import MagazineEditorshipEditor, {
+  type EditorshipRow,
+  editorshipsToPayload,
+} from "../components/MagazineEditorshipEditor";
 import FirstPublishedField, {
   emptyFirstPublished,
   firstPublishedPayload,
@@ -911,6 +916,12 @@ function MagazineForm() {
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
   const [issn, setIssn] = useState("");
+  const [foundedYear, setFoundedYear] = useState("");
+  const [ceasedYear, setCeasedYear] = useState("");
+  const [statusVal, setStatusVal] = useState<MagazineStatus | "">("");
+  const [place, setPlace] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [editorships, setEditorships] = useState<EditorshipRow[]>([]);
   const [frequencies, setFrequencies] = useState<FrequencyRow[]>([]);
   const [logoUrl, setLogoUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
@@ -924,6 +935,12 @@ function MagazineForm() {
         description: description.trim() || null,
         language,
         issn: issn.trim() || null,
+        founded_year: foundedYear.trim() ? Number(foundedYear) : null,
+        ceased_year: ceasedYear.trim() ? Number(ceasedYear) : null,
+        status: statusVal || null,
+        place_of_publication: place.trim() || null,
+        website_url: websiteUrl.trim() || null,
+        editorships: editorshipsToPayload(editorships),
         frequencies: frequenciesToPayload(frequencies),
         image_urls: logoUrl.trim() ? [logoUrl.trim()] : null,
         genre_ids: [...genreIds],
@@ -934,6 +951,12 @@ function MagazineForm() {
       setTitle("");
       setDescription("");
       setIssn("");
+      setFoundedYear("");
+      setCeasedYear("");
+      setStatusVal("");
+      setPlace("");
+      setWebsiteUrl("");
+      setEditorships([]);
       setFrequencies([]);
       setLogoUrl("");
       setGenreIds(new Set());
@@ -980,6 +1003,73 @@ function MagazineForm() {
           <label className={labelCls}>ISSN</label>
           <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelCls}>Founded (year)</label>
+          <input
+            type="number"
+            value={foundedYear}
+            onChange={(e) => setFoundedYear(e.target.value)}
+            min={1800}
+            max={2100}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Ceased (year)</label>
+          <input
+            type="number"
+            value={ceasedYear}
+            onChange={(e) => setCeasedYear(e.target.value)}
+            min={1800}
+            max={2100}
+            placeholder="blank if running"
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Status</label>
+          <select
+            value={statusVal}
+            onChange={(e) => setStatusVal(e.target.value as MagazineStatus | "")}
+            className={inputCls}
+          >
+            <option value="">—</option>
+            <option value="active">Active</option>
+            <option value="ceased">Ceased</option>
+            <option value="hiatus">Hiatus</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Place of publication</label>
+          <input
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+            placeholder="e.g. Kolkata"
+            className={inputCls}
+          />
+        </div>
+        <div className="col-span-2">
+          <label className={labelCls}>Official website URL</label>
+          <input
+            type="url"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+            placeholder="https://…"
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className={labelCls}>Editors</label>
+        <p className="text-xs text-gray-400 mb-2">
+          Editorship history — add a row per editor stint (years optional).
+        </p>
+        <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
       </div>
 
       <div>
