@@ -434,6 +434,10 @@ function BookForm() {
                 ))}
             </optgroup>
           </select>
+          <p className="mt-1 text-xs text-gray-400">
+            Is the original also in KalpaDB? Submit this record first — once approved, the two
+            works can be linked from its Edit page (“Translations &amp; editions”).
+          </p>
         </div>
         <div>
           <label className={labelCls}>Publication year</label>
@@ -748,6 +752,10 @@ function StoryForm() {
                 ))}
             </optgroup>
           </select>
+          <p className="mt-1 text-xs text-gray-400">
+            Is the original also in KalpaDB? Submit this record first — once approved, the two
+            works can be linked from its Edit page (“Translations &amp; editions”).
+          </p>
         </div>
         <div>
           <label className={labelCls}>Publication year</label>
@@ -1143,6 +1151,11 @@ function MagazineForm() {
           </div>
         </div>
       )}
+
+      <p className="text-xs text-gray-400">
+        Translated edition of a magazine that's also in KalpaDB? Submit this record first — once
+        approved, the two works can be linked from its Edit page (“Translations”).
+      </p>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit magazine" />
     </form>

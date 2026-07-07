@@ -119,7 +119,19 @@ export default function AdminAdd() {
 
 // ── Success banner ──────────────────────────────────────────────────────────
 
-function SuccessBanner({ message, link, linkText }: { message: string; link?: string; linkText?: string }) {
+function SuccessBanner({
+  message,
+  link,
+  linkText,
+  editLink,
+  editText,
+}: {
+  message: string;
+  link?: string;
+  linkText?: string;
+  editLink?: string;
+  editText?: string;
+}) {
   return (
     <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md px-4 py-3 mb-4">
       {message}{" "}
@@ -127,6 +139,14 @@ function SuccessBanner({ message, link, linkText }: { message: string; link?: st
         <Link to={link} className="underline font-medium">
           {linkText ?? "View →"}
         </Link>
+      )}
+      {editLink && (
+        <>
+          {" · "}
+          <Link to={editLink} className="underline font-medium">
+            {editText ?? "Edit →"}
+          </Link>
+        </>
       )}
     </div>
   );
@@ -237,7 +257,13 @@ function BookForm() {
       className="max-w-2xl space-y-4"
     >
       {createdId != null && (
-        <SuccessBanner message="Book created." link={`/works/${createdId}`} linkText="View book →" />
+        <SuccessBanner
+          message="Book created."
+          link={`/works/${createdId}`}
+          linkText="View book →"
+          editLink={`/admin/edit/${createdId}`}
+          editText="Edit / link translations →"
+        />
       )}
 
       <div>
@@ -304,6 +330,10 @@ function BookForm() {
                 ))}
             </optgroup>
           </select>
+          <p className="mt-1 text-xs text-gray-400">
+            Is the original also in KalpaDB? Create this record first, then link the two works
+            from its Edit page (“Translations &amp; editions”).
+          </p>
         </div>
         <div>
           <label className={labelCls}>Publication year</label>
@@ -574,7 +604,13 @@ function StoryForm() {
       className="max-w-2xl space-y-4"
     >
       {createdId != null && (
-        <SuccessBanner message="Story created." link={`/works/${createdId}`} linkText="View story →" />
+        <SuccessBanner
+          message="Story created."
+          link={`/works/${createdId}`}
+          linkText="View story →"
+          editLink={`/admin/edit-story/${createdId}`}
+          editText="Edit / link translations →"
+        />
       )}
 
       <div>
@@ -639,6 +675,10 @@ function StoryForm() {
                 ))}
             </optgroup>
           </select>
+          <p className="mt-1 text-xs text-gray-400">
+            Is the original also in KalpaDB? Create this record first, then link the two works
+            from its Edit page (“Translations &amp; editions”).
+          </p>
         </div>
         <div>
           <label className={labelCls}>Publication year</label>
@@ -897,9 +937,11 @@ function MagazineForm() {
     >
       {createdId != null && (
         <SuccessBanner
-          message="Magazine created — you can now add its issues from the edit page."
+          message="Magazine created — add issues and translation links from the edit page."
           link={`/works/${createdId}`}
           linkText="View magazine →"
+          editLink={`/admin/edit-magazine/${createdId}`}
+          editText="Edit →"
         />
       )}
 
@@ -1081,6 +1123,11 @@ function MagazineForm() {
         </div>
       )}
       </FormSection>
+
+      <p className="text-xs text-gray-400">
+        Translated edition of a magazine that's also in KalpaDB? Create this record first, then
+        link the two works from its Edit page (“Translations”).
+      </p>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create magazine" />
     </form>
