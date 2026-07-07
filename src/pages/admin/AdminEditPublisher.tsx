@@ -12,6 +12,7 @@ import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
+import FormSection from "../../components/FormSection";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -164,6 +165,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
@@ -182,14 +184,6 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
           <CountrySelect value={country} onChange={setCountry} />
         </div>
       </div>
-
-      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
-
-      <NativeNameField
-        primaryLanguage={primaryLanguage}
-        value={nativeName}
-        onChange={setNativeName}
-      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -215,7 +209,22 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
           />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="Names & scripts"
+        hint="The native-script form of the publisher's name, for display and search."
+      >
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
+      </FormSection>
+
+      <FormSection title="Details & image">
       <div>
         <label className={labelCls}>Website</label>
         <input value={website} onChange={(e) => setWebsite(e.target.value)} className={inputCls} />
@@ -232,6 +241,7 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
 
       <p className="text-xs text-gray-400">
         {isAdmin

@@ -26,6 +26,7 @@ import FirstPublishedField, {
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
+import FormSection from "../../components/FormSection";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
@@ -244,6 +245,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         <EditSavedBanner isAdmin={!!isAdmin} viewHref={`/works/${work.id}`} viewLabel="View story" />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title *</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -274,7 +276,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           className={inputCls}
         />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Story type</label>
@@ -352,7 +356,12 @@ function EditForm({ work }: { work: WorkDetail }) {
           />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="People & credits"
+        hint="Search existing people, or type a new name to create them inline."
+      >
       <EntityPicker
         label="Authors"
         placeholder="Search or create a person…"
@@ -374,7 +383,12 @@ function EditForm({ work }: { work: WorkDetail }) {
         onCreate={isAdmin ? createPersonInline : undefined}
       />
       <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
+      </FormSection>
 
+      <FormSection
+        title="Appearances & first publication"
+        hint="Every container the story appears in, plus its single original venue."
+      >
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"
         placeholder="Search a book…"
@@ -393,7 +407,12 @@ function EditForm({ work }: { work: WorkDetail }) {
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
 
       <FirstPublishedField value={firstPub} onChange={setFirstPub} />
+      </FormSection>
 
+      <FormSection
+        title="Source & translations"
+        hint="An uncatalogued source as free text, or links to catalogued translations/originals."
+      >
       <SourceAttributionFields value={source} onChange={setSource} />
 
       <TranslationLinksEditor
@@ -401,7 +420,9 @@ function EditForm({ work }: { work: WorkDetail }) {
         workLanguage={work.language}
         isAdmin={!!isAdmin}
       />
+      </FormSection>
 
+      <FormSection title="Illustration & classification">
       <ImageUploadField
         label="Headpiece / illustration"
         category="illustrations"
@@ -464,6 +485,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           </div>
         </div>
       )}
+      </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
 

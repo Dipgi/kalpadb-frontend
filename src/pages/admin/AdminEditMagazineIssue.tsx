@@ -15,6 +15,7 @@ import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
+import FormSection from "../../components/FormSection";
 import EditNoteField from "../../components/EditNoteField";
 
 const inputCls =
@@ -239,6 +240,10 @@ function IssueForm({
         </div>
       )}
 
+      <FormSection
+        title="Issue identity"
+        hint="The structured numbers power sorting and de-duplication; the display label is what readers see."
+      >
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div>
           <label className={labelCls}>Volume (বর্ষ)</label>
@@ -327,7 +332,9 @@ function IssueForm({
           </p>
         </div>
       </div>
+      </FormSection>
 
+      <FormSection title="Synopsis & cover">
       <div>
         <label className={labelCls}>Synopsis / contents note</label>
         <textarea value={synopsis} onChange={(e) => setSynopsis(e.target.value)} rows={3} className={inputCls} />
@@ -339,7 +346,12 @@ function IssueForm({
         value={coverUrl}
         onChange={(url) => setCoverUrl(url ?? "")}
       />
+      </FormSection>
 
+      <FormSection
+        title="Credits"
+        hint="People credited on this specific issue — distinct from magazine-level editorships."
+      >
       <EntityPicker
         label="Editors"
         placeholder="Search or create a person…"
@@ -385,7 +397,12 @@ function IssueForm({
         onChange={setPublishers}
         onCreate={isAdmin ? createPublisherInline : undefined}
       />
+      </FormSection>
 
+      <FormSection
+        title="Table of contents"
+        hint="The stories that appeared in this issue. Page ranges set elsewhere are preserved."
+      >
       <EntityPicker
         label="Stories in this issue"
         placeholder="Search existing stories…"
@@ -401,6 +418,12 @@ function IssueForm({
         onChange={setStories}
       />
 
+      </FormSection>
+
+      <FormSection
+        title="Scans & archives"
+        hint="Links to scanned or digitised copies of this issue."
+      >
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className={labelCls + " mb-0"}>Scan / archive links</label>
@@ -472,6 +495,8 @@ function IssueForm({
           </div>
         )}
       </div>
+
+      </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
 

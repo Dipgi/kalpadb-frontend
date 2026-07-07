@@ -12,6 +12,7 @@ import NativeNameField from "../../components/NativeNameField";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
+import FormSection from "../../components/FormSection";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -177,6 +178,7 @@ function EditForm({ person }: { person: Person }) {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
@@ -210,7 +212,12 @@ function EditForm({ person }: { person: Person }) {
           <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="Names & scripts"
+        hint="The native-script name form and any pen names this person writes under."
+      >
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
       <NativeNameField
@@ -219,12 +226,14 @@ function EditForm({ person }: { person: Person }) {
         onChange={setNativeName}
       />
 
+      <PenNamesField value={penNames} onChange={setPenNames} />
+      </FormSection>
+
+      <FormSection title="Bio & image">
       <div>
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
-
-      <PenNamesField value={penNames} onChange={setPenNames} />
 
       <ImageUploadField
         label="Image"
@@ -232,6 +241,7 @@ function EditForm({ person }: { person: Person }) {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
 
       <p className="text-xs text-gray-400">
         {isAdmin

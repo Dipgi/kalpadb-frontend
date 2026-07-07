@@ -16,6 +16,7 @@ import SourceAttributionFields, {
   sourceAttributionPayload,
 } from "../../components/SourceAttributionFields";
 import ImageUploadField from "../../components/ImageUploadField";
+import FormSection from "../../components/FormSection";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
@@ -274,6 +275,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         <EditSavedBanner isAdmin={!!isAdmin} viewHref={`/works/${work.id}`} viewLabel="View book" />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title *</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -304,7 +306,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           className={inputCls}
         />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Work type</label>
@@ -368,16 +372,6 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
-      <FormatsEditor value={formats} onChange={setFormats} />
-
-      <SourceAttributionFields value={source} onChange={setSource} />
-
-      <TranslationLinksEditor
-        workId={work.id}
-        workLanguage={work.language}
-        isAdmin={!!isAdmin}
-      />
-
       {seriesList.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -426,14 +420,19 @@ function EditForm({ work }: { work: WorkDetail }) {
           />
         </div>
       </div>
+      </FormSection>
 
-      <ImageUploadField
-        label="Cover image"
-        category="covers"
-        value={coverUrl}
-        onChange={(url) => setCoverUrl(url ?? "")}
-      />
+      <FormSection
+        title="Formats"
+        hint="Hardcover / paperback / ebook / audiobook releases of this edition."
+      >
+        <FormatsEditor value={formats} onChange={setFormats} />
+      </FormSection>
 
+      <FormSection
+        title="People & credits"
+        hint="Search existing people, or type a new name to create them inline."
+      >
       <EntityPicker
         label="Authors"
         placeholder="Search or create a person…"
@@ -494,6 +493,28 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setPublishers}
         onCreate={isAdmin ? createPublisherInline : undefined}
       />
+      </FormSection>
+
+      <FormSection
+        title="Source & translations"
+        hint="An uncatalogued source as free text, or links to catalogued translations/originals."
+      >
+      <SourceAttributionFields value={source} onChange={setSource} />
+
+      <TranslationLinksEditor
+        workId={work.id}
+        workLanguage={work.language}
+        isAdmin={!!isAdmin}
+      />
+      </FormSection>
+
+      <FormSection title="Cover & classification">
+      <ImageUploadField
+        label="Cover image"
+        category="covers"
+        value={coverUrl}
+        onChange={(url) => setCoverUrl(url ?? "")}
+      />
 
       <div>
         <label className={labelCls}>Genres</label>
@@ -550,6 +571,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           </div>
         </div>
       )}
+      </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
 

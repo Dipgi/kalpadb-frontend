@@ -266,6 +266,7 @@ function BookForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title * (Bengali script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -280,7 +281,9 @@ function BookForm() {
           className={inputCls}
         />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Work type</label>
@@ -348,10 +351,6 @@ function BookForm() {
         </div>
       </div>
 
-      <FormatsEditor value={formats} onChange={setFormats} />
-
-      <SourceAttributionFields value={source} onChange={setSource} />
-
       {seriesList.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -387,14 +386,19 @@ function BookForm() {
           <input value={editionNotes} onChange={(e) => setEditionNotes(e.target.value)} className={inputCls} />
         </div>
       </div>
+      </FormSection>
 
-      <ImageUploadField
-        label="Cover image"
-        category="covers"
-        value={coverUrl}
-        onChange={(url) => setCoverUrl(url ?? "")}
-      />
+      <FormSection
+        title="Formats"
+        hint="Hardcover / paperback / ebook / audiobook releases of this edition."
+      >
+        <FormatsEditor value={formats} onChange={setFormats} />
+      </FormSection>
 
+      <FormSection
+        title="People & credits"
+        hint="Search existing people, or type a new name to create them inline."
+      >
       <EntityPicker
         label="Authors"
         placeholder="Search or create a person…"
@@ -455,6 +459,22 @@ function BookForm() {
         onChange={setPublishers}
         onCreate={createPublisherInline}
       />
+      </FormSection>
+
+      <FormSection
+        title="Source"
+        hint="Where this work came from, when the original is not in the catalogue."
+      >
+        <SourceAttributionFields value={source} onChange={setSource} />
+      </FormSection>
+
+      <FormSection title="Cover & classification">
+      <ImageUploadField
+        label="Cover image"
+        category="covers"
+        value={coverUrl}
+        onChange={(url) => setCoverUrl(url ?? "")}
+      />
 
       <div>
         <label className={labelCls}>Genres</label>
@@ -511,6 +531,7 @@ function BookForm() {
           </div>
         </div>
       )}
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create book" />
     </form>
@@ -616,6 +637,7 @@ function StoryForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title * (native script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -633,7 +655,9 @@ function StoryForm() {
           className={inputCls}
         />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Story type</label>
@@ -715,7 +739,12 @@ function StoryForm() {
           />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="People & credits"
+        hint="Search existing people, or type a new name to create them inline."
+      >
       <EntityPicker
         label="Authors"
         placeholder="Search or create a person…"
@@ -737,7 +766,12 @@ function StoryForm() {
         onCreate={createPersonInline}
       />
       <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
+      </FormSection>
 
+      <FormSection
+        title="Appearances & first publication"
+        hint="Every container the story appears in, plus its single original venue."
+      >
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"
         placeholder="Search a book…"
@@ -756,9 +790,16 @@ function StoryForm() {
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
 
       <FirstPublishedField value={firstPub} onChange={setFirstPub} />
+      </FormSection>
 
-      <SourceAttributionFields value={source} onChange={setSource} />
+      <FormSection
+        title="Source"
+        hint="Where this story came from, when the original is not in the catalogue."
+      >
+        <SourceAttributionFields value={source} onChange={setSource} />
+      </FormSection>
 
+      <FormSection title="Illustration & classification">
       <ImageUploadField
         label="Headpiece / illustration"
         category="illustrations"
@@ -821,6 +862,7 @@ function StoryForm() {
           </div>
         </div>
       )}
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create story" />
     </form>
@@ -1223,6 +1265,7 @@ function PersonForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
@@ -1253,7 +1296,12 @@ function PersonForm() {
           <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="Names & scripts"
+        hint="The native-script name form and any pen names this person writes under."
+      >
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
       <NativeNameField
@@ -1262,12 +1310,14 @@ function PersonForm() {
         onChange={setNativeName}
       />
 
+      <PenNamesField value={penNames} onChange={setPenNames} />
+      </FormSection>
+
+      <FormSection title="Bio & image">
       <div>
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
-
-      <PenNamesField value={penNames} onChange={setPenNames} />
 
       <ImageUploadField
         label="Image"
@@ -1275,6 +1325,7 @@ function PersonForm() {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create person" />
     </form>
@@ -1362,6 +1413,7 @@ function PublisherForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
@@ -1380,14 +1432,6 @@ function PublisherForm() {
           <CountrySelect value={country} onChange={setCountry} />
         </div>
       </div>
-
-      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
-
-      <NativeNameField
-        primaryLanguage={primaryLanguage}
-        value={nativeName}
-        onChange={setNativeName}
-      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -1413,7 +1457,22 @@ function PublisherForm() {
           />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="Names & scripts"
+        hint="The native-script form of the publisher's name, for display and search."
+      >
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
+      </FormSection>
+
+      <FormSection title="Details & image">
       <div>
         <label className={labelCls}>Website</label>
         <input value={website} onChange={(e) => setWebsite(e.target.value)} className={inputCls} />
@@ -1430,6 +1489,7 @@ function PublisherForm() {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create publisher" />
     </form>

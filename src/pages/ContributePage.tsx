@@ -13,6 +13,7 @@ import {
   type MagazineStatus,
 } from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
+import FormSection from "../components/FormSection";
 import { slugify } from "../lib/slugify";
 import BylineFields, { bylinePayload } from "../components/BylineFields";
 import FormatsEditor, {
@@ -383,6 +384,7 @@ function BookForm() {
     >
       {submitted && <PendingBanner />}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title * (Bengali script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -392,7 +394,9 @@ function BookForm() {
         <label className={labelCls}>Description</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Work type</label>
@@ -452,10 +456,6 @@ function BookForm() {
         </div>
       </div>
 
-      <FormatsEditor value={formats} onChange={setFormats} />
-
-      <SourceAttributionFields value={source} onChange={setSource} />
-
       {seriesList.length > 0 && (
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -498,14 +498,16 @@ function BookForm() {
           <input value={editionNotes} onChange={(e) => setEditionNotes(e.target.value)} className={inputCls} />
         </div>
       </div>
+      </FormSection>
 
-      <ImageUploadField
-        label="Cover image"
-        category="covers"
-        value={coverUrl}
-        onChange={(url) => setCoverUrl(url ?? "")}
-      />
+      <FormSection
+        title="Formats"
+        hint="Hardcover / paperback / ebook / audiobook releases of this edition."
+      >
+        <FormatsEditor value={formats} onChange={setFormats} />
+      </FormSection>
 
+      <FormSection title="People & credits">
       <EntityPicker
         label="Authors"
         placeholder="Search persons…"
@@ -559,6 +561,22 @@ function BookForm() {
         fetcher={(q) => catalogue.publishers(q)}
         selected={publishers}
         onChange={setPublishers}
+      />
+      </FormSection>
+
+      <FormSection
+        title="Source"
+        hint="Where this work came from, when the original is not in the catalogue."
+      >
+        <SourceAttributionFields value={source} onChange={setSource} />
+      </FormSection>
+
+      <FormSection title="Cover & classification">
+      <ImageUploadField
+        label="Cover image"
+        category="covers"
+        value={coverUrl}
+        onChange={(url) => setCoverUrl(url ?? "")}
       />
 
       <div>
@@ -616,6 +634,7 @@ function BookForm() {
           </div>
         </div>
       )}
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit book" />
     </form>
@@ -705,6 +724,7 @@ function StoryForm() {
     >
       {submitted && <PendingBanner />}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title * (native script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -714,7 +734,9 @@ function StoryForm() {
         <label className={labelCls}>Description / synopsis</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Story type</label>
@@ -773,7 +795,9 @@ function StoryForm() {
           <input type="number" min={1} value={pageCount} onChange={(e) => setPageCount(e.target.value)} className={inputCls} />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection title="People & credits">
       <EntityPicker
         label="Authors"
         placeholder="Search persons…"
@@ -793,7 +817,12 @@ function StoryForm() {
         onChange={setTranslators}
       />
       <BylineFields people={translators} bylines={bylines} onChange={setBylines} />
+      </FormSection>
 
+      <FormSection
+        title="Appearances & first publication"
+        hint="Every container the story appears in, plus its single original venue."
+      >
       <EntityPicker
         label="Appears in (anthologies / collections — optional)"
         placeholder="Search a book…"
@@ -810,9 +839,16 @@ function StoryForm() {
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
 
       <FirstPublishedField value={firstPub} onChange={setFirstPub} />
+      </FormSection>
 
-      <SourceAttributionFields value={source} onChange={setSource} />
+      <FormSection
+        title="Source"
+        hint="Where this story came from, when the original is not in the catalogue."
+      >
+        <SourceAttributionFields value={source} onChange={setSource} />
+      </FormSection>
 
+      <FormSection title="Illustration & classification">
       <ImageUploadField
         label="Headpiece / illustration"
         category="illustrations"
@@ -875,6 +911,7 @@ function StoryForm() {
           </div>
         </div>
       )}
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit story" />
     </form>
@@ -989,6 +1026,7 @@ function MagazineForm() {
     >
       {submitted && <PendingBanner />}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Title * (native script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
@@ -1001,7 +1039,9 @@ function MagazineForm() {
         <label className={labelCls}>Description</label>
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
+      </FormSection>
 
+      <FormSection title="Publication details">
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Language</label>
@@ -1077,23 +1117,23 @@ function MagazineForm() {
           />
         </div>
       </div>
+      </FormSection>
 
-      <div>
-        <label className={labelCls}>Editors</label>
-        <p className="text-xs text-gray-400 mb-2">
-          Editorship history — add a row per editor stint (years optional).
-        </p>
-        <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
-      </div>
-
-      <div>
-        <label className={labelCls}>Frequency</label>
-        <p className="text-xs text-gray-400 mb-2">
-          Release cadence. Add a period per cadence if it changed over time (years optional).
-        </p>
+      <FormSection
+        title="Frequency"
+        hint="Release cadence over time. Add a period per cadence if it changed (years optional)."
+      >
         <MagazineFrequencyEditor rows={frequencies} onChange={setFrequencies} />
-      </div>
+      </FormSection>
 
+      <FormSection
+        title="Editors"
+        hint="Editorship history — add a row per editor stint (years optional)."
+      >
+        <MagazineEditorshipEditor rows={editorships} onChange={setEditorships} />
+      </FormSection>
+
+      <FormSection title="Cover & classification">
       <ImageUploadField
         label="Cover / logo"
         category="covers"
@@ -1156,6 +1196,8 @@ function MagazineForm() {
           </div>
         </div>
       )}
+
+      </FormSection>
 
       <p className="text-xs text-gray-400">
         Translated edition of a magazine that's also in KalpaDB? Submit this record first — once
@@ -1248,6 +1290,7 @@ function PersonForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
@@ -1278,7 +1321,12 @@ function PersonForm() {
           <input type="date" value={deathDate} onChange={(e) => setDeathDate(e.target.value)} className={inputCls} />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="Names & scripts"
+        hint="The native-script name form and any pen names this person writes under."
+      >
       <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
 
       <NativeNameField
@@ -1287,12 +1335,14 @@ function PersonForm() {
         onChange={setNativeName}
       />
 
+      <PenNamesField value={penNames} onChange={setPenNames} />
+      </FormSection>
+
+      <FormSection title="Bio & image">
       <div>
         <label className={labelCls}>Bio</label>
         <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} className={inputCls} />
       </div>
-
-      <PenNamesField value={penNames} onChange={setPenNames} />
 
       <ImageUploadField
         label="Image"
@@ -1300,6 +1350,7 @@ function PersonForm() {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit person" />
     </form>
@@ -1386,6 +1437,7 @@ function PublisherForm() {
         />
       )}
 
+      <FormSection title="Basics">
       <div>
         <label className={labelCls}>Name * (in English)</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
@@ -1404,14 +1456,6 @@ function PublisherForm() {
           <CountrySelect value={country} onChange={setCountry} />
         </div>
       </div>
-
-      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
-
-      <NativeNameField
-        primaryLanguage={primaryLanguage}
-        value={nativeName}
-        onChange={setNativeName}
-      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -1437,7 +1481,22 @@ function PublisherForm() {
           />
         </div>
       </div>
+      </FormSection>
 
+      <FormSection
+        title="Names & scripts"
+        hint="The native-script form of the publisher's name, for display and search."
+      >
+      <PrimaryLanguageSelect value={primaryLanguage} onChange={setPrimaryLanguage} />
+
+      <NativeNameField
+        primaryLanguage={primaryLanguage}
+        value={nativeName}
+        onChange={setNativeName}
+      />
+      </FormSection>
+
+      <FormSection title="Details & image">
       <div>
         <label className={labelCls}>Website</label>
         <input value={website} onChange={(e) => setWebsite(e.target.value)} className={inputCls} />
@@ -1454,6 +1513,7 @@ function PublisherForm() {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit publisher" />
     </form>
