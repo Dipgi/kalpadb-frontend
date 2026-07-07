@@ -144,6 +144,16 @@ function IssueForm({
     }))
   );
   const [saved, setSaved] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: () => admin.issues.delete(existing!.m_issue_id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["magazine-issues", magazineId] });
+      qc.invalidateQueries({ queryKey: ["work", String(magazineId)] });
+      navigate(`/admin/edit-magazine/${magazineId}`);
+    },
+  });
 
   function setScan(idx: number, patch: Partial<ScanInput>) {
     setScans((prev) => prev.map((s, i) => (i === idx ? { ...s, ...patch } : s)));
@@ -483,7 +493,41 @@ function IssueForm({
             {(mutation.error as Error)?.message || "Save failed — try again."}
           </span>
         )}
+
+        {isAdmin && existing && (
+          <button
+            type="button"
+            disabled={deleteMutation.isPending}
+            onClick={() => {
+              if (confirmDelete) deleteMutation.mutate();
+              else setConfirmDelete(true);
+            }}
+            onBlur={() => setConfirmDelete(false)}
+            className={`ml-auto text-sm px-4 py-2 rounded-md border transition-colors disabled:opacity-40 ${
+              confirmDelete
+                ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
+                : "border-red-300 text-red-600 hover:bg-red-50"
+            }`}
+          >
+            {deleteMutation.isPending
+              ? "Deleting…"
+              : confirmDelete
+                ? "Click again to permanently delete"
+                : "Delete issue"}
+          </button>
+        )}
       </div>
+      {isAdmin && existing && deleteMutation.isError && (
+        <p className="text-sm text-red-500 text-right">
+          Delete failed — try again.
+        </p>
+      )}
+      {isAdmin && existing && (
+        <p className="text-xs text-gray-400 text-right">
+          Deleting removes this issue, its credits and scan links. Stories that appeared in it
+          stay in the catalogue — they're only unlinked.
+        </p>
+      )}
     </form>
   );
 }

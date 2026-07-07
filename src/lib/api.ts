@@ -1029,6 +1029,10 @@ export const admin = {
     delete: (id: number) => request(`/admin/series/${id}`, { method: "DELETE" }),
   },
 
+  issues: {
+    delete: (id: number) => request(`/admin/issues/${id}`, { method: "DELETE" }),
+  },
+
   translations: {
     delete: (linkId: number) =>
       request(`/works/translations/${linkId}`, { method: "DELETE" }),

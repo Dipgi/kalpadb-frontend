@@ -126,6 +126,13 @@ export default function AdminGuide() {
             link. The story-side pickers preserve ranges set elsewhere; the issue editor doesn’t edit
             ranges yet (they’re kept on save, just not editable there).
           </li>
+          <li>
+            <strong>Deleting an issue (admin only).</strong> The “Delete issue” button on an
+            issue’s edit form removes that one issue with its credits and scan links — immediate,
+            like all admin deletes. Stories that appeared in it are only unlinked, never deleted;
+            a story whose “first published in” pointed at the issue keeps its record but loses
+            that link.
+          </li>
         </ul>
         <p className="text-amber-700">
           When approving a volunteer story edit, the container links show as a coarse “changed” in
