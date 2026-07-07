@@ -21,6 +21,7 @@ import FirstPublishedField, {
 } from "../../components/FirstPublishedField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
+import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
@@ -382,6 +383,12 @@ function EditForm({ work }: { work: WorkDetail }) {
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
 
       <FirstPublishedField value={firstPub} onChange={setFirstPub} />
+
+      <TranslationLinksEditor
+        workId={work.id}
+        workLanguage={work.language}
+        isAdmin={!!isAdmin}
+      />
 
       <ImageUploadField
         label="Headpiece / illustration"

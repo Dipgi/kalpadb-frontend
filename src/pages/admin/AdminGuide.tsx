@@ -66,8 +66,8 @@ export default function AdminGuide() {
 
       <Section title="Linking translations">
         <p>
-          On a book’s “Edit” page, the “Translations &amp; editions” box links a work to its
-          translation (or original) in another language. Set the{" "}
+          On a book’s, story’s or magazine’s “Edit” page, the “Translations &amp; editions” box
+          links a work to its translation (or original) in another language. Set the{" "}
           <em>This work is the original / translation</em> toggle first so the direction is stored
           correctly, then search and pick the other work — your add is auto-approved and shows on
           both works’ pages at once. Use “Remove” to delete a link (admin only; immediate). If the

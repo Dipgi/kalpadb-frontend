@@ -25,6 +25,7 @@ import MagazineEditorshipEditor, {
   type EditorshipRow,
 } from "../../components/MagazineEditorshipEditor";
 import MagazineRelationshipsEditor from "../../components/MagazineRelationshipsEditor";
+import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import FormSection from "../../components/FormSection";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 
@@ -336,6 +337,17 @@ function EditForm({ work }: { work: WorkDetail }) {
         hint="Link titles that renamed or merged — e.g. this continues an earlier magazine."
       >
         <MagazineRelationshipsEditor work={work} />
+      </FormSection>
+
+      <FormSection
+        title="Translations"
+        hint="Link this magazine to a translated edition in another language (or its original)."
+      >
+        <TranslationLinksEditor
+          workId={work.id}
+          workLanguage={work.language}
+          isAdmin={!!isAdmin}
+        />
       </FormSection>
 
       <FormSection title="Cover & classification">
