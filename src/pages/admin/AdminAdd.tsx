@@ -544,6 +544,7 @@ function StoryForm() {
   const [collection, setCollection] = useState<PickerItem[]>([]);
   const [magIssues, setMagIssues] = useState<IssueRef[]>([]);
   const [firstPub, setFirstPub] = useState<FirstPublishedValue>(emptyFirstPublished);
+  const [source, setSource] = useState<SourceAttribution>(emptySourceAttribution());
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [createdId, setCreatedId] = useState<number | null>(null);
@@ -567,6 +568,7 @@ function StoryForm() {
           book_ids: collection.map((c) => c.id),
           magazine_issue_ids: magIssues.map((m) => m.m_issue_id),
           ...firstPublishedPayload(firstPub),
+          ...sourceAttributionPayload(source),
           author_ids: authors.map((a) => a.id),
           translator_ids: translators.map((t) => t.id),
           credited_as: bylinePayload([...authors, ...translators], bylines),
@@ -590,6 +592,7 @@ function StoryForm() {
       setCollection([]);
       setMagIssues([]);
       setFirstPub(emptyFirstPublished);
+      setSource(emptySourceAttribution());
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -753,6 +756,8 @@ function StoryForm() {
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
 
       <FirstPublishedField value={firstPub} onChange={setFirstPub} />
+
+      <SourceAttributionFields value={source} onChange={setSource} />
 
       <ImageUploadField
         label="Headpiece / illustration"

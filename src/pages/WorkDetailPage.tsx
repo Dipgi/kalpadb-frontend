@@ -158,6 +158,13 @@ export default function WorkDetailPage() {
             : `/works/${work.id}/edit-magazine`
           : null;
 
+  // Uncatalogued source attribution — books and stories carry the same fields.
+  const externalSource = work.book?.original_title
+    ? work.book
+    : work.story?.original_title
+      ? work.story
+      : null;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
       <div className="flex flex-col md:flex-row gap-8 mb-10">
@@ -734,21 +741,21 @@ export default function WorkDetailPage() {
           </div>
         )}
 
-        {work.book?.original_title && (
+        {externalSource && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
               Source
             </h3>
             <p className="text-sm text-gray-700">
-              {work.book.source_relation === "transcreation"
+              {externalSource.source_relation === "transcreation"
                 ? "Transcreation of "
-                : work.book.source_relation === "inspired_by"
+                : externalSource.source_relation === "inspired_by"
                   ? "Inspired by "
-                  : work.book.source_relation === "translation"
+                  : externalSource.source_relation === "translation"
                     ? "Translation of "
                     : "Based on "}
-              <span className="italic">{work.book.original_title}</span>
-              {work.book.original_author && ` by ${work.book.original_author}`}
+              <span className="italic">{externalSource.original_title}</span>
+              {externalSource.original_author && ` by ${externalSource.original_author}`}
             </p>
           </div>
         )}

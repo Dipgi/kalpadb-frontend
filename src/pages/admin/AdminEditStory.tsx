@@ -14,6 +14,10 @@ import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import BylineFields, { bylinePayload } from "../../components/BylineFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import MagazineIssuePicker, { type IssueRef } from "../../components/MagazineIssuePicker";
+import SourceAttributionFields, {
+  type SourceAttribution,
+  sourceAttributionPayload,
+} from "../../components/SourceAttributionFields";
 import FirstPublishedField, {
   firstPublishedFromDetail,
   firstPublishedPayload,
@@ -122,6 +126,11 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [firstPub, setFirstPub] = useState<FirstPublishedValue>(
     firstPublishedFromDetail(work.story?.first_published ?? null)
   );
+  const [source, setSource] = useState<SourceAttribution>({
+    original_title: work.story?.original_title ?? "",
+    original_author: work.story?.original_author ?? "",
+    source_relation: work.story?.source_relation ?? "",
+  });
   const [headpieceUrl, setHeadpieceUrl] = useState(work.image_urls?.[0] ?? "");
   const [magIssues, setMagIssues] = useState<IssueRef[]>(
     (work.story?.magazine_appearances ?? []).map((a) => ({
@@ -171,6 +180,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           book_ids: collection.map((c) => c.id),
           magazine_issue_ids: magIssues.map((m) => m.m_issue_id),
           ...firstPublishedPayload(firstPub),
+          ...sourceAttributionPayload(source),
           author_ids: authors.map((a) => a.id),
           translator_ids: translators.map((t) => t.id),
           credited_as: bylinePayload([...authors, ...translators], bylines),
@@ -383,6 +393,8 @@ function EditForm({ work }: { work: WorkDetail }) {
       <MagazineIssuePicker value={magIssues} onChange={setMagIssues} />
 
       <FirstPublishedField value={firstPub} onChange={setFirstPub} />
+
+      <SourceAttributionFields value={source} onChange={setSource} />
 
       <TranslationLinksEditor
         workId={work.id}

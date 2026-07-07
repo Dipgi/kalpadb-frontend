@@ -179,6 +179,8 @@ export interface WorkDetail extends WorkSummary {
 export interface StoryDetail {
   id: number;
   original_title: string | null;
+  original_author: string | null;
+  source_relation: string | null;
   page_count: number | null;
   word_count: number | null;
   story_length: string | null;
@@ -1157,6 +1159,8 @@ export interface StoryCreateIn {
   /** Magazine issues this story appears in. */
   magazine_issue_ids?: number[];
   original_title?: string | null;
+  original_author?: string | null;
+  source_relation?: string | null;
   page_count?: number | null;
   word_count?: number | null;
   story_length?: string | null;
@@ -1186,6 +1190,8 @@ export interface StoryUpdateIn {
   book_ids?: number[];
   magazine_issue_ids?: number[];
   original_title?: string | null;
+  original_author?: string | null;
+  source_relation?: string | null;
   page_count?: number | null;
   word_count?: number | null;
   story_length?: string | null;
