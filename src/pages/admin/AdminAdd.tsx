@@ -47,6 +47,7 @@ import NativeNameField from "../../components/NativeNameField";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 import { slugify } from "../../lib/slugify";
+import TagChipPicker from "../../components/TagChipPicker";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../../lib/workTypes";
 
 type Tab = "book" | "story" | "magazine" | "issue" | "person" | "publisher" | "series";
@@ -163,7 +164,6 @@ function BookForm() {
   });
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
   const seriesList = seriesPage?.items ?? [];
-  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -503,34 +503,7 @@ function BookForm() {
         </div>
       </div>
 
-      {(allTags ?? []).length > 0 && (
-        <div>
-          <label className={labelCls}>Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {(allTags ?? []).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() =>
-                  setTagIds((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(t.id)) next.delete(t.id);
-                    else next.add(t.id);
-                    return next;
-                  })
-                }
-                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                  tagIds.has(t.id)
-                    ? "bg-violet-700 text-white border-violet-700"
-                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
-                }`}
-              >
-                {t.tag_name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create book" />
@@ -547,7 +520,6 @@ function StoryForm() {
     queryKey: ["all-languages"],
     queryFn: catalogue.allLanguages,
   });
-  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -834,34 +806,7 @@ function StoryForm() {
         </div>
       </div>
 
-      {(allTags ?? []).length > 0 && (
-        <div>
-          <label className={labelCls}>Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {(allTags ?? []).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() =>
-                  setTagIds((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(t.id)) next.delete(t.id);
-                    else next.add(t.id);
-                    return next;
-                  })
-                }
-                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                  tagIds.has(t.id)
-                    ? "bg-violet-700 text-white border-violet-700"
-                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
-                }`}
-              >
-                {t.tag_name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create story" />
@@ -918,7 +863,6 @@ function MagazineForm() {
     queryKey: ["all-languages"],
     queryFn: catalogue.allLanguages,
   });
-  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -1141,34 +1085,7 @@ function MagazineForm() {
         </div>
       </div>
 
-      {(allTags ?? []).length > 0 && (
-        <div>
-          <label className={labelCls}>Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {(allTags ?? []).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() =>
-                  setTagIds((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(t.id)) next.delete(t.id);
-                    else next.add(t.id);
-                    return next;
-                  })
-                }
-                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                  tagIds.has(t.id)
-                    ? "bg-violet-700 text-white border-violet-700"
-                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
-                }`}
-              >
-                {t.tag_name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
       <p className="text-xs text-gray-400">

@@ -17,6 +17,7 @@ import SourceAttributionFields, {
 } from "../../components/SourceAttributionFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import FormSection from "../../components/FormSection";
+import TagChipPicker from "../../components/TagChipPicker";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import EditSavedBanner from "../../components/EditSavedBanner";
@@ -83,7 +84,6 @@ function EditForm({ work }: { work: WorkDetail }) {
   const isAdmin = user?.role.toLowerCase() === "admin";
   const [note, setNote] = useState("");
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
-  const { data: allTags } = useQuery({ queryKey: ["all-tags"], queryFn: catalogue.allTags });
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
   const { data: languages } = useQuery({
     queryKey: ["all-languages"],
@@ -543,34 +543,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         </div>
       </div>
 
-      {(allTags ?? []).length > 0 && (
-        <div>
-          <label className={labelCls}>Tags</label>
-          <div className="flex flex-wrap gap-2">
-            {(allTags ?? []).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() =>
-                  setTagIds((prev) => {
-                    const next = new Set(prev);
-                    if (next.has(t.id)) next.delete(t.id);
-                    else next.add(t.id);
-                    return next;
-                  })
-                }
-                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                  tagIds.has(t.id)
-                    ? "bg-violet-700 text-white border-violet-700"
-                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
-                }`}
-              >
-                {t.tag_name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />
