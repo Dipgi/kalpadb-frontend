@@ -37,6 +37,7 @@ function EditForm({ series }: { series: BookSeriesOut }) {
   const isAdmin = user?.role.toLowerCase() === "admin";
 
   const [name, setName] = useState(series.name);
+  const [slug, setSlug] = useState(series.slug ?? "");
   const [description, setDescription] = useState(series.description ?? "");
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
@@ -49,6 +50,7 @@ function EditForm({ series }: { series: BookSeriesOut }) {
         series.id,
         {
           name: name.trim(),
+          slug: slug.trim() || null,
           description: description.trim() || null,
         },
         isAdmin ? undefined : note,
@@ -73,6 +75,7 @@ function EditForm({ series }: { series: BookSeriesOut }) {
     if (!name.trim()) return;
     if (isAdmin) {
       const cleared = findClearedFields([
+        { label: "Slug", previous: series.slug, next: slug.trim() || null },
         { label: "Description", previous: series.description, next: description.trim() || null },
       ]);
       if (cleared.length) {
@@ -131,6 +134,16 @@ function EditForm({ series }: { series: BookSeriesOut }) {
       <div>
         <label className={labelCls}>Name *</label>
         <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
+      </div>
+
+      <div>
+        <label className={labelCls}>Slug (lowercase, hyphens)</label>
+        <input
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          pattern="[a-z0-9\-]*"
+          className={inputCls}
+        />
       </div>
 
       <div>

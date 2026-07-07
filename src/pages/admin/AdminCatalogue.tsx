@@ -2,19 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, ApiError } from "../../lib/api";
+import { slugify } from "../../lib/slugify";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 const cardCls = "bg-white border border-gray-200 rounded-lg p-5";
-
-/** Lowercase ASCII slug from a name; Bengali/other scripts yield "" → user types one. */
-function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 export default function AdminCatalogue() {
   return (

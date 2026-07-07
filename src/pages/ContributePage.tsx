@@ -13,6 +13,7 @@ import {
   type MagazineStatus,
 } from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
+import { slugify } from "../lib/slugify";
 import BylineFields, { bylinePayload } from "../components/BylineFields";
 import FormatsEditor, {
   type FormatRow,
@@ -1445,6 +1446,7 @@ function PublisherForm() {
 
 function SeriesForm() {
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -1452,11 +1454,13 @@ function SeriesForm() {
     mutationFn: () =>
       volunteer.submitSeries({
         name: name.trim(),
+        slug: slug.trim() || null,
         description: description.trim() || null,
       }),
     onSuccess: () => {
       setSubmitted(true);
       setName("");
+      setSlug("");
       setDescription("");
     },
   });
@@ -1474,7 +1478,26 @@ function SeriesForm() {
 
       <div>
         <label className={labelCls}>Series name *</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} required className={inputCls} />
+        <input
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (!slug) setSlug(slugify(e.target.value));
+          }}
+          required
+          className={inputCls}
+        />
+      </div>
+
+      <div>
+        <label className={labelCls}>Slug (optional — lowercase, hyphens)</label>
+        <input
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          pattern="[a-z0-9\-]*"
+          placeholder="auto-generated if left blank"
+          className={inputCls}
+        />
       </div>
 
       <div>

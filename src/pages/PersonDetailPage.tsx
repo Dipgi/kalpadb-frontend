@@ -25,6 +25,12 @@ export default function PersonDetailPage() {
     enabled: !!id,
   });
 
+  const { data: awards } = useQuery({
+    queryKey: ["person-awards", id],
+    queryFn: () => catalogue.personAwards(Number(id)),
+    enabled: !!id,
+  });
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 animate-pulse">
@@ -143,6 +149,42 @@ export default function PersonDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Awards */}
+      {((awards && awards.length > 0) || person.awards) && (
+        <div className="mb-10">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+            Awards
+            {awards && awards.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-gray-400">({awards.length})</span>
+            )}
+          </h2>
+          {awards && awards.length > 0 && (
+            <ul className="text-sm text-gray-700 space-y-1.5">
+              {awards.map((a) => (
+                <li key={a.id}>
+                  {a.award} — {a.category} ({a.year}) — {a.result}
+                  {a.lw_id && a.work_title && (
+                    <>
+                      {" "}
+                      for{" "}
+                      <Link to={`/works/${a.lw_id}`} className="text-violet-700 hover:underline italic">
+                        {a.work_title}
+                      </Link>
+                    </>
+                  )}
+                  {a.notes && <span className="text-gray-400"> · {a.notes}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+          {person.awards && (
+            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line mt-2">
+              {person.awards}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Works */}
       {worksPage && worksPage.items.length > 0 && (

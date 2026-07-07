@@ -343,6 +343,8 @@ export interface Person {
   bio: string | null;
   gender: string | null;
   image_url: string | null;
+  /** Legacy free-text awards note; structured results come from personAwards(). */
+  awards: string | null;
   nationality: string | null;
   /** Free-text "primary / known-for" hint only — not authoritative. */
   role_type: string | null;
@@ -651,8 +653,20 @@ export interface TagNode {
   children?: TagNode[];
 }
 
+export interface PersonAward {
+  id: number;
+  award: string;
+  category: string;
+  year: number;
+  result: string;
+  notes: string | null;
+  lw_id: number | null;
+  work_title: string | null;
+}
+
 export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
+  personAwards: (id: number) => request<PersonAward[]>(`/persons/${id}/awards`),
   publisher: (id: number) => request<PublisherDetail>(`/publishers/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),

@@ -46,9 +46,10 @@ import PrimaryLanguageSelect from "../../components/PrimaryLanguageSelect";
 import NativeNameField from "../../components/NativeNameField";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import { WORLD_LANGUAGES } from "../../lib/languages";
+import { slugify } from "../../lib/slugify";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../../lib/workTypes";
 
-type Tab = "book" | "story" | "magazine" | "issue" | "person" | "publisher";
+type Tab = "book" | "story" | "magazine" | "issue" | "person" | "publisher" | "series";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -90,7 +91,7 @@ export default function AdminAdd() {
       <h1 className="text-xl font-bold text-gray-900 mb-6">Add Records</h1>
 
       <div className="flex gap-2 mb-6">
-        {(["book", "story", "magazine", "issue", "person", "publisher"] as Tab[]).map((t) => (
+        {(["book", "story", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -111,6 +112,7 @@ export default function AdminAdd() {
       {tab === "issue" && <MagazineIssueChooser />}
       {tab === "person" && <PersonForm />}
       {tab === "publisher" && <PublisherForm />}
+      {tab === "series" && <SeriesForm />}
     </div>
   );
 }
@@ -1378,6 +1380,75 @@ function PublisherForm() {
       />
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create publisher" />
+    </form>
+  );
+}
+
+function SeriesForm() {
+  const qc = useQueryClient();
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [description, setDescription] = useState("");
+  const [created, setCreated] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      submitAndApprove(() =>
+        volunteer.submitSeries({
+          name: name.trim(),
+          slug: slug.trim() || null,
+          description: description.trim() || null,
+        })
+      ),
+    onSuccess: () => {
+      setCreated(true);
+      setName("");
+      setSlug("");
+      setDescription("");
+      qc.invalidateQueries({ queryKey: ["all-series"] });
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (name.trim()) mutation.mutate();
+      }}
+      className="max-w-2xl space-y-4"
+    >
+      {created && <SuccessBanner message="Series created — books can now be assigned to it." link="/series" linkText="Browse series →" />}
+
+      <div>
+        <label className={labelCls}>Name *</label>
+        <input
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (!slug) setSlug(slugify(e.target.value));
+          }}
+          required
+          className={inputCls}
+        />
+      </div>
+
+      <div>
+        <label className={labelCls}>Slug (optional — lowercase, hyphens)</label>
+        <input
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          pattern="[a-z0-9\-]*"
+          placeholder="auto-generated if left blank"
+          className={inputCls}
+        />
+      </div>
+
+      <div>
+        <label className={labelCls}>Description</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
+      </div>
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create series" />
     </form>
   );
 }
