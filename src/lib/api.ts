@@ -680,6 +680,10 @@ export interface AwardTypeItem {
   slug: string | null;
   country: string | null;
   language: string | null;
+  awarding_body: string | null;
+  inaugural_year: number | null;
+  discontinued_year: number | null;
+  website: string | null;
   notes: string | null;
   is_active: boolean;
   categories: AwardCategoryItem[];
@@ -1129,6 +1133,10 @@ export const admin = {
       slug?: string | null;
       country?: string | null;
       language?: string | null;
+      awarding_body?: string | null;
+      inaugural_year?: number | null;
+      discontinued_year?: number | null;
+      website?: string | null;
       notes?: string | null;
       is_active?: boolean;
     }) => request<AwardTypeItem>("/awards", { method: "POST", body: JSON.stringify(data) }),
@@ -1139,6 +1147,10 @@ export const admin = {
         slug: string | null;
         country: string | null;
         language: string | null;
+        awarding_body: string | null;
+        inaugural_year: number | null;
+        discontinued_year: number | null;
+        website: string | null;
         notes: string | null;
         is_active: boolean;
       }>

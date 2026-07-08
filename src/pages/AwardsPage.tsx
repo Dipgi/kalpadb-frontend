@@ -57,10 +57,16 @@ function AwardRow({ award }: { award: AwardTypeItem }) {
       >
         <span className="text-gray-400 text-sm w-4">{open ? "▾" : "▸"}</span>
         <span className="font-semibold text-gray-900">{award.name}</span>
-        {award.country && <span className="text-xs text-gray-400">{award.country}</span>}
-        {award.language && (
-          <span className="text-xs text-gray-400 uppercase">· {award.language}</span>
+        {award.awarding_body && (
+          <span className="text-xs text-gray-500">· {award.awarding_body}</span>
         )}
+        {(award.inaugural_year || award.discontinued_year) && (
+          <span className="text-xs text-gray-400">
+            · {award.inaugural_year ?? "?"}
+            {award.discontinued_year ? `–${award.discontinued_year}` : ""}
+          </span>
+        )}
+        {award.country && <span className="text-xs text-gray-400">· {award.country}</span>}
         <span className="ml-auto text-xs text-gray-400">
           {award.categories.length} categor{award.categories.length === 1 ? "y" : "ies"}
         </span>
@@ -68,6 +74,21 @@ function AwardRow({ award }: { award: AwardTypeItem }) {
 
       {open && (
         <div className="border-t border-gray-100 px-4 py-3">
+          {(award.awarding_body || award.website) && (
+            <p className="text-xs text-gray-500 mb-2">
+              {award.awarding_body && <>Presented by {award.awarding_body}. </>}
+              {award.website && (
+                <a
+                  href={award.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-violet-600 hover:underline"
+                >
+                  Official site ↗
+                </a>
+              )}
+            </p>
+          )}
           {award.notes && <p className="text-xs text-gray-500 mb-3">{award.notes}</p>}
           {isLoading ? (
             <p className="text-sm text-gray-400">Loading results…</p>

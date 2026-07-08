@@ -56,6 +56,9 @@ export default function AdminAwards() {
   const [name, setName] = useState("");
   const [country, setCountry] = useState("");
   const [language, setLanguage] = useState("");
+  const [awardingBody, setAwardingBody] = useState("");
+  const [inauguralYear, setInauguralYear] = useState("");
+  const [website, setWebsite] = useState("");
   const [notes, setNotes] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
   const [catInput, setCatInput] = useState("");
@@ -77,6 +80,9 @@ export default function AdminAwards() {
         name: name.trim(),
         country: country.trim() || null,
         language: language.trim() || null,
+        awarding_body: awardingBody.trim() || null,
+        inaugural_year: inauguralYear.trim() ? Number(inauguralYear) : null,
+        website: website.trim() || null,
         notes: notes.trim() || null,
       });
       // Create each named category under the new award.
@@ -89,6 +95,9 @@ export default function AdminAwards() {
       setName("");
       setCountry("");
       setLanguage("");
+      setAwardingBody("");
+      setInauguralYear("");
+      setWebsite("");
       setNotes("");
       setCategories([]);
       setCatInput("");
@@ -150,9 +159,42 @@ export default function AdminAwards() {
             <LanguageSelect value={language} onChange={setLanguage} />
           </div>
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mt-3">
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Awarding body (optional)</label>
+            <input
+              value={awardingBody}
+              onChange={(e) => setAwardingBody(e.target.value)}
+              placeholder="e.g. Kalpabiswa, Sahitya Akademi"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">First awarded (optional)</label>
+            <input
+              type="number"
+              value={inauguralYear}
+              onChange={(e) => setInauguralYear(e.target.value)}
+              placeholder="2016"
+              min={1800}
+              max={2100}
+              className={inputCls}
+            />
+          </div>
+        </div>
+        <div className="mt-3">
+          <label className="block text-xs text-gray-500 mb-1">Website (optional)</label>
+          <input
+            type="url"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            placeholder="https://…"
+            className={inputCls}
+          />
+        </div>
         <div className="mt-3">
           <label className="block text-xs text-gray-500 mb-1">Notes (optional)</label>
-          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Awarding body, scope…" className={inputCls} />
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Scope, frequency…" className={inputCls} />
         </div>
 
         {/* Categories — an award needs at least one (e.g. Best Novel). Add them here,
@@ -245,6 +287,14 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
   const [name, setName] = useState(award.name);
   const [country, setCountry] = useState(award.country ?? "");
   const [language, setLanguage] = useState(award.language ?? "");
+  const [awardingBody, setAwardingBody] = useState(award.awarding_body ?? "");
+  const [inauguralYear, setInauguralYear] = useState(
+    award.inaugural_year != null ? String(award.inaugural_year) : ""
+  );
+  const [discontinuedYear, setDiscontinuedYear] = useState(
+    award.discontinued_year != null ? String(award.discontinued_year) : ""
+  );
+  const [website, setWebsite] = useState(award.website ?? "");
   const [active, setActive] = useState(award.is_active);
   const [newCat, setNewCat] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -255,6 +305,10 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
         name: name.trim(),
         country: country.trim() || null,
         language: language.trim() || null,
+        awarding_body: awardingBody.trim() || null,
+        inaugural_year: inauguralYear.trim() ? Number(inauguralYear) : null,
+        discontinued_year: discontinuedYear.trim() ? Number(discontinuedYear) : null,
+        website: website.trim() || null,
         is_active: active,
       }),
     onSuccess: () => {
@@ -291,6 +345,37 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls + " sm:col-span-2"} />
           <CountryNameSelect value={country} onChange={setCountry} />
           <LanguageSelect value={language} onChange={setLanguage} />
+          <input
+            value={awardingBody}
+            onChange={(e) => setAwardingBody(e.target.value)}
+            placeholder="Awarding body"
+            className={inputCls + " sm:col-span-2"}
+          />
+          <input
+            type="number"
+            value={inauguralYear}
+            onChange={(e) => setInauguralYear(e.target.value)}
+            placeholder="First yr"
+            min={1800}
+            max={2100}
+            className={inputCls}
+          />
+          <input
+            type="number"
+            value={discontinuedYear}
+            onChange={(e) => setDiscontinuedYear(e.target.value)}
+            placeholder="Last yr"
+            min={1800}
+            max={2100}
+            className={inputCls}
+          />
+          <input
+            type="url"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+            placeholder="Website URL"
+            className={inputCls + " sm:col-span-4"}
+          />
           <label className="flex items-center gap-2 text-sm text-gray-600 sm:col-span-2">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
             Active (shown in pickers)
@@ -314,8 +399,27 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
           {!award.is_active && (
             <span className="text-[11px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">retired</span>
           )}
-          {award.country && <span className="text-xs text-gray-400">{award.country}</span>}
+          {award.awarding_body && (
+            <span className="text-xs text-gray-500">· {award.awarding_body}</span>
+          )}
+          {(award.inaugural_year || award.discontinued_year) && (
+            <span className="text-xs text-gray-400">
+              · {award.inaugural_year ?? "?"}
+              {award.discontinued_year ? `–${award.discontinued_year}` : ""}
+            </span>
+          )}
+          {award.country && <span className="text-xs text-gray-400">· {award.country}</span>}
           {award.language && <span className="text-xs text-gray-400 uppercase">· {award.language}</span>}
+          {award.website && (
+            <a
+              href={award.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-teal-600 hover:underline"
+            >
+              site ↗
+            </a>
+          )}
           <span className="text-xs text-gray-400">· {award.categories.length} categories</span>
           <span className="ml-auto flex items-center gap-3">
             <button onClick={() => setEditing(true)} className="text-xs text-teal-700 hover:underline">
