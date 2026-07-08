@@ -6,6 +6,91 @@ import { COUNTRIES } from "../../lib/countries";
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500";
 
+/** Standard speculative-fiction award categories offered in the picker.
+ * Admins can still type a custom one for awards that don't fit these. */
+const GENERAL_CATEGORIES = [
+  "Best Novel",
+  "Best Novella",
+  "Best Short Story",
+  "Best Collection",
+  "Best Anthology",
+  "Best Graphic Novel / Comic",
+  "Best Young Adult / Children's",
+  "Best Debut",
+  "Best Translation",
+  "Best Cover Art / Illustration",
+  "Best Editor",
+  "Best Non-fiction / Related Work",
+  "Best Magazine",
+  "Lifetime Achievement",
+  "Special Jury Mention",
+  "Award",
+];
+
+/** Pick a standard category from the list, or type a custom one. Calls onAdd(name). */
+function CategoryAdder({
+  existing,
+  onAdd,
+  disabled,
+}: {
+  existing: string[];
+  onAdd: (name: string) => void;
+  disabled?: boolean;
+}) {
+  const [custom, setCustom] = useState("");
+  const taken = (n: string) => existing.some((e) => e.toLowerCase() === n.toLowerCase());
+  const available = GENERAL_CATEGORIES.filter((c) => !taken(c));
+
+  function addCustom() {
+    const c = custom.trim();
+    if (c && !taken(c)) onAdd(c);
+    setCustom("");
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <select
+        value=""
+        disabled={disabled}
+        onChange={(e) => {
+          if (e.target.value) onAdd(e.target.value);
+          e.target.value = "";
+        }}
+        className="border border-gray-200 rounded-md px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-40"
+      >
+        <option value="">+ standard category…</option>
+        {available.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </select>
+      <span className="text-xs text-gray-400">or</span>
+      <input
+        value={custom}
+        onChange={(e) => setCustom(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            addCustom();
+          }
+        }}
+        disabled={disabled}
+        placeholder="custom category"
+        className="border border-gray-200 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 w-40 disabled:opacity-40"
+      />
+      <button
+        type="button"
+        onClick={addCustom}
+        disabled={disabled || !custom.trim()}
+        className="text-sm px-3 py-2 rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-40 whitespace-nowrap"
+      >
+        Add
+      </button>
+    </div>
+  );
+}
+
 /** Country dropdown that stores the full English name (matches existing award data
  * and what the public Awards page displays). Keeps a legacy value selectable. */
 function CountryNameSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -61,18 +146,9 @@ export default function AdminAwards() {
   const [website, setWebsite] = useState("");
   const [notes, setNotes] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
-  const [catInput, setCatInput] = useState("");
   const [formErr, setFormErr] = useState<string | null>(null);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["award-types"] });
-
-  function addCategory() {
-    const c = catInput.trim();
-    if (c && !categories.some((x) => x.toLowerCase() === c.toLowerCase())) {
-      setCategories((prev) => [...prev, c]);
-    }
-    setCatInput("");
-  }
 
   const createMutation = useMutation({
     mutationFn: async (cats: string[]) => {
@@ -100,7 +176,6 @@ export default function AdminAwards() {
       setWebsite("");
       setNotes("");
       setCategories([]);
-      setCatInput("");
       setFormErr(null);
       invalidate();
     },
@@ -113,13 +188,7 @@ export default function AdminAwards() {
       setFormErr("Name is required.");
       return;
     }
-    // Fold a half-typed category into the list before submitting.
-    const pending = catInput.trim();
-    const finalCats =
-      pending && !categories.some((x) => x.toLowerCase() === pending.toLowerCase())
-        ? [...categories, pending]
-        : categories;
-    createMutation.mutate(finalCats);
+    createMutation.mutate(categories);
   }
 
   const total = awards?.length ?? 0;
@@ -223,31 +292,13 @@ export default function AdminAwards() {
               ))}
             </div>
           )}
-          <div className="flex items-center gap-2">
-            <input
-              value={catInput}
-              onChange={(e) => setCatInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addCategory();
-                }
-              }}
-              placeholder="Type a category and press Enter"
-              className={inputCls}
-            />
-            <button
-              type="button"
-              onClick={addCategory}
-              disabled={!catInput.trim()}
-              className="text-sm px-3 py-2 rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-40 whitespace-nowrap"
-            >
-              Add
-            </button>
-          </div>
+          <CategoryAdder
+            existing={categories}
+            onAdd={(c) => setCategories((prev) => [...prev, c])}
+          />
           <p className="mt-1 text-xs text-gray-400">
-            Single-category prize? Add one named e.g. “Award”. You can also add categories later on
-            the award’s card.
+            Pick standard categories, or type a custom one. Single-category prize? Add one named
+            e.g. “Award”. You can also add categories later on the award’s card.
           </p>
         </div>
 
@@ -296,7 +347,6 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
   );
   const [website, setWebsite] = useState(award.website ?? "");
   const [active, setActive] = useState(award.is_active);
-  const [newCat, setNewCat] = useState("");
   const [err, setErr] = useState<string | null>(null);
 
   const save = useMutation({
@@ -329,9 +379,8 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
   });
 
   const addCat = useMutation({
-    mutationFn: () => admin.awards.createCategory(award.id, { name: newCat.trim() }),
+    mutationFn: (catName: string) => admin.awards.createCategory(award.id, { name: catName }),
     onSuccess: () => {
-      setNewCat("");
       setErr(null);
       onChange();
     },
@@ -438,27 +487,17 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-wrap gap-2 items-center mb-2">
         {award.categories.map((c) => (
           <CategoryChip key={c.id} awardId={award.id} category={c} onChange={onChange} setErr={setErr} />
         ))}
         {award.categories.length === 0 && <span className="text-xs text-gray-400">No categories yet.</span>}
-        <span className="inline-flex items-center gap-1">
-          <input
-            value={newCat}
-            onChange={(e) => setNewCat(e.target.value)}
-            placeholder="+ category"
-            className="border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-teal-400 w-32"
-          />
-          <button
-            onClick={() => newCat.trim() && addCat.mutate()}
-            disabled={!newCat.trim() || addCat.isPending}
-            className="text-xs text-teal-700 hover:underline disabled:opacity-40"
-          >
-            Add
-          </button>
-        </span>
       </div>
+      <CategoryAdder
+        existing={award.categories.map((c) => c.name)}
+        onAdd={(name) => addCat.mutate(name)}
+        disabled={addCat.isPending}
+      />
       {err && <p className="text-xs text-red-500 mt-2">{err}</p>}
     </div>
   );
