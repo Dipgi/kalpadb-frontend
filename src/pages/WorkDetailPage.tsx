@@ -982,15 +982,20 @@ function RatingSection({
 }) {
   const serverReview = myRating?.review ?? "";
   const [review, setReview] = useState(serverReview);
-  const [showReview, setShowReview] = useState(!!myRating?.review);
+  // Whether the review textarea is open. Default closed: a saved review shows in
+  // read mode until the user chooses to edit it, so we never greet them with
+  // Save/Cancel on a review they already wrote.
+  const [editing, setEditing] = useState(false);
 
   // Re-sync the editor to the server value when the saved review changes
-  // (e.g. after saving or refetch). Done during render rather than in an effect
-  // so it doesn't clobber in-progress typing or trigger a cascading render.
+  // (e.g. after saving or refetch), and close the editor once a save lands.
+  // Done during render rather than in an effect so it doesn't clobber
+  // in-progress typing or trigger a cascading render.
   const [prevServerReview, setPrevServerReview] = useState(serverReview);
   if (serverReview !== prevServerReview) {
     setPrevServerReview(serverReview);
     setReview(serverReview);
+    setEditing(false);
   }
 
   const reviewChanged = review.trim() !== serverReview;
@@ -1015,17 +1020,25 @@ function RatingSection({
             Clear
           </button>
         )}
-        {myRating && !showReview && (
+        {myRating && !editing && (
           <button
-            onClick={() => setShowReview(true)}
+            onClick={() => setEditing(true)}
             className="text-xs text-violet-600 hover:underline"
           >
-            {myRating.review ? "Edit review" : "Add a review"}
+            {serverReview ? "Edit review" : "Add a review"}
           </button>
         )}
       </div>
 
-      {showReview && myRating && (
+      {/* Read mode: show the saved review with an Edit affordance above. */}
+      {myRating && !editing && serverReview && (
+        <p className="mt-3 text-sm text-gray-600 leading-relaxed whitespace-pre-line break-words bg-gray-50 border border-gray-100 rounded-md px-3 py-2">
+          {serverReview}
+        </p>
+      )}
+
+      {/* Edit mode: textarea + Save/Cancel, only while actively editing. */}
+      {editing && myRating && (
         <div className="mt-3">
           <textarea
             value={review}
@@ -1033,6 +1046,7 @@ function RatingSection({
             rows={3}
             maxLength={2000}
             placeholder="Write a short review (optional)…"
+            autoFocus
             className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-violet-400 resize-y"
           />
           <div className="flex gap-2 mt-1">
@@ -1045,8 +1059,8 @@ function RatingSection({
             </button>
             <button
               onClick={() => {
-                setShowReview(false);
-                setReview(myRating.review ?? "");
+                setEditing(false);
+                setReview(serverReview);
               }}
               className="text-xs px-3 py-1.5 rounded-md border border-gray-300 text-gray-600 hover:border-gray-400 transition-colors"
             >
