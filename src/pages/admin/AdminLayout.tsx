@@ -13,6 +13,7 @@ const NAV: NavItem[] = [
   { to: "/admin/users", label: "Users" },
   { to: "/admin/tagging", label: "Genre & Tag Tagging" },
   { to: "/admin/tags", label: "Tag Management" },
+  { to: "/admin/awards", label: "Award Management" },
   { to: "/admin/add", label: "Add Records" },
   { to: "/admin/catalogue", label: "Catalogue" },
   { to: "/admin/duplicates", label: "Find Duplicates" },

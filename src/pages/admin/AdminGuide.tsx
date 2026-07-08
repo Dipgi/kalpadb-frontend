@@ -88,7 +88,11 @@ export default function AdminGuide() {
             result (winner / shortlist / nominee …). If the award or category isn’t in the list yet,
             use the small “+ new award / + new category” inputs (admin only) to create it inline —
             it becomes available everywhere at once. Existing results have <em>Edit</em> (change
-            category/year/result/notes) and <em>Remove</em> (admin only, immediate).
+            category/year/result/notes) and <em>Remove</em> (admin only, immediate). To maintain the
+            award list itself (rename, add categories, retire an award), use{" "}
+            <Link to="/admin/awards" className="text-violet-700 hover:underline">Award Management</Link>;
+            the public <Link to="/awards" className="text-violet-700 hover:underline">Awards</Link>{" "}
+            page lists every award with its winners rolled up.
           </li>
           <li>
             <strong>External links.</strong> Goodreads, Wikipedia, WorldCat, Open Library or other

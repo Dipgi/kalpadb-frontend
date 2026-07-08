@@ -379,7 +379,9 @@ export default function HelpPage() {
             or person has an “Awards &amp; external links” section. Add an award result (pick the
             award and category, plus year and result), or a reference link such as Goodreads or
             Wikipedia. These save on their own — you don’t use the page’s Save button for them — and
-            your additions queue for review like any other edit.
+            your additions queue for review like any other edit. The{" "}
+            <Link to="/awards" className="text-violet-700 hover:underline">Awards</Link> page lists
+            every award with its winners.
           </li>
         </ul>
       </Section>

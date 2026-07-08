@@ -11,6 +11,7 @@ const BROWSE_LINKS = [
   { to: "/series", label: "Series" },
   { to: "/persons", label: "People" },
   { to: "/publishers", label: "Publishers" },
+  { to: "/awards", label: "Awards" },
   { to: "/explore", label: "Explore" },
 ];
 

@@ -705,6 +705,19 @@ export interface ExternalLinkItem {
   label: string | null;
 }
 
+/** One award result rolled up for the public award page. */
+export interface AwardWinner {
+  id: number;
+  category: string;
+  year: number;
+  result: string;
+  notes: string | null;
+  lw_id: number | null;
+  work_title: string | null;
+  stakeholder_id: number | null;
+  person_name: string | null;
+}
+
 /** Award-result payload (create). One of work/person target is injected by the route. */
 export interface AwardResultInput {
   category_id: number;
@@ -735,6 +748,8 @@ export const catalogue = {
   personAwards: (id: number) => request<PersonAward[]>(`/persons/${id}/awards`),
   workAwards: (id: number) => request<WorkAward[]>(`/works/${id}/awards`),
   awardTypes: () => request<AwardTypeItem[]>(`/awards?active_only=false`),
+  awardTypesActive: () => request<AwardTypeItem[]>(`/awards`),
+  awardResults: (awardId: number) => request<AwardWinner[]>(`/awards/${awardId}/results`),
   publisher: (id: number) => request<PublisherDetail>(`/publishers/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
@@ -1117,11 +1132,34 @@ export const admin = {
       notes?: string | null;
       is_active?: boolean;
     }) => request<AwardTypeItem>("/awards", { method: "POST", body: JSON.stringify(data) }),
+    updateType: (
+      id: number,
+      data: Partial<{
+        name: string;
+        slug: string | null;
+        country: string | null;
+        language: string | null;
+        notes: string | null;
+        is_active: boolean;
+      }>
+    ) => request<AwardTypeItem>(`/awards/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+    deleteType: (id: number) => request(`/awards/${id}`, { method: "DELETE" }),
     createCategory: (awardId: number, data: { name: string; description?: string | null }) =>
       request<AwardCategoryItem>(`/awards/${awardId}/categories`, {
         method: "POST",
         body: JSON.stringify(data),
       }),
+    updateCategory: (
+      awardId: number,
+      catId: number,
+      data: Partial<{ name: string; description: string | null }>
+    ) =>
+      request<AwardCategoryItem>(`/awards/${awardId}/categories/${catId}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    deleteCategory: (awardId: number, catId: number) =>
+      request(`/awards/${awardId}/categories/${catId}`, { method: "DELETE" }),
   },
 
   links: {

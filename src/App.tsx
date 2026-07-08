@@ -18,6 +18,7 @@ import BrowsePersonsPage from "./pages/BrowsePersonsPage";
 import BrowsePublishersPage from "./pages/BrowsePublishersPage";
 import BrowseSeriesPage from "./pages/BrowseSeriesPage";
 import BrowseMagazinesPage from "./pages/BrowseMagazinesPage";
+import AwardsPage from "./pages/AwardsPage";
 import BrowseIssuesPage from "./pages/BrowseIssuesPage";
 import SeriesDetailPage from "./pages/SeriesDetailPage";
 import SearchPage from "./pages/SearchPage";
@@ -35,6 +36,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminVolunteerRequests from "./pages/admin/AdminVolunteerRequests";
 import AdminTagging from "./pages/admin/AdminTagging";
 import AdminTags from "./pages/admin/AdminTags";
+import AdminAwards from "./pages/admin/AdminAwards";
 import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditStory from "./pages/admin/AdminEditStory";
@@ -105,6 +107,7 @@ export default function App() {
                 <Route path="/publishers/:id" element={<PublisherDetailPage />} />
                 <Route path="/series" element={<BrowseSeriesPage />} />
                 <Route path="/series/:id" element={<SeriesDetailPage />} />
+                <Route path="/awards" element={<AwardsPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
@@ -193,6 +196,7 @@ export default function App() {
                   <Route path="volunteer-requests" element={<AdminVolunteerRequests />} />
                   <Route path="tagging" element={<AdminTagging />} />
                   <Route path="tags" element={<AdminTags />} />
+                  <Route path="awards" element={<AdminAwards />} />
                   <Route path="add" element={<AdminAdd />} />
                   <Route path="catalogue" element={<AdminCatalogue />} />
                   <Route path="audit" element={<AdminAudit />} />
