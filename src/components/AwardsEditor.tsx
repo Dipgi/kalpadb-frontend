@@ -86,15 +86,20 @@ export default function AwardsEditor({
         notes: a.notes,
       }));
     }
-    return (rawRows as Awaited<ReturnType<typeof catalogue.personAwards>>).map((a) => ({
-      id: a.id,
-      awardName: a.award,
-      categoryName: a.category,
-      categoryId: a.category_id,
-      year: a.year,
-      result: a.result,
-      notes: a.notes,
-    }));
+    // On a person, personAwards() also rolls up awards won by their works; those
+    // belong to the work and are managed on the work's page, so don't list them
+    // as editable here — only awards given to the person directly.
+    return (rawRows as Awaited<ReturnType<typeof catalogue.personAwards>>)
+      .filter((a) => !a.for_work)
+      .map((a) => ({
+        id: a.id,
+        awardName: a.award,
+        categoryName: a.category,
+        categoryId: a.category_id,
+        year: a.year,
+        result: a.result,
+        notes: a.notes,
+      }));
   }, [rawRows, target.kind]);
 
   function refresh() {

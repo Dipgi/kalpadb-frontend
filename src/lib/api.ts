@@ -666,6 +666,8 @@ export interface PersonAward {
   notes: string | null;
   lw_id: number | null;
   work_title: string | null;
+  /** True when the award went to one of the person's works, not to them directly. */
+  for_work: boolean;
 }
 
 export interface AwardCategoryItem {
