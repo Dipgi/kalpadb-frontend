@@ -1,9 +1,45 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { catalogue, admin, ApiError, type AwardTypeItem, type AwardCategoryItem } from "../../lib/api";
+import { COUNTRIES } from "../../lib/countries";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500";
+
+/** Country dropdown that stores the full English name (matches existing award data
+ * and what the public Awards page displays). Keeps a legacy value selectable. */
+function CountryNameSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const known = COUNTRIES.some((c) => c.name === value);
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
+      <option value="">— none —</option>
+      {value && !known && <option value={value}>{value}</option>}
+      {COUNTRIES.map((c) => (
+        <option key={c.code} value={c.name}>
+          {c.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/** Language dropdown storing a BCP-47 code (matches award_types.language, e.g. "bn"). */
+function LanguageSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
+  const known = (languages ?? []).some((l) => l.code === value);
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
+      <option value="">— none —</option>
+      {value && !known && <option value={value}>{value}</option>}
+      {(languages ?? []).map((l) => (
+        <option key={l.code} value={l.code}>
+          {l.name}
+          {l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 /**
  * Manage the award taxonomy: create/edit/retire award types and their
@@ -21,23 +57,41 @@ export default function AdminAwards() {
   const [country, setCountry] = useState("");
   const [language, setLanguage] = useState("");
   const [notes, setNotes] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [catInput, setCatInput] = useState("");
   const [formErr, setFormErr] = useState<string | null>(null);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["award-types"] });
 
+  function addCategory() {
+    const c = catInput.trim();
+    if (c && !categories.some((x) => x.toLowerCase() === c.toLowerCase())) {
+      setCategories((prev) => [...prev, c]);
+    }
+    setCatInput("");
+  }
+
   const createMutation = useMutation({
-    mutationFn: () =>
-      admin.awards.createType({
+    mutationFn: async (cats: string[]) => {
+      const award = await admin.awards.createType({
         name: name.trim(),
         country: country.trim() || null,
         language: language.trim() || null,
         notes: notes.trim() || null,
-      }),
+      });
+      // Create each named category under the new award.
+      for (const c of cats) {
+        await admin.awards.createCategory(award.id, { name: c });
+      }
+      return award;
+    },
     onSuccess: () => {
       setName("");
       setCountry("");
       setLanguage("");
       setNotes("");
+      setCategories([]);
+      setCatInput("");
       setFormErr(null);
       invalidate();
     },
@@ -50,7 +104,13 @@ export default function AdminAwards() {
       setFormErr("Name is required.");
       return;
     }
-    createMutation.mutate();
+    // Fold a half-typed category into the list before submitting.
+    const pending = catInput.trim();
+    const finalCats =
+      pending && !categories.some((x) => x.toLowerCase() === pending.toLowerCase())
+        ? [...categories, pending]
+        : categories;
+    createMutation.mutate(finalCats);
   }
 
   const total = awards?.length ?? 0;
@@ -83,17 +143,72 @@ export default function AdminAwards() {
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Country (optional)</label>
-            <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="India" className={inputCls} />
+            <CountryNameSelect value={country} onChange={setCountry} />
           </div>
           <div>
             <label className="block text-xs text-gray-500 mb-1">Language (optional)</label>
-            <input value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="bn" className={inputCls} />
+            <LanguageSelect value={language} onChange={setLanguage} />
           </div>
         </div>
         <div className="mt-3">
           <label className="block text-xs text-gray-500 mb-1">Notes (optional)</label>
           <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Awarding body, scope…" className={inputCls} />
         </div>
+
+        {/* Categories — an award needs at least one (e.g. Best Novel). Add them here,
+            or later on the award's card below. */}
+        <div className="mt-3">
+          <label className="block text-xs text-gray-500 mb-1">
+            Categories <span className="text-gray-400">(e.g. Best Novel, Best Short Story)</span>
+          </label>
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {categories.map((c) => (
+                <span
+                  key={c}
+                  className="inline-flex items-center gap-1 bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full"
+                >
+                  {c}
+                  <button
+                    type="button"
+                    onClick={() => setCategories((prev) => prev.filter((x) => x !== c))}
+                    className="hover:text-teal-950 font-bold"
+                    aria-label={`Remove ${c}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <input
+              value={catInput}
+              onChange={(e) => setCatInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addCategory();
+                }
+              }}
+              placeholder="Type a category and press Enter"
+              className={inputCls}
+            />
+            <button
+              type="button"
+              onClick={addCategory}
+              disabled={!catInput.trim()}
+              className="text-sm px-3 py-2 rounded-md border border-teal-300 text-teal-700 hover:bg-teal-50 disabled:opacity-40 whitespace-nowrap"
+            >
+              Add
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-gray-400">
+            Single-category prize? Add one named e.g. “Award”. You can also add categories later on
+            the award’s card.
+          </p>
+        </div>
+
         <div className="flex items-center gap-3 mt-3">
           <button
             type="submit"
@@ -174,8 +289,8 @@ function AwardCard({ award, onChange }: { award: AwardTypeItem; onChange: () => 
       {editing ? (
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-3">
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls + " sm:col-span-2"} />
-          <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Country" className={inputCls} />
-          <input value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="Lang" className={inputCls} />
+          <CountryNameSelect value={country} onChange={setCountry} />
+          <LanguageSelect value={language} onChange={setLanguage} />
           <label className="flex items-center gap-2 text-sm text-gray-600 sm:col-span-2">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />
             Active (shown in pickers)
