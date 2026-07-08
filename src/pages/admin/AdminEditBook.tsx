@@ -11,6 +11,8 @@ import FormatsEditor, {
   formatRowsToPayload,
 } from "../../components/FormatsEditor";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
+import AwardsEditor from "../../components/AwardsEditor";
+import ExternalLinksEditor from "../../components/ExternalLinksEditor";
 import SourceAttributionFields, {
   type SourceAttribution,
   sourceAttributionPayload,
@@ -544,6 +546,18 @@ function EditForm({ work }: { work: WorkDetail }) {
       </div>
 
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
+      </FormSection>
+
+      <FormSection
+        title="Awards & external links"
+        hint="Saved immediately, separately from the fields above — no need to click Save."
+      >
+        <AwardsEditor target={{ kind: "work", id: work.id }} isAdmin={!!isAdmin} />
+        <ExternalLinksEditor
+          target={{ kind: "work", id: work.id }}
+          links={work.external_links}
+          isAdmin={!!isAdmin}
+        />
       </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />

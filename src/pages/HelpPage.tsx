@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "6 July 2026";
+const LAST_UPDATED = "8 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -373,6 +373,13 @@ export default function HelpPage() {
           <li>
             <strong>Genres vs tags:</strong> genres are broad categories (e.g. Hard SF); tags are
             granular themes (e.g. Time Travel, Robots).
+          </li>
+          <li>
+            <strong>Awards &amp; external links:</strong> the edit page for a book, story, magazine
+            or person has an “Awards &amp; external links” section. Add an award result (pick the
+            award and category, plus year and result), or a reference link such as Goodreads or
+            Wikipedia. These save on their own — you don’t use the page’s Save button for them — and
+            your additions queue for review like any other edit.
           </li>
         </ul>
       </Section>

@@ -734,7 +734,9 @@ export default function WorkDetailPage() {
             <ul className="text-sm text-gray-700 space-y-1">
               {work.awards.map((a) => (
                 <li key={a.id}>
+                  {a.award ? `${a.award} — ` : ""}
                   {a.category.name} ({a.year}) — {a.result}
+                  {a.notes && <span className="text-gray-400"> · {a.notes}</span>}
                 </li>
               ))}
             </ul>

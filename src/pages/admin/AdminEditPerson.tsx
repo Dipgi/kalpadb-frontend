@@ -12,6 +12,8 @@ import NativeNameField from "../../components/NativeNameField";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
+import AwardsEditor from "../../components/AwardsEditor";
+import ExternalLinksEditor from "../../components/ExternalLinksEditor";
 import FormSection from "../../components/FormSection";
 
 const inputCls =
@@ -241,6 +243,18 @@ function EditForm({ person }: { person: Person }) {
         value={imageUrl}
         onChange={(url) => setImageUrl(url ?? "")}
       />
+      </FormSection>
+
+      <FormSection
+        title="Awards & external links"
+        hint="Saved immediately, separately from the fields above — no need to click Save."
+      >
+        <AwardsEditor target={{ kind: "person", id: person.id }} isAdmin={!!isAdmin} />
+        <ExternalLinksEditor
+          target={{ kind: "person", id: person.id }}
+          links={person.external_links}
+          isAdmin={!!isAdmin}
+        />
       </FormSection>
 
       <p className="text-xs text-gray-400">

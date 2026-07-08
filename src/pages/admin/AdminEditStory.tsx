@@ -26,6 +26,8 @@ import FirstPublishedField, {
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
+import AwardsEditor from "../../components/AwardsEditor";
+import ExternalLinksEditor from "../../components/ExternalLinksEditor";
 import FormSection from "../../components/FormSection";
 import TagChipPicker from "../../components/TagChipPicker";
 import EditSavedBanner from "../../components/EditSavedBanner";
@@ -458,6 +460,18 @@ function EditForm({ work }: { work: WorkDetail }) {
       </div>
 
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
+      </FormSection>
+
+      <FormSection
+        title="Awards & external links"
+        hint="Saved immediately, separately from the fields above — no need to click Save."
+      >
+        <AwardsEditor target={{ kind: "work", id: work.id }} isAdmin={!!isAdmin} />
+        <ExternalLinksEditor
+          target={{ kind: "work", id: work.id }}
+          links={work.external_links}
+          isAdmin={!!isAdmin}
+        />
       </FormSection>
 
       <EditNoteField show={!isAdmin} value={note} onChange={setNote} />

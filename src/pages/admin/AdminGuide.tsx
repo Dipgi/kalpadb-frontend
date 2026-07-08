@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "7 July 2026";
+const LAST_UPDATED = "8 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -74,6 +74,32 @@ export default function AdminGuide() {
           original isn’t in the catalogue, use the book form’s “Based on an external work” field
           instead.
         </p>
+      </Section>
+
+      <Section title="Awards & external links">
+        <p>
+          Every book, story, magazine and person edit page has an{" "}
+          <strong>“Awards &amp; external links”</strong> section. Both editors save immediately,
+          separately from the main form — you don’t click the page’s Save button for them.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Awards.</strong> Pick the award, then a category within it, plus year and
+            result (winner / shortlist / nominee …). If the award or category isn’t in the list yet,
+            use the small “+ new award / + new category” inputs (admin only) to create it inline —
+            it becomes available everywhere at once. Existing results have <em>Edit</em> (change
+            category/year/result/notes) and <em>Remove</em> (admin only, immediate).
+          </li>
+          <li>
+            <strong>External links.</strong> Goodreads, Wikipedia, WorldCat, Open Library or other
+            reference URLs, with an optional label. Add, edit or remove them the same way. For
+            digital-archive scans of magazine issues, use the issue’s scan repository instead.
+          </li>
+          <li>
+            Volunteers’ additions and edits queue for review; removals are admin-only. Award results
+            display on the work and person pages once approved.
+          </li>
+        </ul>
       </Section>
 
       <Section title="Stories, anthologies & magazine issues">

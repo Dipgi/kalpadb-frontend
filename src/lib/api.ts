@@ -134,6 +134,7 @@ export interface WorkDetail extends WorkSummary {
   external_links: { id: number; url: string; link_type: string; label: string | null }[];
   awards: {
     id: number;
+    award: string | null;
     category: { name: string };
     year: number;
     result: string;
@@ -358,7 +359,7 @@ export interface Person {
   end_date: string | null;
   localised: Record<string, Record<string, string>>;
   aliases: { alias: string; alias_type: string | null; language: string | null }[];
-  external_links: { url: string; link_type: string }[];
+  external_links: ExternalLinkItem[];
 }
 
 /** A pen name / alias to submit with a person. alias_type is "pen_name" for pen names. */
@@ -659,6 +660,7 @@ export interface PersonAward {
   id: number;
   award: string;
   category: string;
+  category_id: number;
   year: number;
   result: string;
   notes: string | null;
@@ -666,9 +668,73 @@ export interface PersonAward {
   work_title: string | null;
 }
 
+export interface AwardCategoryItem {
+  id: number;
+  name: string;
+  description?: string | null;
+}
+
+export interface AwardTypeItem {
+  id: number;
+  name: string;
+  slug: string | null;
+  country: string | null;
+  language: string | null;
+  notes: string | null;
+  is_active: boolean;
+  categories: AwardCategoryItem[];
+}
+
+/** One award result attached to a work (from GET /works/{id}/awards). */
+export interface WorkAward {
+  id: number;
+  award: string | null;
+  category: AwardCategoryItem;
+  year: number;
+  result: string;
+  notes: string | null;
+  lw_id: number | null;
+  stakeholder_id: number | null;
+  stakeholder: { id: number; name: string } | null;
+}
+
+export interface ExternalLinkItem {
+  id: number;
+  link_type: string;
+  url: string;
+  label: string | null;
+}
+
+/** Award-result payload (create). One of work/person target is injected by the route. */
+export interface AwardResultInput {
+  category_id: number;
+  year: number;
+  result: string;
+  notes?: string | null;
+  /** For a work award crediting a specific person (e.g. best translation). */
+  stakeholder_id?: number | null;
+  /** For a person award tied to a specific work. */
+  lw_id?: number | null;
+}
+
+export interface AwardResultUpdateInput {
+  category_id?: number;
+  year?: number;
+  result?: string;
+  notes?: string | null;
+}
+
+export interface ExternalLinkInput {
+  link_type: string;
+  url: string;
+  label?: string | null;
+}
+
 export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
   personAwards: (id: number) => request<PersonAward[]>(`/persons/${id}/awards`),
+  workAwards: (id: number) => request<WorkAward[]>(`/works/${id}/awards`),
+  awardTypes: () => request<AwardTypeItem[]>(`/awards?active_only=false`),
   publisher: (id: number) => request<PublisherDetail>(`/publishers/${id}`),
   personWorks: (id: number, page = 1, size = 25) =>
     request<Page<WorkSummary>>(`/persons/${id}/works?page=${page}&page_size=${size}`),
@@ -1038,6 +1104,28 @@ export const admin = {
   translations: {
     delete: (linkId: number) =>
       request(`/works/translations/${linkId}`, { method: "DELETE" }),
+  },
+
+  awards: {
+    deleteResult: (resultId: number) =>
+      request(`/awards/results/${resultId}`, { method: "DELETE" }),
+    createType: (data: {
+      name: string;
+      slug?: string | null;
+      country?: string | null;
+      language?: string | null;
+      notes?: string | null;
+      is_active?: boolean;
+    }) => request<AwardTypeItem>("/awards", { method: "POST", body: JSON.stringify(data) }),
+    createCategory: (awardId: number, data: { name: string; description?: string | null }) =>
+      request<AwardCategoryItem>(`/awards/${awardId}/categories`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+  },
+
+  links: {
+    delete: (linkId: number) => request(`/links/${linkId}`, { method: "DELETE" }),
   },
 
   relationships: {
@@ -1482,6 +1570,40 @@ export const volunteer = {
   addMagazineRelationship: (workId: number, data: MagazineRelationshipInput) =>
     request<EditSubmission>(`/works/${workId}/relationships`, {
       method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  // Awards — create goes through the review queue (auto-approved for admins by the caller).
+  addWorkAward: (workId: number, data: AwardResultInput) =>
+    request<EditSubmission>(`/works/${workId}/awards`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addPersonAward: (personId: number, data: AwardResultInput) =>
+    request<EditSubmission>(`/persons/${personId}/awards`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateAward: (resultId: number, data: AwardResultUpdateInput, note?: string | null) =>
+    request<EditSubmission>(`/awards/results/${resultId}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  // External links — create via the work/person sub-route, edit by row id.
+  addWorkLink: (workId: number, data: ExternalLinkInput) =>
+    request<EditSubmission>(`/works/${workId}/links`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addPersonLink: (personId: number, data: ExternalLinkInput) =>
+    request<EditSubmission>(`/persons/${personId}/links`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateLink: (linkId: number, data: Partial<ExternalLinkInput>, note?: string | null) =>
+    request<EditSubmission>(`/links/${linkId}${noteQuery(note)}`, {
+      method: "PATCH",
       body: JSON.stringify(data),
     }),
   updateSeries: (id: number, data: SeriesUpdateIn, note?: string | null) =>
