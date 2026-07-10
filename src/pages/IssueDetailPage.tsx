@@ -114,7 +114,7 @@ export default function IssueDetailPage() {
             <p className="text-gray-700 italic mb-3">{issue.special_title}</p>
           )}
           {issue.synopsis && (
-            <p className="text-gray-600 text-sm leading-relaxed mb-4">{issue.synopsis}</p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4 whitespace-pre-line">{issue.synopsis}</p>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

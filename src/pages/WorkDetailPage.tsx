@@ -608,7 +608,7 @@ export default function WorkDetailPage() {
                 <div className="space-y-1">
                   {work.book?.edition_label && <p>Edition: {work.book.edition_label}</p>}
                   {work.book?.edition_notes && (
-                    <p className="text-gray-500">{work.book.edition_notes}</p>
+                    <p className="text-gray-500 whitespace-pre-line">{work.book.edition_notes}</p>
                   )}
                 </div>
               )}
@@ -627,7 +627,7 @@ export default function WorkDetailPage() {
                       {f.currency ? ` ${f.currency}` : ""}
                     </p>
                   )}
-                  {f.notes && <p className="text-gray-500">{f.notes}</p>}
+                  {f.notes && <p className="text-gray-500 whitespace-pre-line">{f.notes}</p>}
                 </div>
               ))}
             </div>
