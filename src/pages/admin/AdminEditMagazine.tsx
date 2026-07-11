@@ -24,7 +24,7 @@ import MagazineEditorshipEditor, {
   editorshipsToPayload,
   type EditorshipRow,
 } from "../../components/MagazineEditorshipEditor";
-import MagazineRelationshipsEditor from "../../components/MagazineRelationshipsEditor";
+import WorkRelationshipsEditor from "../../components/WorkRelationshipsEditor";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import AwardsEditor from "../../components/AwardsEditor";
 import ExternalLinksEditor from "../../components/ExternalLinksEditor";
@@ -338,7 +338,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         title="Related magazines"
         hint="Link titles that renamed or merged — e.g. this continues an earlier magazine."
       >
-        <MagazineRelationshipsEditor work={work} />
+        <WorkRelationshipsEditor work={work} />
       </FormSection>
 
       <FormSection

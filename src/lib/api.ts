@@ -143,6 +143,7 @@ export interface WorkDetail extends WorkSummary {
   related_works: {
     id: number;
     relation_type: string;
+    notes?: string | null;
     work: WorkSummary;
   }[];
   book: {
@@ -294,9 +295,19 @@ export interface MagazineFrequencyInput {
   end_year?: number | null;
 }
 
-export interface MagazineRelationshipInput {
+export interface WorkRelationshipInput {
   other_work_id: number;
-  direction: "continues" | "continued_by";
+  direction:
+    | "continues"
+    | "continued_by"
+    | "sequel_to"
+    | "prequel_of"
+    | "spinoff_of"
+    | "companion_to"
+    | "fix_up_of"
+    | "retelling_of"
+    | "inspired_by"
+    | "part_of_series";
   notes?: string | null;
 }
 
@@ -1619,7 +1630,7 @@ export const volunteer = {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  addMagazineRelationship: (workId: number, data: MagazineRelationshipInput) =>
+  addWorkRelationship: (workId: number, data: WorkRelationshipInput) =>
     request<EditSubmission>(`/works/${workId}/relationships`, {
       method: "POST",
       body: JSON.stringify(data),

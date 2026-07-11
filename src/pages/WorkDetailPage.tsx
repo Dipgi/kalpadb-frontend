@@ -10,6 +10,7 @@ import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
 import PlaceholderCover from "../components/PlaceholderCover";
 import { PersonList } from "../components/PersonLink";
+import { relationLabel } from "../lib/relations";
 
 const SHELF_STATUSES: { value: string; label: string }[] = [
   { value: "want", label: "Want to Read" },
@@ -796,7 +797,7 @@ export default function WorkDetailPage() {
                   {r.work.language && (
                     <span className="text-gray-400 ml-1 uppercase text-xs">{r.work.language}</span>
                   )}
-                  <span className="text-gray-400 ml-1 text-xs">({r.relation_type})</span>
+                  <span className="text-gray-400 ml-1 text-xs">({relationLabel(r.relation_type)})</span>
                 </li>
               ))}
             </ul>

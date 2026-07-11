@@ -13,6 +13,7 @@ import FormatsEditor, {
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import AwardsEditor from "../../components/AwardsEditor";
 import ExternalLinksEditor from "../../components/ExternalLinksEditor";
+import WorkRelationshipsEditor from "../../components/WorkRelationshipsEditor";
 import SourceAttributionFields, {
   type SourceAttribution,
   sourceAttributionPayload,
@@ -508,6 +509,13 @@ function EditForm({ work }: { work: WorkDetail }) {
         workLanguage={work.language}
         isAdmin={!!isAdmin}
       />
+      </FormSection>
+
+      <FormSection
+        title="Related works"
+        hint="Link sequels, prequels, spin-offs, retellings, or fix-ups. Saved immediately, separately from the fields above."
+      >
+        <WorkRelationshipsEditor work={work} />
       </FormSection>
 
       <FormSection title="Cover & classification">
