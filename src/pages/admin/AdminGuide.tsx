@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "8 July 2026";
+const LAST_UPDATED = "11 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -74,6 +74,38 @@ export default function AdminGuide() {
           original isn’t in the catalogue, use the book form’s “Based on an external work” field
           instead.
         </p>
+      </Section>
+
+      <Section title="Related works">
+        <p>
+          The <strong>“Related works”</strong> section on a book’s, story’s or magazine’s edit page
+          records a directional link to another catalogued work — a sequel, prequel, spin-off,
+          retelling, fix-up, or (for magazines) a serial rename. Pick the other work, choose the
+          relationship, add an optional note, and save (auto-approved for you; volunteers’ links
+          queue for review). “Remove” deletes a link (admin only; immediate).
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Record it once — it shows on both works.</strong> The reverse side is generated
+            automatically: mark work A <em>Sequel to</em> B and B’s page reads <em>Prequel of</em> A;
+            a novel marked <em>Fix-up of</em> a story makes the story read <em>Fixed up into</em> the
+            novel. Symmetric links (<em>Companion to</em>, <em>Part of series</em>) read the same on
+            both sides. Never enter the mirror link yourself — you’d get a duplicate.
+          </li>
+          <li>
+            <strong>Options depend on the work type.</strong> Magazines offer only the serial pair —
+            <em> Continues</em> / <em>Continued by</em> — for titles that renamed or merged, and the
+            picker is limited to other magazines. Books, stories and (later) comics/media offer the
+            narrative set (sequel, prequel, spin-off, companion, fix-up, retelling, inspired by,
+            part of series) and can link to any work.
+          </li>
+          <li>
+            <strong>Not the same as translations or adaptations.</strong> Use “Translations &amp;
+            editions” for the <em>same</em> work in another language, and this section for a{" "}
+            <em>different but connected</em> work in the same language. Approved links appear in the
+            “Related works” block on both public work pages.
+          </li>
+        </ul>
       </Section>
 
       <Section title="Awards & external links">

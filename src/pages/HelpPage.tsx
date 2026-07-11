@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "8 July 2026";
+const LAST_UPDATED = "11 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -382,6 +382,15 @@ export default function HelpPage() {
             your additions queue for review like any other edit. The{" "}
             <Link to="/awards" className="text-violet-700 hover:underline">Awards</Link> page lists
             every award with its winners.
+          </li>
+          <li>
+            <strong>Related works:</strong> the “Related works” section on a book, story or magazine
+            edit page links a work to a <em>different but connected</em> one — a sequel, prequel,
+            spin-off, retelling or fix-up (magazines instead link serial renames, “continues /
+            continued by”). Pick the other work and the relationship; you only record it once and it
+            shows on <em>both</em> works’ pages, with the reverse side worded automatically (mark
+            one “Sequel to” another and the other reads “Prequel of”). Keep it distinct from{" "}
+            <em>Translations</em>, which link the <em>same</em> work in another language.
           </li>
         </ul>
       </Section>
