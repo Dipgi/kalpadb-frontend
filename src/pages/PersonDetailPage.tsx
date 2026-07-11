@@ -1,17 +1,25 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { catalogue } from "../lib/api";
+import { catalogue, type WorkSummary } from "../lib/api";
 import { formatRole } from "../lib/roles";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
-import Pagination from "../components/Pagination";
-import { useState } from "react";
+
+// Work-type sections, in display order. A person's credits collapse to whole
+// works, so magazine issues surface as their parent MAGAZINE title (there is no
+// standalone "issue" work type to group on).
+const WORK_CATEGORIES: { type: string; label: string }[] = [
+  { type: "BOOK", label: "Books" },
+  { type: "STORY", label: "Short Stories" },
+  { type: "MAGAZINE", label: "Magazines" },
+  { type: "COMIC", label: "Comics" },
+  { type: "MEDIA", label: "Screen & Audio" },
+];
 
 export default function PersonDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const isAdmin = user?.role.toLowerCase() === "admin";
-  const [page, setPage] = useState(1);
 
   const { data: person, isLoading } = useQuery({
     queryKey: ["person", id],
@@ -19,9 +27,21 @@ export default function PersonDetailPage() {
     enabled: !!id,
   });
 
-  const { data: worksPage } = useQuery({
-    queryKey: ["person-works", id, page],
-    queryFn: () => catalogue.personWorks(Number(id), page),
+  // Fetch every credited work (looping pages) so categories aren't fragmented
+  // across pagination. Almost everyone fits in a single 100-item page.
+  const { data: allWorks } = useQuery({
+    queryKey: ["person-works-all", id],
+    queryFn: async () => {
+      const acc: WorkSummary[] = [];
+      let page = 1;
+      for (;;) {
+        const res = await catalogue.personWorks(Number(id), page, 100);
+        acc.push(...res.items);
+        if (page >= res.pages || res.items.length === 0) break;
+        page += 1;
+      }
+      return acc;
+    },
     enabled: !!id,
   });
 
@@ -186,21 +206,39 @@ export default function PersonDetailPage() {
         </div>
       )}
 
-      {/* Works */}
-      {worksPage && worksPage.items.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Works
-            <span className="ml-2 text-sm font-normal text-gray-400">
-              ({worksPage.total})
-            </span>
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {worksPage.items.map((w) => (
-              <WorkCard key={w.id} work={w} />
-            ))}
-          </div>
-          <Pagination page={worksPage.page} pages={worksPage.pages} onChange={setPage} />
+      {/* Works — grouped by type (Books, Short Stories, Magazines, …) */}
+      {allWorks && allWorks.length > 0 && (
+        <div className="space-y-10">
+          {(() => {
+            // Bucket works by type, preserving the API's date-desc order within
+            // each bucket. Any unknown/future type falls into a trailing "Other".
+            const buckets = new Map<string, WorkSummary[]>();
+            for (const w of allWorks) {
+              const key = WORK_CATEGORIES.some((c) => c.type === w.type) ? w.type : "OTHER";
+              (buckets.get(key) ?? buckets.set(key, []).get(key)!).push(w);
+            }
+            const sections = [
+              ...WORK_CATEGORIES,
+              { type: "OTHER", label: "Other" },
+            ].filter((c) => (buckets.get(c.type)?.length ?? 0) > 0);
+
+            return sections.map((c) => {
+              const items = buckets.get(c.type)!;
+              return (
+                <div key={c.type}>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                    {c.label}
+                    <span className="ml-2 text-sm font-normal text-gray-400">({items.length})</span>
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {items.map((w) => (
+                      <WorkCard key={w.id} work={w} />
+                    ))}
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
       )}
     </div>
