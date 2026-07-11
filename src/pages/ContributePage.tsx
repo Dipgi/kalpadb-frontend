@@ -50,11 +50,12 @@ import CountrySelect from "../components/CountrySelect";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../lib/workTypes";
 
-type Tab = "book" | "story" | "magazine" | "issue" | "person" | "publisher" | "series";
+type Tab = "book" | "story" | "comic" | "magazine" | "issue" | "person" | "publisher" | "series";
 
 const TAB_LABELS: Record<Tab, string> = {
   book: "Book",
   story: "Story",
+  comic: "Comic",
   magazine: "Magazine",
   issue: "Magazine issue",
   person: "Person",
@@ -107,7 +108,7 @@ export default function ContributePage() {
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {(["book", "story", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
+        {(["book", "story", "comic", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -124,6 +125,7 @@ export default function ContributePage() {
 
       {tab === "book" && <BookForm />}
       {tab === "story" && <StoryForm />}
+      {tab === "comic" && <ComicForm />}
       {tab === "magazine" && <MagazineForm />}
       {tab === "issue" && <MagazineIssueChooser />}
       {tab === "person" && <PersonForm />}
@@ -859,6 +861,240 @@ function StoryForm() {
       </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit story" />
+    </form>
+  );
+}
+
+// ── Comic ─────────────────────────────────────────────────────────────────────
+
+function ComicForm() {
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [language, setLanguage] = useState("bn");
+  const [originalLanguage, setOriginalLanguage] = useState("");
+  const [year, setYear] = useState("");
+  const [readingDirection, setReadingDirection] = useState<"" | "ltr" | "rtl">("");
+  const [isColor, setIsColor] = useState<"" | "yes" | "no">("");
+  const [pageCount, setPageCount] = useState("");
+  const [isbn, setIsbn] = useState("");
+  const [coverUrl, setCoverUrl] = useState("");
+  const [writers, setWriters] = useState<PickerItem[]>([]);
+  const [artists, setArtists] = useState<PickerItem[]>([]);
+  const [inkers, setInkers] = useState<PickerItem[]>([]);
+  const [colorists, setColorists] = useState<PickerItem[]>([]);
+  const [letterers, setLetterers] = useState<PickerItem[]>([]);
+  const [publishers, setPublishers] = useState<PickerItem[]>([]);
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      const y = year ? Number(year) : null;
+      return volunteer.submitComic({
+        title: title.trim(),
+        description: description.trim() || null,
+        language,
+        original_language: originalLanguage || null,
+        publication_date: y ? `${y}-01-01` : null,
+        content_type: "graphic_novel",
+        image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
+        writer_ids: writers.map((w) => w.id),
+        artist_ids: artists.map((a) => a.id),
+        inker_ids: inkers.map((i) => i.id),
+        colorist_ids: colorists.map((c) => c.id),
+        letterer_ids: letterers.map((l) => l.id),
+        publisher_ids: publishers.map((p) => p.id),
+        reading_direction: readingDirection || null,
+        is_color: isColor === "" ? null : isColor === "yes",
+        page_count: pageCount ? Number(pageCount) : null,
+        isbn: isbn.trim() || null,
+        genre_ids: [...genreIds],
+        tag_ids: [...tagIds],
+      });
+    },
+    onSuccess: () => {
+      setSubmitted(true);
+      setTitle("");
+      setDescription("");
+      setOriginalLanguage("");
+      setYear("");
+      setReadingDirection("");
+      setIsColor("");
+      setPageCount("");
+      setIsbn("");
+      setCoverUrl("");
+      setWriters([]);
+      setArtists([]);
+      setInkers([]);
+      setColorists([]);
+      setLetterers([]);
+      setPublishers([]);
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  const creatorPicker = (
+    label: string,
+    selected: PickerItem[],
+    onChange: (v: PickerItem[]) => void
+  ) => (
+    <EntityPicker
+      label={label}
+      placeholder="Search persons…"
+      fetchKey="picker-persons"
+      fetcher={(q) => catalogue.persons(q)}
+      selected={selected}
+      onChange={onChange}
+    />
+  );
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitted(false);
+        if (title.trim()) mutation.mutate();
+      }}
+      className="space-y-4"
+    >
+      {submitted && <PendingBanner />}
+
+      <FormSection title="Basics">
+        <div>
+          <label className={labelCls}>Title * (native script preferred)</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Description / synopsis</label>
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
+        </div>
+      </FormSection>
+
+      <FormSection title="Publication details">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Language</label>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+              {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Original language (if translation)</label>
+            <select value={originalLanguage} onChange={(e) => setOriginalLanguage(e.target.value)} className={inputCls}>
+              <option value="">Not a translation</option>
+              <optgroup label="World languages">
+                {WORLD_LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code}>{l.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Indian languages">
+                {(languages ?? [])
+                  .filter((l) => !WORLD_LANGUAGES.some((w) => w.code === l.code))
+                  .map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                    </option>
+                  ))}
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Publication year</label>
+            <input type="number" min={1000} max={2100} value={year} onChange={(e) => setYear(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Reading direction</label>
+            <select
+              value={readingDirection}
+              onChange={(e) => setReadingDirection(e.target.value as "" | "ltr" | "rtl")}
+              className={inputCls}
+            >
+              <option value="">Unspecified</option>
+              <option value="ltr">Left-to-right</option>
+              <option value="rtl">Right-to-left (manga-style)</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Colour</label>
+            <select value={isColor} onChange={(e) => setIsColor(e.target.value as "" | "yes" | "no")} className={inputCls}>
+              <option value="">Unspecified</option>
+              <option value="yes">Colour</option>
+              <option value="no">Black &amp; white</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Page count</label>
+            <input type="number" min={1} value={pageCount} onChange={(e) => setPageCount(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>ISBN</label>
+            <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
+          </div>
+        </div>
+      </FormSection>
+
+      <FormSection title="Creators & credits" hint="Writers double as the comic's authors.">
+        {creatorPicker("Writers", writers, setWriters)}
+        {creatorPicker("Artists (pencillers)", artists, setArtists)}
+        {creatorPicker("Inkers", inkers, setInkers)}
+        {creatorPicker("Colorists", colorists, setColorists)}
+        {creatorPicker("Letterers", letterers, setLetterers)}
+        <EntityPicker
+          label="Publishers"
+          placeholder="Search publishers…"
+          fetchKey="picker-publishers"
+          fetcher={(q) => catalogue.publishers(q)}
+          selected={publishers}
+          onChange={setPublishers}
+        />
+      </FormSection>
+
+      <FormSection title="Cover & classification">
+        <ImageUploadField
+          label="Cover image"
+          category="covers"
+          value={coverUrl}
+          onChange={(url) => setCoverUrl(url ?? "")}
+        />
+        <div>
+          <label className={labelCls}>Genres</label>
+          <div className="flex flex-wrap gap-2">
+            {(allGenres ?? []).map((g: GenreItem) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() =>
+                  setGenreIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(g.id)) next.delete(g.id);
+                    else next.add(g.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  genreIds.has(g.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {g.genre_name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <TagChipPicker selected={tagIds} onChange={setTagIds} />
+      </FormSection>
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit comic" />
     </form>
   );
 }

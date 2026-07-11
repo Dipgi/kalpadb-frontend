@@ -1354,6 +1354,36 @@ export interface StoryUpdateIn {
   localised?: Record<string, Record<string, string>>;
 }
 
+export interface ComicCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  content_type?: string | null;
+  image_urls?: string[] | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  /** Writers double as the work-level authors (shown in browse/cards). */
+  writer_ids?: number[];
+  artist_ids?: number[];
+  inker_ids?: number[];
+  colorist_ids?: number[];
+  letterer_ids?: number[];
+  publisher_ids?: number[];
+  series_id?: number | null;
+  series_position?: number | null;
+  is_color?: boolean | null;
+  reading_direction?: "ltr" | "rtl" | null;
+  page_count?: number | null;
+  isbn?: string | null;
+  /** Optional manual localised overrides: { field: { lang: value } }. */
+  localised?: Record<string, Record<string, string>>;
+}
+
+/** All fields optional — a present field replaces, an absent one is left unchanged. */
+export type ComicUpdateIn = Partial<ComicCreateIn>;
+
 export interface MagazineCreateIn {
   title: string;
   description?: string | null;
@@ -1583,6 +1613,13 @@ export const volunteer = {
     request<EditSubmission>("/works/stories", { method: "POST", body: JSON.stringify(data) }),
   updateStory: (work_id: number, data: StoryUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/stories/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitComic: (data: ComicCreateIn) =>
+    request<EditSubmission>("/works/comics", { method: "POST", body: JSON.stringify(data) }),
+  updateComic: (work_id: number, data: ComicUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/comics/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),

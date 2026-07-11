@@ -164,7 +164,11 @@ export default function WorkDetailPage() {
           ? role === "admin"
             ? `/admin/edit-magazine/${work.id}`
             : `/works/${work.id}/edit-magazine`
-          : null;
+          : work.type === "COMIC"
+            ? role === "admin"
+              ? `/admin/edit-comic/${work.id}`
+              : `/works/${work.id}/edit-comic`
+            : null;
 
   // Uncatalogued source attribution — books and stories carry the same fields.
   const externalSource = work.book?.original_title
@@ -293,6 +297,56 @@ export default function WorkDetailPage() {
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Publishers</h3>
             <p className="text-sm text-gray-700">{publishers.map((p) => p.name).join(", ")}</p>
           </div>
+        )}
+
+        {work.comic && (
+          <>
+            {([
+              ["Writers", work.comic.writers],
+              ["Artists", work.comic.artists],
+              ["Inkers", work.comic.inkers],
+              ["Colorists", work.comic.colorists],
+              ["Letterers", work.comic.letterers],
+            ] as const).map(([label, people]) =>
+              people.length > 0 ? (
+                <div key={label}>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{label}</h3>
+                  <p className="text-sm text-gray-700"><PersonList people={people} /></p>
+                </div>
+              ) : null
+            )}
+            {work.comic.publishers.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Publishers</h3>
+                <p className="text-sm text-gray-700">
+                  {work.comic.publishers.map((p) => p.name).join(", ")}
+                </p>
+              </div>
+            )}
+            {(work.comic.reading_direction ||
+              work.comic.is_color != null ||
+              work.comic.page_count != null ||
+              work.comic.isbn) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Comic details</h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.comic.is_color != null && (
+                    <p>{work.comic.is_color ? "Colour" : "Black & white"}</p>
+                  )}
+                  {work.comic.reading_direction && (
+                    <p>
+                      Reading direction:{" "}
+                      {work.comic.reading_direction === "rtl"
+                        ? "Right-to-left (manga-style)"
+                        : "Left-to-right"}
+                    </p>
+                  )}
+                  {work.comic.page_count != null && <p>Pages: {work.comic.page_count}</p>}
+                  {work.comic.isbn && <p>ISBN: {work.comic.isbn}</p>}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {work.story &&
