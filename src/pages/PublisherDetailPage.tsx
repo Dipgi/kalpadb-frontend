@@ -5,6 +5,7 @@ import { catalogue } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 export default function PublisherDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,13 @@ export default function PublisherDetailPage() {
     queryKey: ["publisher-works", id, page],
     queryFn: () => catalogue.publisherWorks(Number(id), page),
     enabled: !!id,
+  });
+
+  useSeo({
+    title: publisher?.name,
+    description: publisher
+      ? `${publisher.name} — a publisher of Indian speculative fiction catalogued in KalpaDB.`
+      : undefined,
   });
 
   if (isLoading) {

@@ -5,6 +5,7 @@ import { catalogue } from "../lib/api";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 type Sort = "position_asc" | "date_asc" | "title_asc";
 
@@ -31,6 +32,13 @@ export default function SeriesDetailPage() {
     queryKey: ["series-works", id, sort, page],
     queryFn: () => catalogue.seriesWorks(Number(id), { sort, page }),
     enabled: !!id,
+  });
+
+  useSeo({
+    title: series ? `${series.name} (series)` : undefined,
+    description: series
+      ? `${series.name} — an Indian speculative-fiction series catalogued in KalpaDB.`
+      : undefined,
   });
 
   if (isLoading) {

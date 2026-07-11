@@ -4,6 +4,7 @@ import { works } from "../lib/api";
 import { ISSUE_TYPE_LABELS, issueDisplay } from "../lib/issues";
 import { useAuth } from "../hooks/useAuth";
 import { PersonList } from "../components/PersonLink";
+import { useSeo } from "../hooks/useSeo";
 
 export default function IssueDetailPage() {
   const { magId, issueId } = useParams<{ magId: string; issueId: string }>();
@@ -22,6 +23,14 @@ export default function IssueDetailPage() {
   });
 
   const issue = issues?.find((i) => i.m_issue_id === Number(issueId));
+
+  useSeo({
+    title:
+      issue && magazine
+        ? `${magazine.title} — ${issueDisplay(issue) ?? "Issue"}`
+        : undefined,
+    description: issue?.synopsis,
+  });
 
   if (isLoading) {
     return <div className="max-w-4xl mx-auto px-4 py-16 text-center text-gray-400">Loading…</div>;

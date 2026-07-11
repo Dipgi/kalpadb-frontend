@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { stats, type InsightItem } from "../lib/api";
+import { useSeo } from "../hooks/useSeo";
 
 const VIOLET = "#6d28d9";
 // Distinct categorical hues, in a FIXED order chosen so no two adjacent
@@ -84,6 +85,12 @@ function HBar({
 }
 
 export default function ExplorePage() {
+  useSeo({
+    title: "Explore the data",
+    description:
+      "Visualise Indian speculative fiction in KalpaDB — works by language, decade, genre and prolific authors, with drill-through charts.",
+    path: "/explore",
+  });
   const navigate = useNavigate();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["insights"],

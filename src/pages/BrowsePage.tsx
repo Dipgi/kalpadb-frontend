@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { works, catalogue } from "../lib/api";
 import WorkCard from "../components/WorkCard";
+import { useSeo } from "../hooks/useSeo";
 import Pagination from "../components/Pagination";
 import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
 
@@ -18,6 +19,12 @@ const SORT_OPTIONS = [
 ];
 
 export default function BrowsePage() {
+  useSeo({
+    title: "Browse the catalogue",
+    description:
+      "Browse KalpaDB's catalogue of Indian speculative fiction — filter by language, genre, theme and work type across science fiction, fantasy and horror.",
+    path: "/browse",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const type = searchParams.get("type") ?? "";
   const contentType = searchParams.get("content_type") ?? "";

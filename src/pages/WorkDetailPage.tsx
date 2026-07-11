@@ -11,6 +11,7 @@ import { Stars, StarPicker } from "../components/StarRating";
 import PlaceholderCover from "../components/PlaceholderCover";
 import { PersonList } from "../components/PersonLink";
 import { relationLabel } from "../lib/relations";
+import { useSeo } from "../hooks/useSeo";
 
 const SHELF_STATUSES: { value: string; label: string }[] = [
   { value: "want", label: "Want to Read" },
@@ -93,6 +94,11 @@ export default function WorkDetailPage() {
       qc.invalidateQueries({ queryKey: ["my-ratings"] });
       qc.invalidateQueries({ queryKey: ["work", id] });
     },
+  });
+
+  useSeo({
+    title: work ? [work.title, work.authors.map((a) => a.name).join(", ")].filter(Boolean).join(" — ") : undefined,
+    description: work?.description,
   });
 
   if (isLoading) {

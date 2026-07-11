@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "../hooks/useSeo";
 
 // Current volunteer nicknames. Curated credits — update when the volunteer
 // roster changes (the project's own `kalpadb` account is intentionally omitted).
@@ -13,6 +14,12 @@ const VOLUNTEERS = [
 ];
 
 export default function AboutPage() {
+  useSeo({
+    title: "About",
+    description:
+      "About KalpaDB — a community-curated database unearthing 200 years of Indian speculative fiction across every Indian language, for readers, writers and researchers.",
+    path: "/about",
+  });
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 prose-sm">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">About KalpaDB</h1>

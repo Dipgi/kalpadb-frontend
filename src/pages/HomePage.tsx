@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { stats, works, news } from "../lib/api";
+import { useSeo } from "../hooks/useSeo";
 import WorkCard from "../components/WorkCard";
 
 export default function HomePage() {
+  useSeo({ path: "/" });
   const queryClient = useQueryClient();
   const { data: siteStats } = useQuery({ queryKey: ["stats"], queryFn: stats.get });
   const { data: recent } = useQuery({

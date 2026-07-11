@@ -2,12 +2,19 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue, type AwardTypeItem } from "../lib/api";
+import { useSeo } from "../hooks/useSeo";
 
 /**
  * Public awards directory: every award, expandable to show its results (winners,
  * shortlists…) rolled up across works and people, newest year first.
  */
 export default function AwardsPage() {
+  useSeo({
+    title: "Awards",
+    description:
+      "Awards for Indian speculative fiction — winners and shortlists rolled up across works and people, catalogued in KalpaDB.",
+    path: "/awards",
+  });
   const { data: awards, isLoading } = useQuery({
     queryKey: ["award-types-active"],
     queryFn: () => catalogue.awardTypesActive(),

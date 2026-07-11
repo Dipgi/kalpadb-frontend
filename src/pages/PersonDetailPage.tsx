@@ -4,6 +4,7 @@ import { catalogue, type WorkSummary } from "../lib/api";
 import { formatRole } from "../lib/roles";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
+import { useSeo } from "../hooks/useSeo";
 
 // Work-type sections, in display order. A person's credits collapse to whole
 // works, so magazine issues surface as their parent MAGAZINE title (there is no
@@ -49,6 +50,15 @@ export default function PersonDetailPage() {
     queryKey: ["person-awards", id],
     queryFn: () => catalogue.personAwards(Number(id)),
     enabled: !!id,
+  });
+
+  useSeo({
+    title: person?.name,
+    description:
+      person?.bio ??
+      (person
+        ? `${person.name}${person.nationality ? `, ${person.nationality}` : ""} — works catalogued in KalpaDB, the Indian Speculative Fiction Database.`
+        : undefined),
   });
 
   if (isLoading) {
