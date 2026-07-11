@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { works } from "../lib/api";
 import { ISSUE_TYPE_LABELS, issueDisplay } from "../lib/issues";
 import { useAuth } from "../hooks/useAuth";
+import { PersonList } from "../components/PersonLink";
 
 export default function IssueDetailPage() {
   const { magId, issueId } = useParams<{ magId: string; issueId: string }>();
@@ -142,9 +143,7 @@ export default function IssueDetailPage() {
                   {s.title}
                 </Link>
                 {s.authors.length > 0 && (
-                  <span className="text-gray-500"> — {s.authors
-                    .map((a) => (a.credited_as ? `${a.name} (as ${a.credited_as})` : a.name))
-                    .join(", ")}</span>
+                  <span className="text-gray-500"> — <PersonList people={s.authors} className="hover:text-violet-700 hover:underline" /></span>
                 )}
                 {s.page_start != null && (
                   <span className="text-gray-400">

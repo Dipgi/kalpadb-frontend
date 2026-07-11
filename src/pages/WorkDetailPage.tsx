@@ -9,6 +9,7 @@ import { romanisedTitle } from "../lib/title";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
 import PlaceholderCover from "../components/PlaceholderCover";
+import { PersonList } from "../components/PersonLink";
 
 const SHELF_STATUSES: { value: string; label: string }[] = [
   { value: "want", label: "Want to Read" },
@@ -198,15 +199,7 @@ export default function WorkDetailPage() {
             </p>
           )}
           <p className="text-gray-500 mb-3">
-            {work.authors.map((a, i) => (
-              <span key={a.id}>
-                {i > 0 && ", "}
-                <Link to={`/persons/${a.id}`} className="hover:text-violet-700">{a.name}</Link>
-                {a.credited_as && (
-                  <span className="text-gray-400 text-sm"> (as {a.credited_as})</span>
-                )}
-              </span>
-            ))}
+            <PersonList people={work.authors} />
             {publicationYear && <span> · {publicationYear}</span>}
           </p>
 
@@ -312,9 +305,7 @@ export default function WorkDetailPage() {
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Translators</h3>
             <p className="text-sm text-gray-700">
-              {work.story.translators
-                .map((t) => (t.credited_as ? `${t.name} (as ${t.credited_as})` : t.name))
-                .join(", ")}
+              <PersonList people={work.story.translators} />
             </p>
           </div>
         )}
@@ -539,9 +530,9 @@ export default function WorkDetailPage() {
                     </div>
                     {(i.editors.length > 0 || i.cover_artists.length > 0) && (
                       <div className="text-xs text-gray-500 mt-0.5">
-                        {i.editors.length > 0 && <>Ed. {i.editors.map((e) => e.name).join(", ")}</>}
+                        {i.editors.length > 0 && <>Ed. <PersonList people={i.editors} /></>}
                         {i.editors.length > 0 && i.cover_artists.length > 0 && " · "}
-                        {i.cover_artists.length > 0 && <>Cover: {i.cover_artists.map((c) => c.name).join(", ")}</>}
+                        {i.cover_artists.length > 0 && <>Cover: <PersonList people={i.cover_artists} /></>}
                       </div>
                     )}
                     {i.stories.length > 0 && (
@@ -653,7 +644,7 @@ export default function WorkDetailPage() {
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Translators</h3>
             <p className="text-sm text-gray-700">
-              {work.book.translators.map((t) => t.name).join(", ")}
+              <PersonList people={work.book.translators} />
             </p>
           </div>
         )}
@@ -661,21 +652,21 @@ export default function WorkDetailPage() {
         {work.book?.editors && work.book.editors.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Editors</h3>
-            <p className="text-sm text-gray-700">{work.book.editors.map((e) => e.name).join(", ")}</p>
+            <p className="text-sm text-gray-700"><PersonList people={work.book.editors} /></p>
           </div>
         )}
 
         {work.book?.illustrators && work.book.illustrators.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Illustrators</h3>
-            <p className="text-sm text-gray-700">{work.book.illustrators.map((i) => i.name).join(", ")}</p>
+            <p className="text-sm text-gray-700"><PersonList people={work.book.illustrators} /></p>
           </div>
         )}
 
         {work.book?.cover_artists && work.book.cover_artists.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Cover artists</h3>
-            <p className="text-sm text-gray-700">{work.book.cover_artists.map((c) => c.name).join(", ")}</p>
+            <p className="text-sm text-gray-700"><PersonList people={work.book.cover_artists} /></p>
           </div>
         )}
 
@@ -691,9 +682,7 @@ export default function WorkDetailPage() {
                     {s.title}
                   </Link>
                   {s.authors.length > 0 && (
-                    <span className="text-gray-500"> — {s.authors
-                      .map((a) => (a.credited_as ? `${a.name} (as ${a.credited_as})` : a.name))
-                      .join(", ")}</span>
+                    <span className="text-gray-500"> — <PersonList people={s.authors} className="hover:text-violet-700 hover:underline" /></span>
                   )}
                   {s.page_start != null && (
                     <span className="text-gray-400">
