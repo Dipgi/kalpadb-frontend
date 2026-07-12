@@ -484,6 +484,7 @@ export interface UserOut {
   username: string;
   email: string;
   role: string;
+  is_owner?: boolean;
   is_active: boolean;
   agreed_terms_at?: string | null;
 }
@@ -969,6 +970,7 @@ export interface AdminUser {
   username: string;
   email: string;
   role: string;
+  is_owner?: boolean;
   is_active: boolean;
   created_at?: string;
 }

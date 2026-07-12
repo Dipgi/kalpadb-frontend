@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, type AdminUser } from "../../lib/api";
-
-const ROLES = ["user", "volunteer", "admin"];
+import { useAuth } from "../../hooks/useAuth";
 
 export default function AdminUsers() {
   const qc = useQueryClient();
+  const { user: me } = useAuth();
   const [page, setPage] = useState(1);
+
+  // Mirror of the backend guards (which are authoritative): nobody edits their
+  // own account or the owner's; only the owner touches admins or grants admin.
+  const rowLocked = (u: AdminUser) =>
+    u.id === me?.id || !!u.is_owner || (!me?.is_owner && u.role.toLowerCase() === "admin");
+  const roleOptions = (u: AdminUser) =>
+    me?.is_owner || u.role.toLowerCase() === "admin"
+      ? ["user", "volunteer", "admin"]
+      : ["user", "volunteer"];
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-users", page],
@@ -57,13 +66,23 @@ export default function AdminUsers() {
                   <td className="px-4 py-3 font-medium text-gray-800">
                     {u.username}
                     <span className="ml-1.5 text-xs text-gray-400">#{u.id}</span>
+                    {u.is_owner && (
+                      <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 font-semibold uppercase tracking-wide">
+                        Owner
+                      </span>
+                    )}
+                    {u.id === me?.id && (
+                      <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-semibold uppercase tracking-wide">
+                        You
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-gray-500">{u.email}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <select
                         value={pendingRole?.id === u.id ? pendingRole.role : u.role.toLowerCase()}
-                        disabled={updateMutation.isPending}
+                        disabled={updateMutation.isPending || rowLocked(u)}
                         onChange={(e) => {
                           const next = e.target.value;
                           // Clear pending if the selection returns to the current role.
@@ -71,7 +90,7 @@ export default function AdminUsers() {
                         }}
                         className="border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-50"
                       >
-                        {ROLES.map((r) => (
+                        {roleOptions(u).map((r) => (
                           <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
                         ))}
                       </select>
@@ -103,10 +122,11 @@ export default function AdminUsers() {
                       onClick={() =>
                         updateMutation.mutate({ id: u.id, data: { is_active: !u.is_active } })
                       }
-                      className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${
+                      disabled={rowLocked(u)}
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors disabled:cursor-default ${
                         u.is_active
-                          ? "bg-green-100 text-green-700 hover:bg-green-200"
-                          : "bg-red-100 text-red-600 hover:bg-red-200"
+                          ? "bg-green-100 text-green-700 enabled:hover:bg-green-200"
+                          : "bg-red-100 text-red-600 enabled:hover:bg-red-200"
                       }`}
                     >
                       {u.is_active ? "Active" : "Inactive"}

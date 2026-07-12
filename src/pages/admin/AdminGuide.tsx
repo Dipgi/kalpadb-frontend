@@ -217,12 +217,32 @@ export default function AdminGuide() {
         </p>
       </Section>
 
-      <Section title="Users">
+      <Section title="Users, roles & the owner account">
         <p>
           <Link to="/admin/users" className="text-violet-700 hover:underline">Users</Link> lists
           accounts and lets you manage roles (user / volunteer / admin) and account state. Promote
           trusted contributors; be conservative granting admin.
         </p>
+        <p>
+          One account carries the <strong>Owner</strong> badge — the site owner. The privilege
+          rules (enforced by the server, mirrored in the UI):
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Admins</strong> manage user ↔ volunteer roles and can deactivate those
+            accounts. They cannot grant or remove the admin role, cannot modify another admin’s
+            account, and cannot touch the owner account.
+          </li>
+          <li>
+            <strong>Only the owner</strong> can promote someone to admin, demote an admin, or
+            deactivate an admin account.
+          </li>
+          <li>
+            <strong>Nobody edits their own row</strong> — not even the owner — so you can’t
+            accidentally demote or lock yourself out. Deactivating an account signs it out
+            immediately (every request re-checks account state).
+          </li>
+        </ul>
       </Section>
 
       <Section title="Genre & tag tagging">
