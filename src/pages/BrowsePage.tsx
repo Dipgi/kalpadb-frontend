@@ -4,7 +4,7 @@ import { works, catalogue } from "../lib/api";
 import WorkCard from "../components/WorkCard";
 import { useSeo } from "../hooks/useSeo";
 import Pagination from "../components/Pagination";
-import { WORK_TYPE_OPTIONS } from "../lib/workTypes";
+import { contentTypeOptionsFor } from "../lib/workTypes";
 
 // Magazines are serial containers with their own index (/magazines), so they're
 // intentionally excluded from the general works browse.
@@ -58,10 +58,16 @@ export default function BrowsePage() {
       const next = new URLSearchParams(prev);
       if (value) next.set(key, value);
       else next.delete(key);
+      // Categories differ per work type, so changing the type clears any
+      // category filter that no longer applies (e.g. "novel" under Comic).
+      if (key === "type") next.delete("content_type");
       next.delete("page");
       return next;
     });
   }
+
+  // Category options track the selected work type (empty for "All types").
+  const contentTypeOptions = contentTypeOptionsFor(type);
 
   function setPage(p: number) {
     setSearchParams((prev) => {
@@ -92,18 +98,20 @@ export default function BrowsePage() {
           ))}
         </select>
 
-        <select
-          value={contentType}
-          onChange={(e) => set("content_type", e.target.value)}
-          className="border border-gray-200 rounded-md px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
-        >
-          <option value="">All work types</option>
-          {WORK_TYPE_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        {contentTypeOptions.length > 0 && (
+          <select
+            value={contentType}
+            onChange={(e) => set("content_type", e.target.value)}
+            className="border border-gray-200 rounded-md px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+          >
+            <option value="">All categories</option>
+            {contentTypeOptions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        )}
 
         {languages && languages.length > 0 && (
           <select
