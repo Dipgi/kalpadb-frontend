@@ -12,6 +12,12 @@ import AwardsEditor from "../../components/AwardsEditor";
 import ExternalLinksEditor from "../../components/ExternalLinksEditor";
 import WorkRelationshipsEditor from "../../components/WorkRelationshipsEditor";
 import FormSection from "../../components/FormSection";
+import FormatsEditor, {
+  type FormatRow,
+  formatRowsFromExisting,
+  formatRowsToPayload,
+  COMIC_FORMAT_TYPES,
+} from "../../components/FormatsEditor";
 import TagChipPicker from "../../components/TagChipPicker";
 import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
@@ -113,6 +119,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [publishers, setPublishers] = useState<PickerItem[]>(
     (comic?.publishers ?? []).map((p) => ({ id: p.id, name: p.name }))
   );
+  const [formats, setFormats] = useState<FormatRow[]>(formatRowsFromExisting(comic?.formats));
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
   const [saved, setSaved] = useState(false);
@@ -150,6 +157,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           is_color: isColor === "" ? null : isColor === "yes",
           page_count: pageCount ? Number(pageCount) : null,
           isbn: isbn.trim() || null,
+          formats: formatRowsToPayload(formats, true, false),
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
           writer_ids: writers.map((w) => w.id),
           artist_ids: artists.map((a) => a.id),
@@ -355,6 +363,16 @@ function EditForm({ work }: { work: WorkDetail }) {
             <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
           </div>
         </div>
+      </FormSection>
+
+      <FormSection title="Formats" hint="Print/digital editions (single issue, trade paperback, omnibus, digital…).">
+        <FormatsEditor
+          value={formats}
+          onChange={setFormats}
+          formatTypes={COMIC_FORMAT_TYPES}
+          showAvailability={false}
+          hint="Single issue, trade paperback, hardcover, omnibus, digital or webcomic — one row each."
+        />
       </FormSection>
 
       <FormSection

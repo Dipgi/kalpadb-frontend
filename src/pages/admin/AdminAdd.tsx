@@ -27,6 +27,7 @@ import FormatsEditor, {
   type FormatRow,
   emptyFormatRow,
   formatRowsToPayload,
+  COMIC_FORMAT_TYPES,
 } from "../../components/FormatsEditor";
 import SourceAttributionFields, {
   type SourceAttribution,
@@ -844,6 +845,7 @@ function ComicForm() {
   const [translators, setTranslators] = useState<PickerItem[]>([]);
   const [editors, setEditors] = useState<PickerItem[]>([]);
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
+  const [formats, setFormats] = useState<FormatRow[]>([emptyFormatRow("single_issue")]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [createdId, setCreatedId] = useState<number | null>(null);
@@ -873,6 +875,7 @@ function ComicForm() {
           is_color: isColor === "" ? null : isColor === "yes",
           page_count: pageCount ? Number(pageCount) : null,
           isbn: isbn.trim() || null,
+          formats: formatRowsToPayload(formats, false, false),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         })
@@ -899,6 +902,7 @@ function ComicForm() {
       setTranslators([]);
       setEditors([]);
       setPublishers([]);
+      setFormats([emptyFormatRow("single_issue")]);
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -1027,6 +1031,16 @@ function ComicForm() {
             <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
           </div>
         </div>
+      </FormSection>
+
+      <FormSection title="Formats" hint="Print/digital editions — add a row per format (optional).">
+        <FormatsEditor
+          value={formats}
+          onChange={setFormats}
+          formatTypes={COMIC_FORMAT_TYPES}
+          showAvailability={false}
+          hint="Single issue, trade paperback, hardcover, omnibus, digital or webcomic — one row each."
+        />
       </FormSection>
 
       <FormSection

@@ -1396,8 +1396,20 @@ export interface ComicCreateIn {
   reading_direction?: "ltr" | "rtl" | null;
   page_count?: number | null;
   isbn?: string | null;
+  formats?: ComicFormatInput[];
   /** Optional manual localised overrides: { field: { lang: value } }. */
   localised?: Record<string, Record<string, string>>;
+}
+
+export interface ComicFormatInput {
+  format_type: string;
+  isbn?: string | null;
+  page_count?: number | null;
+  publication_date?: string | null;
+  cover_image_url?: string | null;
+  price?: string | null;
+  currency?: string | null;
+  notes?: string | null;
 }
 
 /** All fields optional — a present field replaces, an absent one is left unchanged. */
