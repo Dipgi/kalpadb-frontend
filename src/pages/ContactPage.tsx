@@ -1,9 +1,14 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "../hooks/useSeo";
 
 const CONTACT_NAME = "Dip Ghosh";
 const CONTACT_EMAIL = "kalpadb@gmail.com";
 
 export default function ContactPage() {
+  useSeo({
+    title: "Contact",
+    description: "Get in touch with the KalpaDB team.",
+  });
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 prose-sm">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Contact us</h1>

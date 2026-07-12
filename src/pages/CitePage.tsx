@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useSeo } from "../hooks/useSeo";
 
 // Zenodo concept DOI for the dataset (resolves to the latest published version).
 // Version-specific DOIs (e.g. v1.0 = 10.5281/zenodo.20735544) live on each Zenodo record.
@@ -41,6 +42,10 @@ function CitationBlock({ label, text }: { label: string; text: string }) {
 }
 
 export default function CitePage() {
+  useSeo({
+    title: "Cite KalpaDB",
+    description: "How to cite KalpaDB and its Zenodo-archived dataset in APA, MLA and BibTeX.",
+  });
   const accessed = today();
   const doiLine = ZENODO_DOI ? ` https://doi.org/${ZENODO_DOI}.` : "";
 

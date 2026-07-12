@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
 import { formatRole } from "../lib/roles";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 const ROLE_OPTIONS = [
   { value: "", label: "All roles" },
@@ -20,6 +21,10 @@ const SORT_OPTIONS = [
 ];
 
 export default function BrowsePersonsPage() {
+  useSeo({
+    title: "People",
+    description: "Authors, translators, editors and artists of Indian speculative fiction.",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
   const role = searchParams.get("role_type") ?? "";

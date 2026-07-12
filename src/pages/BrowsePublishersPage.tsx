@@ -3,8 +3,13 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 export default function BrowsePublishersPage() {
+  useSeo({
+    title: "Publishers",
+    description: "Publishers of Indian speculative fiction across languages and eras.",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
   const page = Number(searchParams.get("page") ?? 1);

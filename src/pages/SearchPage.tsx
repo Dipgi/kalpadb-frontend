@@ -4,11 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { search } from "../lib/api";
 import WorkCard from "../components/WorkCard";
 import MagazineCard from "../components/MagazineCard";
+import { useSeo } from "../hooks/useSeo";
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
   const page = Number(searchParams.get("page") ?? 1);
+  useSeo({ title: q ? `Search: ${q}` : "Search" });
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { data: result, isLoading } = useQuery({

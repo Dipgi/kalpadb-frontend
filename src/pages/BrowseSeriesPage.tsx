@@ -3,8 +3,13 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { catalogue } from "../lib/api";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 export default function BrowseSeriesPage() {
+  useSeo({
+    title: "Series",
+    description: "Book and story series in Indian speculative fiction.",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
   const page = Number(searchParams.get("page") ?? 1);

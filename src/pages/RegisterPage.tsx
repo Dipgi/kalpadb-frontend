@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { auth, ApiError } from "../lib/api";
 import Turnstile, { TURNSTILE_SITE_KEY } from "../components/Turnstile";
+import { useSeo } from "../hooks/useSeo";
 
 export default function RegisterPage() {
+  useSeo({ title: "Create an account" });
   const { setSession } = useAuth();
   const navigate = useNavigate();
 

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { works, type IssueBrowseItem } from "../lib/api";
 import { ISSUE_TYPE_LABELS, issueDisplay } from "../lib/issues";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 const SORT_OPTIONS = [
   { value: "date_desc", label: "Newest First" },
@@ -79,6 +80,10 @@ function IssueCard({ issue }: { issue: IssueBrowseItem }) {
  * appearing in the general works listing.
  */
 export default function BrowseIssuesPage() {
+  useSeo({
+    title: "Magazine Issues",
+    description: "Browse individual issues of Indian speculative fiction magazines.",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = searchParams.get("sort") ?? "date_desc";
   const q = searchParams.get("q") ?? "";

@@ -3,8 +3,13 @@ import { Link } from "react-router-dom";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { news } from "../lib/api";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 export default function NewsListPage() {
+  useSeo({
+    title: "News",
+    description: "News and announcements from KalpaDB, the Indian Speculative Fiction Database.",
+  });
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isError } = useQuery({

@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { works } from "../lib/api";
 import MagazineCard from "../components/MagazineCard";
 import Pagination from "../components/Pagination";
+import { useSeo } from "../hooks/useSeo";
 
 const SORT_OPTIONS = [
   { value: "title_asc", label: "Title A–Z" },
@@ -17,6 +18,10 @@ const SORT_OPTIONS = [
  * links to the magazine's page, which lists its issues chronologically.
  */
 export default function BrowseMagazinesPage() {
+  useSeo({
+    title: "Magazines",
+    description: "Browse speculative fiction magazines from India — Bengali, Hindi, English and more.",
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const sort = searchParams.get("sort") ?? "title_asc";
   const page = Number(searchParams.get("page") ?? 1);

@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "../hooks/useSeo";
 
 export default function LicensePage() {
+  useSeo({
+    title: "License & Reuse",
+    description: "KalpaDB data is free to reuse under CC BY-SA 4.0 — how to credit and share.",
+  });
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 prose-sm">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">License &amp; Reuse</h1>

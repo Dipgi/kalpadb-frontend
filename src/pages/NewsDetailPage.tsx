@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { news } from "../lib/api";
+import { useSeo } from "../hooks/useSeo";
 
 export default function NewsDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -10,6 +11,8 @@ export default function NewsDetailPage() {
     queryFn: () => news.get(slug!),
     enabled: !!slug,
   });
+
+  useSeo({ title: post?.title, description: post?.body });
 
   if (isLoading) {
     return (

@@ -3,8 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError } from "../lib/api";
 import Turnstile, { TURNSTILE_SITE_KEY } from "../components/Turnstile";
+import { useSeo } from "../hooks/useSeo";
 
 export default function LoginPage() {
+  useSeo({ title: "Log in" });
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

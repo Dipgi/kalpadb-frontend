@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "../hooks/useSeo";
 
 /**
  * Contributor / visitor help & FAQ for the whole site.
@@ -31,6 +32,10 @@ const TOC: { id: string; label: string }[] = [
 ];
 
 export default function HelpPage() {
+  useSeo({
+    title: "Help & Contributor Guide",
+    description: "How to use KalpaDB: searching across scripts, browsing the catalogue, and contributing records.",
+  });
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Help &amp; Contributor Guide</h1>
