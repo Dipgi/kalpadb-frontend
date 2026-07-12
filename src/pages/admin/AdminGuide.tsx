@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "11 July 2026";
+const LAST_UPDATED = "12 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -296,6 +296,51 @@ export default function AdminGuide() {
           <Link to="/admin/audit" className="text-violet-700 hover:underline">Activity Log</Link>{" "}
           records who changed what and when — use it to audit recent edits and trace mistakes.
           Merges appear as <em>duplicates_merged</em> with a full breakdown of repointed links.
+        </p>
+      </Section>
+
+      <Section title="Backups & restore">
+        <p>
+          Two automated backups run as GitHub Actions on the (private) backend repo and are kept
+          for <strong>30 days</strong> as private artifacts — download them from the repo’s{" "}
+          <strong>Actions</strong> tab (open the run, artifact at the bottom). Requires access to
+          the GitHub repo, so in practice this is for the site owner.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Database</strong> (“DB backup” workflow): nightly at 03:00 IST, a full{" "}
+            <code>pg_dump</code> of the production database (~1.5 MB). Roughly 30 restore points at
+            any time.
+          </li>
+          <li>
+            <strong>Images</strong> (“R2 image backup” workflow): weekly, Sunday 03:30 IST, the
+            whole cover/illustration/photo bucket as a tar (~56 MB).
+          </li>
+          <li>
+            <strong>Before anything risky</strong> (bulk import, mass delete, merge spree), take a
+            fresh backup on demand: Actions → pick the workflow → <em>Run workflow</em>.
+          </li>
+        </ul>
+        <p>
+          <strong>Restoring the database</strong>: download and unzip the artifact, then run{" "}
+          <code>pg_restore --clean --if-exists -d "&lt;database-url&gt;" kalpa-YYYY-MM-DD.dump</code>{" "}
+          with the psql-style Neon URL (the one ending in <code>?sslmode=require</code>, from the
+          credentials file — <em>not</em> the app’s <code>+asyncpg</code> URL). This rewinds the{" "}
+          <em>entire</em> database to the snapshot — everything entered after it (edits, users,
+          ratings) is lost, so prefer fixing targeted damage by hand via the Activity Log and only
+          restore wholesale after large-scale loss.
+        </p>
+        <p>
+          <strong>Restoring images</strong>: unzip and untar the artifact, then{" "}
+          <code>aws s3 sync kalpa-images s3://kalpa-images --endpoint-url "&lt;R2-endpoint&gt;"</code>{" "}
+          with the R2 keys as <code>AWS_ACCESS_KEY_ID</code>/<code>AWS_SECRET_ACCESS_KEY</code>.
+          Sync only adds/overwrites files — it never deletes newer uploads. Exact commands also live
+          in the workflow files’ header comments (<code>.github/workflows/db-backup.yml</code> and{" "}
+          <code>r2-backup.yml</code>).
+        </p>
+        <p className="text-amber-700">
+          A failed scheduled backup emails the repo owner — don’t ignore those mails; a broken
+          backup is only discovered when you need it.
         </p>
       </Section>
 
