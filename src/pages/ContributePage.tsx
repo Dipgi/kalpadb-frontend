@@ -871,6 +871,8 @@ function StoryForm() {
 function ComicForm() {
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const seriesList = seriesPage?.items ?? [];
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -881,6 +883,9 @@ function ComicForm() {
   const [isColor, setIsColor] = useState<"" | "yes" | "no">("");
   const [pageCount, setPageCount] = useState("");
   const [isbn, setIsbn] = useState("");
+  const [seriesId, setSeriesId] = useState("");
+  const [seriesPosition, setSeriesPosition] = useState("");
+  const [seriesPositionLabel, setSeriesPositionLabel] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [writers, setWriters] = useState<PickerItem[]>([]);
   const [artists, setArtists] = useState<PickerItem[]>([]);
@@ -920,6 +925,9 @@ function ComicForm() {
         is_color: isColor === "" ? null : isColor === "yes",
         page_count: pageCount ? Number(pageCount) : null,
         isbn: isbn.trim() || null,
+        series_id: seriesId ? Number(seriesId) : null,
+        series_position: seriesPosition ? Number(seriesPosition) : null,
+        series_position_label: seriesPositionLabel.trim() || null,
         formats: formatRowsToPayload(formats, false, false),
         genre_ids: [...genreIds],
         tag_ids: [...tagIds],
@@ -946,6 +954,9 @@ function ComicForm() {
       setEditors([]);
       setPublishers([]);
       setFormats([emptyFormatRow("single_issue")]);
+      setSeriesId("");
+      setSeriesPosition("");
+      setSeriesPositionLabel("");
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -1054,6 +1065,43 @@ function ComicForm() {
           </div>
         </div>
       </FormSection>
+
+      {seriesList.length > 0 && (
+        <FormSection title="Series & issue" hint="Optional — link to a series and set the issue number.">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls}>Series</label>
+              <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
+                <option value="">Not part of a series</option>
+                {seriesList.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Issue / position</label>
+              <input
+                type="number"
+                min={1}
+                value={seriesPosition}
+                onChange={(e) => setSeriesPosition(e.target.value)}
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Issue label (optional)</label>
+              <input
+                value={seriesPositionLabel}
+                onChange={(e) => setSeriesPositionLabel(e.target.value)}
+                placeholder="e.g. Annual, #12.5, Special"
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+          </div>
+        </FormSection>
+      )}
 
       <FormSection title="Formats" hint="Print/digital editions — add a row per format (optional).">
         <FormatsEditor

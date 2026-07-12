@@ -89,6 +89,8 @@ function EditForm({ work }: { work: WorkDetail }) {
     queryKey: ["all-languages"],
     queryFn: catalogue.allLanguages,
   });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const seriesList = seriesPage?.items ?? [];
 
   const comic = work.comic;
   const [title, setTitle] = useState(work.title);
@@ -107,6 +109,11 @@ function EditForm({ work }: { work: WorkDetail }) {
   );
   const [pageCount, setPageCount] = useState(comic?.page_count?.toString() ?? "");
   const [isbn, setIsbn] = useState(comic?.isbn ?? "");
+  const [seriesId, setSeriesId] = useState(comic?.series_id?.toString() ?? "");
+  const [seriesPosition, setSeriesPosition] = useState(comic?.series_position?.toString() ?? "");
+  const [seriesPositionLabel, setSeriesPositionLabel] = useState(
+    comic?.series_position_label ?? ""
+  );
   const [coverUrl, setCoverUrl] = useState(work.image_urls?.[0] ?? "");
   const [writers, setWriters] = useState<PickerItem[]>(toItems(comic?.writers ?? []));
   const [artists, setArtists] = useState<PickerItem[]>(toItems(comic?.artists ?? []));
@@ -157,6 +164,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           is_color: isColor === "" ? null : isColor === "yes",
           page_count: pageCount ? Number(pageCount) : null,
           isbn: isbn.trim() || null,
+          series_id: seriesId ? Number(seriesId) : null,
+          series_position: seriesPosition ? Number(seriesPosition) : null,
+          series_position_label: seriesPositionLabel.trim() || null,
           formats: formatRowsToPayload(formats, true, false),
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
           writer_ids: writers.map((w) => w.id),
@@ -363,6 +373,50 @@ function EditForm({ work }: { work: WorkDetail }) {
             <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
           </div>
         </div>
+      </FormSection>
+
+      <FormSection
+        title="Series & issue"
+        hint="Link this comic to a series (create the series first under Add → Series) and set its issue number."
+      >
+        {seriesList.length === 0 ? (
+          <p className="text-xs text-gray-400">
+            No series exist yet. Create one under Add → Series, then link it here.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls}>Series</label>
+              <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
+                <option value="">Not part of a series</option>
+                {seriesList.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Issue / position</label>
+              <input
+                type="number"
+                min={1}
+                value={seriesPosition}
+                onChange={(e) => setSeriesPosition(e.target.value)}
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Issue label (optional)</label>
+              <input
+                value={seriesPositionLabel}
+                onChange={(e) => setSeriesPositionLabel(e.target.value)}
+                placeholder="e.g. Annual, #12.5, Special"
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+          </div>
+        )}
       </FormSection>
 
       <FormSection title="Formats" hint="Print/digital editions (single issue, trade paperback, omnibus, digital…).">

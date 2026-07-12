@@ -8,6 +8,9 @@ export const COMIC_FORMAT_TYPES = [
   "trade_paperback",
   "hardcover",
   "omnibus",
+  "digest",
+  "album",
+  "magazine_serialization",
   "digital",
   "webcomic",
 ];

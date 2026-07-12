@@ -140,6 +140,10 @@ export default function WorkDetailPage() {
     work.book?.series_id != null
       ? (seriesPage?.items.find((s) => s.id === work.book?.series_id)?.name ?? null)
       : null;
+  const comicSeriesName =
+    work.comic?.series_id != null
+      ? (seriesPage?.items.find((s) => s.id === work.comic?.series_id)?.name ?? null)
+      : null;
   const langName = (code: string) =>
     languages?.find((l) => l.code === code)?.name ??
     WORLD_LANGUAGES.find((l) => l.code === code)?.name ??
@@ -323,6 +327,21 @@ export default function WorkDetailPage() {
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Publishers</h3>
                 <p className="text-sm text-gray-700">
                   {work.comic.publishers.map((p) => p.name).join(", ")}
+                </p>
+              </div>
+            )}
+            {work.comic.series_id != null && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Series</h3>
+                <p className="text-sm text-gray-700">
+                  <Link to={`/series/${work.comic.series_id}`} className="text-violet-700 hover:underline">
+                    {comicSeriesName ?? `Series #${work.comic.series_id}`}
+                  </Link>
+                  {work.comic.series_position_label
+                    ? ` (${work.comic.series_position_label})`
+                    : work.comic.series_position != null
+                      ? ` (issue ${work.comic.series_position})`
+                      : ""}
                 </p>
               </div>
             )}

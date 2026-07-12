@@ -1392,6 +1392,7 @@ export interface ComicCreateIn {
   publisher_ids?: number[];
   series_id?: number | null;
   series_position?: number | null;
+  series_position_label?: string | null;
   is_color?: boolean | null;
   reading_direction?: "ltr" | "rtl" | null;
   page_count?: number | null;
