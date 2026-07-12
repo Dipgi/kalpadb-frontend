@@ -213,15 +213,28 @@ export default function HelpPage() {
             <strong>Comic</strong> — a graphic work: a comic, graphic novel, or manga. Carries its
             own creator roles (writer, artist, inker, colorist, letterer) alongside the shared ones
             (translator, editor, cover artist), a reading direction (left-to-right or right-to-left),
-            colour flag, and formats (single issue, trade paperback, hardcover, omnibus, digest,
-            album, magazine serialization, digital, webcomic). Every graphic work is catalogued
-            here — a graphic novel is a <em>Comic</em>, not a Book. Writers double as the work’s
-            authors, so a comic shows its writer in the browse and on its creators’ pages.{" "}
-            To catalogue the <strong>issues of a comic series</strong>: create the series once under{" "}
-            <em>Add → Series</em>, then on each issue (add or edit) pick that series and set its
-            <em> issue number</em> and an optional label (e.g. “Annual”, “#12.5”). The{" "}
-            <Link to="/series" className="text-violet-700 hover:underline">Series</Link> page then
-            lists the issues in order.
+            and a colour flag. Every graphic work is catalogued here — a graphic novel is a{" "}
+            <em>Comic</em>, not a Book. Writers double as the work’s authors, so a comic shows its
+            writer in the browse and on its creators’ pages.
+            <div className="mt-1.5 text-gray-500">
+              <strong>Comic type vs. format — two different things.</strong> The{" "}
+              <strong>Comic type</strong> (also called the category) is <em>what kind of work it is</em>{" "}
+              — <em>graphic novel</em>, <em>comic issue</em>, <em>manga</em>, or <em>comic strip</em>.
+              Each comic has exactly one, chosen from the “Comic type” dropdown, and you can filter by
+              it on Browse. A <strong>format</strong> is <em>how a particular edition was published</em>{" "}
+              — single issue, trade paperback, hardcover, omnibus, digest, album, magazine
+              serialization, digital, or webcomic. A comic can have <em>several</em> formats (e.g. the
+              same work came out as single issues and was later collected as a trade paperback). So a
+              category answers “is this a graphic novel or an ongoing series?”, while a format answers
+              “in which edition?”.
+            </div>
+            <div className="mt-1.5 text-gray-500">
+              To catalogue the <strong>issues of a comic series</strong>: create the series once under{" "}
+              <em>Add → Series</em>, then on each issue (add or edit) pick that series and set its{" "}
+              <em>issue number</em> and an optional label (e.g. “Annual”, “#12.5”). The{" "}
+              <Link to="/series" className="text-violet-700 hover:underline">Series</Link> page then
+              lists the issues in order.
+            </div>
           </li>
           <li>
             <strong>Magazine</strong> — a periodical <em>title</em> (e.g. <em>Sandesh</em>,{" "}
