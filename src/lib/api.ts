@@ -968,7 +968,8 @@ export function getConflictError(err: unknown): ConflictDetail | null {
 export interface AdminUser {
   id: number;
   username: string;
-  email: string;
+  /** null when the owner's address is hidden from non-owner admins */
+  email: string | null;
   role: string;
   is_owner?: boolean;
   is_active: boolean;

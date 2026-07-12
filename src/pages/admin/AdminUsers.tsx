@@ -77,7 +77,9 @@ export default function AdminUsers() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{u.email}</td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {u.email ?? <span className="text-gray-300 italic">hidden</span>}
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <select
