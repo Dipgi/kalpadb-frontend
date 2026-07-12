@@ -248,7 +248,23 @@ export interface ComicDetail {
   inkers: PersonSummary[];
   colorists: PersonSummary[];
   letterers: PersonSummary[];
+  translators: PersonSummary[];
+  editors: PersonSummary[];
+  cover_artists: PersonSummary[];
   publishers: PublisherSummary[];
+  formats: ComicFormat[];
+}
+
+export interface ComicFormat {
+  id: number;
+  format_type: string;
+  isbn: string | null;
+  page_count: number | null;
+  publication_date: string | null;
+  cover_image_url: string | null;
+  price: string | null;
+  currency: string | null;
+  notes: string | null;
 }
 
 export interface MediaWorkDetail {
@@ -1370,6 +1386,9 @@ export interface ComicCreateIn {
   inker_ids?: number[];
   colorist_ids?: number[];
   letterer_ids?: number[];
+  translator_ids?: number[];
+  editor_ids?: number[];
+  cover_artist_ids?: number[];
   publisher_ids?: number[];
   series_id?: number | null;
   series_position?: number | null;

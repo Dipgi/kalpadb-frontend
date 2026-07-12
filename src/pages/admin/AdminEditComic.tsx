@@ -107,6 +107,9 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [inkers, setInkers] = useState<PickerItem[]>(toItems(comic?.inkers ?? []));
   const [colorists, setColorists] = useState<PickerItem[]>(toItems(comic?.colorists ?? []));
   const [letterers, setLetterers] = useState<PickerItem[]>(toItems(comic?.letterers ?? []));
+  const [coverArtists, setCoverArtists] = useState<PickerItem[]>(toItems(comic?.cover_artists ?? []));
+  const [translators, setTranslators] = useState<PickerItem[]>(toItems(comic?.translators ?? []));
+  const [editors, setEditors] = useState<PickerItem[]>(toItems(comic?.editors ?? []));
   const [publishers, setPublishers] = useState<PickerItem[]>(
     (comic?.publishers ?? []).map((p) => ({ id: p.id, name: p.name }))
   );
@@ -153,6 +156,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           inker_ids: inkers.map((i) => i.id),
           colorist_ids: colorists.map((c) => c.id),
           letterer_ids: letterers.map((l) => l.id),
+          cover_artist_ids: coverArtists.map((c) => c.id),
+          translator_ids: translators.map((t) => t.id),
+          editor_ids: editors.map((e) => e.id),
           publisher_ids: publishers.map((p) => p.id),
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
@@ -360,6 +366,9 @@ function EditForm({ work }: { work: WorkDetail }) {
         {creatorPicker("Inkers", inkers, setInkers)}
         {creatorPicker("Colorists", colorists, setColorists)}
         {creatorPicker("Letterers", letterers, setLetterers)}
+        {creatorPicker("Cover artists", coverArtists, setCoverArtists)}
+        {creatorPicker("Translators", translators, setTranslators)}
+        {creatorPicker("Editors", editors, setEditors)}
         <EntityPicker
           label="Publishers"
           placeholder="Search or create a publisher…"

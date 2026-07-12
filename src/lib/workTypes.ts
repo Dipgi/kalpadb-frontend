@@ -8,7 +8,9 @@ export const WORK_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "nonfiction", label: "Nonfiction" },
   { value: "essay", label: "Essay" },
   { value: "poem", label: "Poetry" },
-  { value: "graphic_novel", label: "Comics / Graphic Novel" },
+  // "Comics / Graphic Novel" was retired here: graphic works are catalogued as
+  // the COMIC work type (its own tab), not a BOOK content_type. See the Comic
+  // consolidation. Existing BOOK+graphic_novel records were migrated to COMIC.
 ];
 
 // ContentType values relevant to a standalone Story / short work.

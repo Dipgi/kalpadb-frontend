@@ -307,6 +307,9 @@ export default function WorkDetailPage() {
               ["Inkers", work.comic.inkers],
               ["Colorists", work.comic.colorists],
               ["Letterers", work.comic.letterers],
+              ["Cover artists", work.comic.cover_artists],
+              ["Translators", work.comic.translators],
+              ["Editors", work.comic.editors],
             ] as const).map(([label, people]) =>
               people.length > 0 ? (
                 <div key={label}>
@@ -343,6 +346,24 @@ export default function WorkDetailPage() {
                   )}
                   {work.comic.page_count != null && <p>Pages: {work.comic.page_count}</p>}
                   {work.comic.isbn && <p>ISBN: {work.comic.isbn}</p>}
+                </div>
+              </div>
+            )}
+            {work.comic.formats.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Formats</h3>
+                <div className="text-sm text-gray-700 space-y-2">
+                  {work.comic.formats.map((f) => (
+                    <div key={f.id} className="space-y-0.5">
+                      <p className="font-medium capitalize">{f.format_type.replace(/_/g, " ")}</p>
+                      {f.page_count != null && <p>Pages: {f.page_count}</p>}
+                      {f.isbn && <p>ISBN: {f.isbn}</p>}
+                      {f.price && (
+                        <p>Price: {f.price}{f.currency ? ` ${f.currency}` : ""}</p>
+                      )}
+                      {f.notes && <p className="text-gray-500 whitespace-pre-line">{f.notes}</p>}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

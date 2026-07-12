@@ -840,6 +840,9 @@ function ComicForm() {
   const [inkers, setInkers] = useState<PickerItem[]>([]);
   const [colorists, setColorists] = useState<PickerItem[]>([]);
   const [letterers, setLetterers] = useState<PickerItem[]>([]);
+  const [coverArtists, setCoverArtists] = useState<PickerItem[]>([]);
+  const [translators, setTranslators] = useState<PickerItem[]>([]);
+  const [editors, setEditors] = useState<PickerItem[]>([]);
   const [publishers, setPublishers] = useState<PickerItem[]>([]);
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
@@ -862,6 +865,9 @@ function ComicForm() {
           inker_ids: inkers.map((i) => i.id),
           colorist_ids: colorists.map((c) => c.id),
           letterer_ids: letterers.map((l) => l.id),
+          cover_artist_ids: coverArtists.map((c) => c.id),
+          translator_ids: translators.map((t) => t.id),
+          editor_ids: editors.map((e) => e.id),
           publisher_ids: publishers.map((p) => p.id),
           reading_direction: readingDirection || null,
           is_color: isColor === "" ? null : isColor === "yes",
@@ -889,6 +895,9 @@ function ComicForm() {
       setInkers([]);
       setColorists([]);
       setLetterers([]);
+      setCoverArtists([]);
+      setTranslators([]);
+      setEditors([]);
       setPublishers([]);
       setGenreIds(new Set());
       setTagIds(new Set());
@@ -1067,6 +1076,33 @@ function ComicForm() {
           fetcher={(q) => catalogue.persons(q)}
           selected={letterers}
           onChange={setLetterers}
+          onCreate={createPersonInline}
+        />
+        <EntityPicker
+          label="Cover artists"
+          placeholder="Search or create a person…"
+          fetchKey="picker-persons"
+          fetcher={(q) => catalogue.persons(q)}
+          selected={coverArtists}
+          onChange={setCoverArtists}
+          onCreate={createPersonInline}
+        />
+        <EntityPicker
+          label="Translators"
+          placeholder="Search or create a person…"
+          fetchKey="picker-persons"
+          fetcher={(q) => catalogue.persons(q)}
+          selected={translators}
+          onChange={setTranslators}
+          onCreate={createPersonInline}
+        />
+        <EntityPicker
+          label="Editors"
+          placeholder="Search or create a person…"
+          fetchKey="picker-persons"
+          fetcher={(q) => catalogue.persons(q)}
+          selected={editors}
+          onChange={setEditors}
           onCreate={createPersonInline}
         />
         <EntityPicker
