@@ -23,6 +23,7 @@ import EditSavedBanner from "../../components/EditSavedBanner";
 import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import { WORLD_LANGUAGES } from "../../lib/languages";
+import { COMIC_TYPE_OPTIONS } from "../../lib/workTypes";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -96,6 +97,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [title, setTitle] = useState(work.title);
   const [description, setDescription] = useState(work.description ?? "");
   const [language, setLanguage] = useState(work.language ?? "bn");
+  const [contentType, setContentType] = useState(work.content_type ?? "graphic_novel");
   // Romanised (Latin) title — auto-generated, editable; pins a manual override.
   const initialRoman = work.localised?.title?.[`${work.language ?? "bn"}-Latn`] ?? "";
   const [roman, setRoman] = useState(initialRoman);
@@ -158,6 +160,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           description: description.trim() || null,
           language,
           localised,
+          content_type: contentType || null,
           original_language: originalLanguage || null,
           publication_date: y ? `${y}-01-01` : null,
           reading_direction: readingDirection || null,
@@ -289,6 +292,16 @@ function EditForm({ work }: { work: WorkDetail }) {
 
       <FormSection title="Publication details">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Comic type</label>
+            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
+              {COMIC_TYPE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className={labelCls}>Language</label>
             <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>

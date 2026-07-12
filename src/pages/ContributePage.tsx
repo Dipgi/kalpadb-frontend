@@ -49,7 +49,7 @@ import PrimaryLanguageSelect from "../components/PrimaryLanguageSelect";
 import NativeNameField from "../components/NativeNameField";
 import CountrySelect from "../components/CountrySelect";
 import { WORLD_LANGUAGES } from "../lib/languages";
-import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS } from "../lib/workTypes";
+import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS, COMIC_TYPE_OPTIONS } from "../lib/workTypes";
 
 type Tab = "book" | "story" | "comic" | "magazine" | "issue" | "person" | "publisher" | "series";
 
@@ -877,6 +877,7 @@ function ComicForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [language, setLanguage] = useState("bn");
+  const [contentType, setContentType] = useState("graphic_novel");
   const [originalLanguage, setOriginalLanguage] = useState("");
   const [year, setYear] = useState("");
   const [readingDirection, setReadingDirection] = useState<"" | "ltr" | "rtl">("");
@@ -910,7 +911,7 @@ function ComicForm() {
         language,
         original_language: originalLanguage || null,
         publication_date: y ? `${y}-01-01` : null,
-        content_type: "graphic_novel",
+        content_type: contentType || null,
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
         writer_ids: writers.map((w) => w.id),
         artist_ids: artists.map((a) => a.id),
@@ -937,6 +938,7 @@ function ComicForm() {
       setSubmitted(true);
       setTitle("");
       setDescription("");
+      setContentType("graphic_novel");
       setOriginalLanguage("");
       setYear("");
       setReadingDirection("");
@@ -1001,6 +1003,16 @@ function ComicForm() {
 
       <FormSection title="Publication details">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Comic type</label>
+            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
+              {COMIC_TYPE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className={labelCls}>Language</label>
             <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
