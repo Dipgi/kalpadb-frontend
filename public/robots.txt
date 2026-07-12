@@ -1,5 +1,4 @@
 User-agent: *
-Allow: /
 
 # Private / thin app routes — no public content to index.
 Disallow: /login
@@ -11,9 +10,8 @@ Disallow: /shelf
 Disallow: /my-submissions
 Disallow: /contribute
 Disallow: /admin
-Disallow: /admin/
+Disallow: /search
 Disallow: /*/edit
-Disallow: /*/edit-story
-Disallow: /*/edit-magazine
+Disallow: /*/issues/new
 
 Sitemap: https://kalpadb.com/sitemap.xml
