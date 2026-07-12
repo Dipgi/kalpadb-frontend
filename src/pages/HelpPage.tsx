@@ -210,8 +210,12 @@ export default function HelpPage() {
             <em>Example:</em> Satyajit Ray’s “ব্যোমযাত্রীর ডায়রি” (<em>Byomjatrir Diary</em>).
           </li>
           <li>
-            <strong>Comic</strong> — a graphic work, with its own creator roles (writer, artist,
-            inker, colorist, letterer).
+            <strong>Comic</strong> — a graphic work: a comic, graphic novel, or manga. Carries its
+            own creator roles (writer, artist, inker, colorist, letterer) alongside the shared ones
+            (translator, editor, cover artist), a reading direction (left-to-right or right-to-left),
+            colour flag, and print/digital formats. Every graphic work is catalogued here — a graphic
+            novel is a <em>Comic</em>, not a Book. Writers double as the work’s authors, so a comic
+            shows its writer in the browse and on its creators’ pages.
           </li>
           <li>
             <strong>Magazine</strong> — a periodical <em>title</em> (e.g. <em>Sandesh</em>,{" "}
@@ -375,19 +379,27 @@ export default function HelpPage() {
             granular themes (e.g. Time Travel, Robots).
           </li>
           <li>
-            <strong>Awards &amp; external links:</strong> the edit page for a book, story, magazine
-            or person has an “Awards &amp; external links” section. Add an award result (pick the
-            award and category, plus year and result), or a reference link such as Goodreads or
-            Wikipedia. These save on their own — you don’t use the page’s Save button for them — and
-            your additions queue for review like any other edit. The{" "}
+            <strong>Added after the record exists (on the Edit page):</strong> awards, external
+            links, translation links, and related works are <em>not</em> on the Add form — they’re on
+            the work’s <strong>Edit</strong> page. This is because each links to or attaches to an
+            existing record (an award result, a URL, another catalogued work), which needs the work
+            to exist first. So the flow is: create the work, then open its Edit page (the “Created —
+            Edit / link works →” link takes you straight there) to add these. Each of the four saves
+            on its own, separately from the page’s Save button.
+          </li>
+          <li>
+            <strong>Awards &amp; external links:</strong> the edit page for a book, story, comic,
+            magazine or person has an “Awards &amp; external links” section. Add an award result (pick
+            the award and category, plus year and result), or a reference link such as Goodreads or
+            Wikipedia. Your additions queue for review like any other edit. The{" "}
             <Link to="/awards" className="text-violet-700 hover:underline">Awards</Link> page lists
             every award with its winners.
           </li>
           <li>
-            <strong>Related works:</strong> the “Related works” section on a book, story or magazine
-            edit page links a work to a <em>different but connected</em> one — a sequel, prequel,
-            spin-off, retelling or fix-up (magazines instead link serial renames, “continues /
-            continued by”). Pick the other work and the relationship; you only record it once and it
+            <strong>Related works:</strong> the “Related works” section on a book, story, comic or
+            magazine edit page links a work to a <em>different but connected</em> one — a sequel,
+            prequel, spin-off, retelling or fix-up (magazines instead link serial renames, “continues
+            / continued by”). Pick the other work and the relationship; you only record it once and it
             shows on <em>both</em> works’ pages, with the reverse side worded automatically (mark
             one “Sequel to” another and the other reads “Prequel of”). Keep it distinct from{" "}
             <em>Translations</em>, which link the <em>same</em> work in another language.

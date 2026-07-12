@@ -78,11 +78,16 @@ export default function AdminGuide() {
 
       <Section title="Related works">
         <p>
-          The <strong>“Related works”</strong> section on a book’s, story’s or magazine’s edit page
-          records a directional link to another catalogued work — a sequel, prequel, spin-off,
-          retelling, fix-up, or (for magazines) a serial rename. Pick the other work, choose the
-          relationship, add an optional note, and save (auto-approved for you; volunteers’ links
+          The <strong>“Related works”</strong> section on a book’s, story’s, comic’s or magazine’s
+          edit page records a directional link to another catalogued work — a sequel, prequel,
+          spin-off, retelling, fix-up, or (for magazines) a serial rename. Pick the other work, choose
+          the relationship, add an optional note, and save (auto-approved for you; volunteers’ links
           queue for review). “Remove” deletes a link (admin only; immediate).
+        </p>
+        <p className="text-gray-500">
+          Like awards, external links and translations, this lives on the <strong>Edit</strong> page,
+          not the Add form — each links to an existing record, so the work must be created first. On
+          the add forms, create the work, then follow the “Edit / link works →” link to add these.
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
@@ -95,9 +100,9 @@ export default function AdminGuide() {
           <li>
             <strong>Options depend on the work type.</strong> Magazines offer only the serial pair —
             <em> Continues</em> / <em>Continued by</em> — for titles that renamed or merged, and the
-            picker is limited to other magazines. Books, stories and (later) comics/media offer the
-            narrative set (sequel, prequel, spin-off, companion, fix-up, retelling, inspired by,
-            part of series) and can link to any work.
+            picker is limited to other magazines. Books, stories and comics offer the narrative set
+            (sequel, prequel, spin-off, companion, fix-up, retelling, inspired by, part of series)
+            and can link to any work.
           </li>
           <li>
             <strong>Not the same as translations or adaptations.</strong> Use “Translations &amp;
@@ -110,7 +115,7 @@ export default function AdminGuide() {
 
       <Section title="Awards & external links">
         <p>
-          Every book, story, magazine and person edit page has an{" "}
+          Every book, story, comic, magazine and person edit page has an{" "}
           <strong>“Awards &amp; external links”</strong> section. Both editors save immediately,
           separately from the main form — you don’t click the page’s Save button for them.
         </p>
