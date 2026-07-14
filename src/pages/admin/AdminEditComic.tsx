@@ -293,7 +293,7 @@ function EditForm({ work }: { work: WorkDetail }) {
 
       <FormSection title="Basics">
         <div>
-          <label className={labelCls}>Title *</label>
+          <label className={labelCls}>Title * (native script preferred)</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
         </div>
 
@@ -347,7 +347,7 @@ function EditForm({ work }: { work: WorkDetail }) {
             </select>
           </div>
           <div>
-            <label className={labelCls}>Original language</label>
+            <label className={labelCls}>Original language (if translation)</label>
             <select
               value={originalLanguage}
               onChange={(e) => setOriginalLanguage(e.target.value)}

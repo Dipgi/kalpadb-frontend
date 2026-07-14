@@ -1820,7 +1820,7 @@ function SeriesForm() {
       {submitted && <PendingBanner />}
 
       <div>
-        <label className={labelCls}>Series name *</label>
+        <label className={labelCls}>Name *</label>
         <input
           value={name}
           onChange={(e) => {

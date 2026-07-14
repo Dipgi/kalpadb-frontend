@@ -137,7 +137,7 @@ function EditForm({ series }: { series: BookSeriesOut }) {
       </div>
 
       <div>
-        <label className={labelCls}>Slug (lowercase, hyphens)</label>
+        <label className={labelCls}>Slug (optional — lowercase, hyphens)</label>
         <input
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
