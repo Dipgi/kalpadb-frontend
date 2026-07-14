@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "12 July 2026";
+const LAST_UPDATED = "14 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -160,11 +160,13 @@ export default function AdminGuide() {
             third link is removed. Existing page ranges on links you keep are preserved.
           </li>
           <li>
-            <strong>“Credited as” bylines (pen names).</strong> Under the Authors / Translators
-            pickers on book and story forms, each selected person gets an optional{" "}
+            <strong>“Credited as” bylines (pen names).</strong> Under <em>every</em> person-role
+            picker — authors, translators, editors, illustrators, cover artists, all comic
+            creator roles, and magazine-issue credits — each selected person gets an optional{" "}
             <em>credited as</em> field — fill it with the name <em>as printed</em> when it differs
             from the canonical record (e.g. a story bylined <em>রনিন</em> credited to Goutam
-            Mandal). Leave blank for the canonical name. Detail pages and tables of contents show
+            Mandal). Leave blank for the canonical name. One byline per person per work: it
+            applies to every role that person holds on that work. Detail pages and tables of contents show
             “Name (as byline)”. Always credit the real person; never create a separate pen-name
             person record. The field suggests the person’s recorded aliases and name forms as you
             type; a byline that matches none of them gets a gentle hint to also record it as a pen
