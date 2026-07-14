@@ -242,6 +242,13 @@ export default function AdminGuide() {
             Mutes are recorded in the activity log and can be lifted early with <em>Unmute</em>.
             Admin accounts cannot be muted.
           </li>
+          <li>
+            <strong>Announcements.</strong> The <em>New announcement</em> button at the top of
+            Messages broadcasts a text to <em>every active user</em> — it appears in each user’s
+            thread under an “📢 Announcement” heading and lights their unread badge. Sending is
+            behind a confirm step and can’t be unsent, so proofread first; each broadcast is
+            recorded in the activity log. Muted users still receive announcements.
+          </li>
         </ul>
       </Section>
 

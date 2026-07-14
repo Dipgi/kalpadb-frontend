@@ -1800,6 +1800,8 @@ export interface Message {
   created_at: string;
   /** True when sent by an admin (not by the thread's owner). */
   from_admin: boolean;
+  /** True for a broadcast announcement (rendered under an "Announcement" heading). */
+  is_announcement: boolean;
   sender_id: number;
   sender_name: string;
 }
@@ -1852,4 +1854,10 @@ export const messages = {
     }),
   unmute: (userId: number) =>
     request<AdminThread>(`/admin/messages/threads/${userId}/mute`, { method: "DELETE" }),
+  /** Broadcast an announcement into every active user's thread. */
+  announce: (body: string) =>
+    request<{ recipients: number }>("/admin/messages/announce", {
+      method: "POST",
+      body: JSON.stringify({ body }),
+    }),
 };

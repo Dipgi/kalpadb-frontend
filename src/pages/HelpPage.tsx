@@ -158,6 +158,10 @@ export default function HelpPage() {
             the inbox usable. Repeated abuse can lead an admin to pause your ability to send for
             a while (you can always still read).
           </li>
+          <li>
+            Site-wide <strong>announcements</strong> from the admin team also arrive in this
+            thread, marked with an “📢 Announcement” heading.
+          </li>
         </ul>
       </Section>
 

@@ -16,6 +16,21 @@ function when(iso: string): string {
 }
 
 export function MessageBubble({ m, mine }: { m: Message; mine: boolean }) {
+  if (m.is_announcement) {
+    // Broadcasts sit apart from the conversation: full-width card with a heading.
+    return (
+      <div className="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm shadow-sm">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-violet-700 mb-1">
+          📢 Announcement
+          <span className="ml-2 font-medium normal-case tracking-normal text-gray-400">
+            from {m.sender_name}
+          </span>
+        </p>
+        <p className="whitespace-pre-wrap break-words text-gray-800">{m.body}</p>
+        <p className="text-[10px] mt-1 text-gray-400">{when(m.created_at)}</p>
+      </div>
+    );
+  }
   return (
     <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
       <div

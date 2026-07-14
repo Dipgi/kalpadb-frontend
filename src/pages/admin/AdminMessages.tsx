@@ -21,6 +21,95 @@ function when(iso: string): string {
   });
 }
 
+/** Admin-only broadcast composer: sends one announcement into every active
+ *  user's thread, behind a type-then-confirm step since it can't be unsent. */
+function AnnouncementComposer() {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [confirming, setConfirming] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+
+  const send = useMutation({
+    mutationFn: () => messages.announce(text.trim()),
+    onSuccess: (r) => {
+      setResult(`Announcement sent to ${r.recipients} users.`);
+      setText("");
+      setConfirming(false);
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: ["admin-message-threads"] });
+    },
+    onError: (e) => {
+      setResult(e instanceof ApiError ? e.message : "Could not send the announcement.");
+      setConfirming(false);
+    },
+  });
+
+  return (
+    <div className="mb-5">
+      {!open ? (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              setOpen(true);
+              setResult(null);
+            }}
+            className="text-sm px-3 py-1.5 rounded-md border border-violet-300 text-violet-700 hover:bg-violet-50 font-medium"
+          >
+            📢 New announcement
+          </button>
+          {result && <p className="text-sm text-gray-500">{result}</p>}
+        </div>
+      ) : (
+        <div className="border border-violet-200 rounded-xl bg-violet-50/50 p-3">
+          <p className="text-xs font-semibold text-violet-700 uppercase tracking-wide mb-2">
+            New announcement — goes to every active user
+          </p>
+          <textarea
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              setConfirming(false);
+            }}
+            rows={3}
+            maxLength={2000}
+            placeholder="Write the announcement… (text only, appears in every user's Messages under an “Announcement” heading)"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+          />
+          <div className="flex items-center gap-2 mt-2">
+            {!confirming ? (
+              <button
+                onClick={() => setConfirming(true)}
+                disabled={!text.trim()}
+                className="text-sm px-3 py-1.5 rounded-md bg-violet-700 text-white hover:bg-violet-800 disabled:opacity-50"
+              >
+                Send to all users…
+              </button>
+            ) : (
+              <button
+                onClick={() => send.mutate()}
+                disabled={send.isPending}
+                className="text-sm px-3 py-1.5 rounded-md bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-50"
+              >
+                {send.isPending ? "Sending…" : "Confirm — send to every active user"}
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setOpen(false);
+                setConfirming(false);
+              }}
+              className="text-sm px-3 py-1.5 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminMessages() {
   const { userId } = useParams<{ userId?: string }>();
   const selected = userId ? Number(userId) : null;
@@ -98,6 +187,8 @@ export default function AdminMessages() {
         </Link>{" "}
         to look up an account.
       </p>
+
+      <AnnouncementComposer />
 
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-5">
         {/* Thread list */}
