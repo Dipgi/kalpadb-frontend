@@ -212,7 +212,10 @@ function BookForm() {
           ...sourceAttributionPayload(source),
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
           author_ids: authors.map((a) => a.id),
-          credited_as: bylinePayload(authors, bylines),
+          credited_as: bylinePayload(
+            [...authors, ...editors, ...translators, ...illustrators, ...coverArtists],
+            bylines
+          ),
           editor_ids: editors.map((e) => e.id),
           illustrator_ids: illustrators.map((i) => i.id),
           translator_ids: translators.map((t) => t.id),
@@ -233,6 +236,7 @@ function BookForm() {
       setOriginalLanguage("");
       setYear("");
       setAuthors([]);
+      setBylines({});
       setEditors([]);
       setIllustrators([]);
       setTranslators([]);
@@ -421,6 +425,7 @@ function BookForm() {
         onChange={setEditors}
         onCreate={createPersonInline}
       />
+      <BylineFields people={editors} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Translators"
@@ -431,6 +436,7 @@ function BookForm() {
         onChange={setTranslators}
         onCreate={createPersonInline}
       />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Illustrators"
@@ -441,6 +447,7 @@ function BookForm() {
         onChange={setIllustrators}
         onCreate={createPersonInline}
       />
+      <BylineFields people={illustrators} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Cover artists"
@@ -451,6 +458,7 @@ function BookForm() {
         onChange={setCoverArtists}
         onCreate={createPersonInline}
       />
+      <BylineFields people={coverArtists} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Publishers"
@@ -583,6 +591,7 @@ function StoryForm() {
       setPageCount("");
       setHeadpieceUrl("");
       setAuthors([]);
+      setBylines({});
       setTranslators([]);
       setCollection([]);
       setMagIssues([]);
@@ -843,6 +852,8 @@ function ComicForm() {
   const [seriesPositionLabel, setSeriesPositionLabel] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [writers, setWriters] = useState<PickerItem[]>([]);
+  // One byline map for the whole comic: applies to every role a person holds.
+  const [bylines, setBylines] = useState<Record<number, string>>({});
   const [artists, setArtists] = useState<PickerItem[]>([]);
   const [inkers, setInkers] = useState<PickerItem[]>([]);
   const [colorists, setColorists] = useState<PickerItem[]>([]);
@@ -869,6 +880,19 @@ function ComicForm() {
           content_type: contentType || null,
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
           writer_ids: writers.map((w) => w.id),
+          credited_as: bylinePayload(
+            [
+              ...writers,
+              ...artists,
+              ...inkers,
+              ...colorists,
+              ...letterers,
+              ...coverArtists,
+              ...translators,
+              ...editors,
+            ],
+            bylines
+          ),
           artist_ids: artists.map((a) => a.id),
           inker_ids: inkers.map((i) => i.id),
           colorist_ids: colorists.map((c) => c.id),
@@ -904,6 +928,7 @@ function ComicForm() {
       setIsbn("");
       setCoverUrl("");
       setWriters([]);
+      setBylines({});
       setArtists([]);
       setInkers([]);
       setColorists([]);
@@ -1116,6 +1141,7 @@ function ComicForm() {
           onChange={setWriters}
           onCreate={createPersonInline}
         />
+        <BylineFields people={writers} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Artists (pencillers)"
           placeholder="Search or create a person…"
@@ -1125,6 +1151,7 @@ function ComicForm() {
           onChange={setArtists}
           onCreate={createPersonInline}
         />
+        <BylineFields people={artists} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Inkers"
           placeholder="Search or create a person…"
@@ -1134,6 +1161,7 @@ function ComicForm() {
           onChange={setInkers}
           onCreate={createPersonInline}
         />
+        <BylineFields people={inkers} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Colorists"
           placeholder="Search or create a person…"
@@ -1143,6 +1171,7 @@ function ComicForm() {
           onChange={setColorists}
           onCreate={createPersonInline}
         />
+        <BylineFields people={colorists} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Letterers"
           placeholder="Search or create a person…"
@@ -1152,6 +1181,7 @@ function ComicForm() {
           onChange={setLetterers}
           onCreate={createPersonInline}
         />
+        <BylineFields people={letterers} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Cover artists"
           placeholder="Search or create a person…"
@@ -1161,6 +1191,7 @@ function ComicForm() {
           onChange={setCoverArtists}
           onCreate={createPersonInline}
         />
+        <BylineFields people={coverArtists} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Translators"
           placeholder="Search or create a person…"
@@ -1170,6 +1201,7 @@ function ComicForm() {
           onChange={setTranslators}
           onCreate={createPersonInline}
         />
+        <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Editors"
           placeholder="Search or create a person…"
@@ -1179,6 +1211,7 @@ function ComicForm() {
           onChange={setEditors}
           onCreate={createPersonInline}
         />
+        <BylineFields people={editors} bylines={bylines} onChange={setBylines} admin />
         <EntityPicker
           label="Publishers"
           placeholder="Search or create a publisher…"

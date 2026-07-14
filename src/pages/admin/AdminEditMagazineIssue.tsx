@@ -13,6 +13,7 @@ import {
 import { ISSUE_TYPE_OPTIONS, composeIssueLabel } from "../../lib/issues";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import BylineFields, { bylinePayload } from "../../components/BylineFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import FormSection from "../../components/FormSection";
@@ -127,6 +128,19 @@ function IssueForm({
   const [illustrators, setIllustrators] = useState<PickerItem[]>(toItems(existing?.illustrators ?? []));
   const [translators, setTranslators] = useState<PickerItem[]>(toItems(existing?.translators ?? []));
   const [publishers, setPublishers] = useState<PickerItem[]>(toItems(existing?.publishers ?? []));
+  // Byline overrides per credited person ("credited as", e.g. a pen name).
+  // One map for the whole issue: a byline applies to every credit that person holds.
+  const [bylines, setBylines] = useState<Record<number, string>>(() => {
+    const init: Record<number, string> = {};
+    const credits = [
+      ...(existing?.editors ?? []),
+      ...(existing?.cover_artists ?? []),
+      ...(existing?.illustrators ?? []),
+      ...(existing?.translators ?? []),
+    ];
+    for (const c of credits) if (c.credited_as && !init[c.id]) init[c.id] = c.credited_as;
+    return init;
+  });
   const [stories, setStories] = useState<PickerItem[]>(
     (existing?.stories ?? []).map((s) => ({ id: s.story_id, name: s.title }))
   );
@@ -196,6 +210,10 @@ function IssueForm({
         cover_artist_ids: coverArtists.map((c) => c.id),
         illustrator_ids: illustrators.map((i) => i.id),
         translator_ids: translators.map((t) => t.id),
+        credited_as: bylinePayload(
+          [...editors, ...coverArtists, ...illustrators, ...translators],
+          bylines
+        ),
         publisher_ids: publishers.map((p) => p.id),
         scans: cleanScans,
         stories: stories.map((s) => ({
@@ -361,6 +379,7 @@ function IssueForm({
         onChange={setEditors}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={editors} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
         label="Cover artists"
         placeholder="Search or create a person…"
@@ -370,6 +389,7 @@ function IssueForm({
         onChange={setCoverArtists}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={coverArtists} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
         label="Illustrators"
         placeholder="Search or create a person…"
@@ -379,6 +399,7 @@ function IssueForm({
         onChange={setIllustrators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={illustrators} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
         label="Translators"
         placeholder="Search or create a person…"
@@ -388,6 +409,7 @@ function IssueForm({
         onChange={setTranslators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
         label="Publishers"
         placeholder="Search or create a publisher…"

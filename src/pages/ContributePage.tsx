@@ -341,7 +341,10 @@ function BookForm() {
         ...sourceAttributionPayload(source),
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
         author_ids: authors.map((a) => a.id),
-        credited_as: bylinePayload(authors, bylines),
+        credited_as: bylinePayload(
+          [...authors, ...editors, ...translators, ...illustrators, ...coverArtists],
+          bylines
+        ),
         editor_ids: editors.map((e) => e.id),
         illustrator_ids: illustrators.map((i) => i.id),
         translator_ids: translators.map((t) => t.id),
@@ -529,6 +532,7 @@ function BookForm() {
         selected={editors}
         onChange={setEditors}
       />
+      <BylineFields people={editors} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Translators"
@@ -538,6 +542,7 @@ function BookForm() {
         selected={translators}
         onChange={setTranslators}
       />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Illustrators"
@@ -547,6 +552,7 @@ function BookForm() {
         selected={illustrators}
         onChange={setIllustrators}
       />
+      <BylineFields people={illustrators} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Cover artists"
@@ -556,6 +562,7 @@ function BookForm() {
         selected={coverArtists}
         onChange={setCoverArtists}
       />
+      <BylineFields people={coverArtists} bylines={bylines} onChange={setBylines} />
 
       <EntityPicker
         label="Publishers"
@@ -889,6 +896,8 @@ function ComicForm() {
   const [seriesPositionLabel, setSeriesPositionLabel] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [writers, setWriters] = useState<PickerItem[]>([]);
+  // One byline map for the whole comic: applies to every role a person holds.
+  const [bylines, setBylines] = useState<Record<number, string>>({});
   const [artists, setArtists] = useState<PickerItem[]>([]);
   const [inkers, setInkers] = useState<PickerItem[]>([]);
   const [colorists, setColorists] = useState<PickerItem[]>([]);
@@ -914,6 +923,19 @@ function ComicForm() {
         content_type: contentType || null,
         image_urls: coverUrl.trim() ? [coverUrl.trim()] : null,
         writer_ids: writers.map((w) => w.id),
+        credited_as: bylinePayload(
+          [
+            ...writers,
+            ...artists,
+            ...inkers,
+            ...colorists,
+            ...letterers,
+            ...coverArtists,
+            ...translators,
+            ...editors,
+          ],
+          bylines
+        ),
         artist_ids: artists.map((a) => a.id),
         inker_ids: inkers.map((i) => i.id),
         colorist_ids: colorists.map((c) => c.id),
@@ -947,6 +969,7 @@ function ComicForm() {
       setIsbn("");
       setCoverUrl("");
       setWriters([]);
+      setBylines({});
       setArtists([]);
       setInkers([]);
       setColorists([]);
@@ -969,14 +992,17 @@ function ComicForm() {
     selected: PickerItem[],
     onChange: (v: PickerItem[]) => void
   ) => (
-    <EntityPicker
-      label={label}
-      placeholder="Search persons…"
-      fetchKey="picker-persons"
-      fetcher={(q) => catalogue.persons(q)}
-      selected={selected}
-      onChange={onChange}
-    />
+    <div>
+      <EntityPicker
+        label={label}
+        placeholder="Search persons…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={selected}
+        onChange={onChange}
+      />
+      <BylineFields people={selected} bylines={bylines} onChange={setBylines} />
+    </div>
   );
 
   return (

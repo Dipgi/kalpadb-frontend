@@ -48,17 +48,15 @@ export default function IssueDetailPage() {
         ? `/magazines/${magazineId}/issues/${issue.m_issue_id}/edit`
         : null;
 
-  const credit = (label: string, people: { id: number; name: string }[]) =>
+  const credit = (
+    label: string,
+    people: { id: number; name: string; credited_as?: string | null }[]
+  ) =>
     people.length > 0 ? (
       <div>
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">{label}</h3>
         <p className="text-sm text-gray-700">
-          {people.map((p, i) => (
-            <span key={p.id}>
-              {i > 0 && ", "}
-              <Link to={`/persons/${p.id}`} className="hover:text-violet-700">{p.name}</Link>
-            </span>
-          ))}
+          <PersonList people={people} />
         </p>
       </div>
     ) : null;

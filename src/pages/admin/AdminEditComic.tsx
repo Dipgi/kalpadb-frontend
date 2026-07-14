@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
+import BylineFields, { bylinePayload } from "../../components/BylineFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import EditNoteField from "../../components/EditNoteField";
@@ -128,6 +129,23 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [publishers, setPublishers] = useState<PickerItem[]>(
     (comic?.publishers ?? []).map((p) => ({ id: p.id, name: p.name }))
   );
+  // Byline overrides per credited person ("credited as", e.g. a pen name).
+  // One map for the whole comic: a byline applies to every role that person holds.
+  const [bylines, setBylines] = useState<Record<number, string>>(() => {
+    const init: Record<number, string> = {};
+    const credits = [
+      ...(comic?.writers ?? []),
+      ...(comic?.artists ?? []),
+      ...(comic?.inkers ?? []),
+      ...(comic?.colorists ?? []),
+      ...(comic?.letterers ?? []),
+      ...(comic?.cover_artists ?? []),
+      ...(comic?.translators ?? []),
+      ...(comic?.editors ?? []),
+    ];
+    for (const c of credits) if (c.credited_as && !init[c.id]) init[c.id] = c.credited_as;
+    return init;
+  });
   const [formats, setFormats] = useState<FormatRow[]>(formatRowsFromExisting(comic?.formats));
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
@@ -173,6 +191,19 @@ function EditForm({ work }: { work: WorkDetail }) {
           formats: formatRowsToPayload(formats, true, false),
           image_urls: coverUrl.trim() ? [coverUrl.trim()] : [],
           writer_ids: writers.map((w) => w.id),
+          credited_as: bylinePayload(
+            [
+              ...writers,
+              ...artists,
+              ...inkers,
+              ...colorists,
+              ...letterers,
+              ...coverArtists,
+              ...translators,
+              ...editors,
+            ],
+            bylines
+          ),
           artist_ids: artists.map((a) => a.id),
           inker_ids: inkers.map((i) => i.id),
           colorist_ids: colorists.map((c) => c.id),
@@ -229,15 +260,18 @@ function EditForm({ work }: { work: WorkDetail }) {
     selected: PickerItem[],
     onChange: (v: PickerItem[]) => void
   ) => (
-    <EntityPicker
-      label={label}
-      placeholder="Search or create a person…"
-      fetchKey="picker-persons"
-      fetcher={(q) => catalogue.persons(q)}
-      selected={selected}
-      onChange={onChange}
-      onCreate={isAdmin ? createPersonInline : undefined}
-    />
+    <div>
+      <EntityPicker
+        label={label}
+        placeholder="Search or create a person…"
+        fetchKey="picker-persons"
+        fetcher={(q) => catalogue.persons(q)}
+        selected={selected}
+        onChange={onChange}
+        onCreate={isAdmin ? createPersonInline : undefined}
+      />
+      <BylineFields people={selected} bylines={bylines} onChange={setBylines} admin />
+    </div>
   );
 
   return (

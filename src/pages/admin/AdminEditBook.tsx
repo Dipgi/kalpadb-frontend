@@ -110,10 +110,18 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [authors, setAuthors] = useState<PickerItem[]>(
     work.authors.map((a) => ({ id: a.id, name: a.name }))
   );
-  // Byline overrides per credited author ("credited as", e.g. a pen name).
+  // Byline overrides per credited person ("credited as", e.g. a pen name).
+  // One map for the whole work: a byline applies to every role that person holds.
   const [bylines, setBylines] = useState<Record<number, string>>(() => {
     const init: Record<number, string> = {};
-    for (const a of work.authors) if (a.credited_as) init[a.id] = a.credited_as;
+    const credits = [
+      ...work.authors,
+      ...(work.book?.editors ?? []),
+      ...(work.book?.translators ?? []),
+      ...(work.book?.illustrators ?? []),
+      ...(work.book?.cover_artists ?? []),
+    ];
+    for (const c of credits) if (c.credited_as && !init[c.id]) init[c.id] = c.credited_as;
     return init;
   });
   const [editors, setEditors] = useState<PickerItem[]>(
@@ -194,7 +202,10 @@ function EditForm({ work }: { work: WorkDetail }) {
         publication_year: y,
         publication_date: y ? `${y}-01-01` : null,
         author_ids: authors.map((a) => a.id),
-        credited_as: bylinePayload(authors, bylines),
+        credited_as: bylinePayload(
+          [...authors, ...editors, ...translators, ...illustrators, ...coverArtists],
+          bylines
+        ),
         editor_ids: editors.map((e) => e.id),
         illustrator_ids: illustrators.map((i) => i.id),
         translator_ids: translators.map((t) => t.id),
@@ -456,6 +467,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setEditors}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={editors} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Translators"
@@ -466,6 +478,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setTranslators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Illustrators"
@@ -476,6 +489,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setIllustrators}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={illustrators} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Cover artists"
@@ -486,6 +500,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         onChange={setCoverArtists}
         onCreate={isAdmin ? createPersonInline : undefined}
       />
+      <BylineFields people={coverArtists} bylines={bylines} onChange={setBylines} admin />
 
       <EntityPicker
         label="Publishers"

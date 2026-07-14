@@ -157,10 +157,10 @@ export interface WorkDetail extends WorkSummary {
     source_relation: string | null;
     formats: BookFormat[];
     publishers: { id: number; name: string }[];
-    editors: { id: number; name: string }[];
-    translators: { id: number; name: string }[];
-    illustrators: { id: number; name: string }[];
-    cover_artists: { id: number; name: string }[];
+    editors: PersonSummary[];
+    translators: PersonSummary[];
+    illustrators: PersonSummary[];
+    cover_artists: PersonSummary[];
     /** Table of contents for anthologies/collections. */
     stories: {
       story_id: number;
@@ -1385,6 +1385,8 @@ export interface ComicCreateIn {
   tag_ids?: number[];
   /** Writers double as the work-level authors (shown in browse/cards). */
   writer_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} — applies to all of that person's role credits. */
+  credited_as?: Record<number, string>;
   artist_ids?: number[];
   inker_ids?: number[];
   colorist_ids?: number[];
@@ -1478,6 +1480,8 @@ export interface MagazineIssueCreateIn {
   editor_ids?: number[];
   illustrator_ids?: number[];
   translator_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} — applies to all of that person's issue credits. */
+  credited_as?: Record<number, string>;
   publisher_ids?: number[];
   scans?: ScanInput[];
   stories?: { story_id: number; page_start?: number | null; page_end?: number | null }[];
@@ -1496,6 +1500,8 @@ export interface MagazineIssueUpdateIn {
   editor_ids?: number[];
   illustrator_ids?: number[];
   translator_ids?: number[];
+  /** {stakeholder_id: byline-as-printed} — applies to all of that person's issue credits. */
+  credited_as?: Record<number, string>;
   publisher_ids?: number[];
   scans?: ScanInput[];
   stories?: { story_id: number; page_start?: number | null; page_end?: number | null }[];
