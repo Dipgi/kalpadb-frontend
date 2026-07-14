@@ -392,7 +392,7 @@ function BookForm() {
 
       <FormSection title="Basics">
       <div>
-        <label className={labelCls}>Title * (Bengali script preferred)</label>
+        <label className={labelCls}>Title * (native script preferred)</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
       </div>
 
