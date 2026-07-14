@@ -4,6 +4,7 @@ import { works } from "../lib/api";
 import { ISSUE_TYPE_LABELS, issueDisplay } from "../lib/issues";
 import { useAuth } from "../hooks/useAuth";
 import { PersonList } from "../components/PersonLink";
+import { PublisherList } from "../components/PublisherLink";
 import { useSeo } from "../hooks/useSeo";
 
 export default function IssueDetailPage() {
@@ -135,7 +136,7 @@ export default function IssueDetailPage() {
             {issue.publishers.length > 0 && (
               <div>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Publishers</h3>
-                <p className="text-sm text-gray-700">{issue.publishers.map((p) => p.name).join(", ")}</p>
+                <p className="text-sm text-gray-700"><PublisherList publishers={issue.publishers} /></p>
               </div>
             )}
           </div>

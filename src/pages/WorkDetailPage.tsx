@@ -10,6 +10,7 @@ import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
 import PlaceholderCover from "../components/PlaceholderCover";
 import { PersonList } from "../components/PersonLink";
+import { PublisherList } from "../components/PublisherLink";
 import { relationLabel } from "../lib/relations";
 import { useSeo } from "../hooks/useSeo";
 
@@ -299,7 +300,7 @@ export default function WorkDetailPage() {
         {publishers.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Publishers</h3>
-            <p className="text-sm text-gray-700">{publishers.map((p) => p.name).join(", ")}</p>
+            <p className="text-sm text-gray-700"><PublisherList publishers={publishers} /></p>
           </div>
         )}
 
@@ -326,7 +327,7 @@ export default function WorkDetailPage() {
               <div>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Publishers</h3>
                 <p className="text-sm text-gray-700">
-                  {work.comic.publishers.map((p) => p.name).join(", ")}
+                  <PublisherList publishers={work.comic.publishers} />
                 </p>
               </div>
             )}
