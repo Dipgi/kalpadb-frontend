@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "11 July 2026";
+const LAST_UPDATED = "14 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -21,6 +21,7 @@ const TOC: { id: string; label: string }[] = [
   { id: "finding", label: "Finding things" },
   { id: "search-tips", label: "Search tips (scripts & spelling)" },
   { id: "account", label: "Your account" },
+  { id: "messages", label: "Messaging the admins" },
   { id: "shelf", label: "Ratings, shelf & lists" },
   { id: "contributing", label: "Becoming a contributor" },
   { id: "adding", label: "Adding & editing records" },
@@ -141,6 +142,22 @@ export default function HelpPage() {
             forget your password, use the “Forgot password” link to reset it by email.
           </li>
           <li>A basic account lets you rate, bookmark, track reading, and build lists.</li>
+        </ul>
+      </Section>
+
+      <Section id="messages" title="Messaging the admins">
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            Signed-in users have a private{" "}
+            <Link to="/messages" className="text-violet-700 hover:underline">Messages</Link>{" "}
+            thread with the admin team (under your account menu) — use it for questions,
+            corrections, or anything about your account. Replies usually take a day or two.
+          </li>
+          <li>
+            Messages are plain text only, and there is a modest hourly/daily send limit to keep
+            the inbox usable. Repeated abuse can lead an admin to pause your ability to send for
+            a while (you can always still read).
+          </li>
         </ul>
       </Section>
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
-import { admin } from "../lib/api";
+import { admin, messages } from "../lib/api";
 
 const BROWSE_LINKS = [
   { to: "/browse", label: "Works" },
@@ -79,6 +79,36 @@ export default function Navbar() {
   });
   const pendingEdits = isAdmin ? (pending?.edit_queue ?? 0) : 0;
   const pendingRequests = isAdmin ? (pending?.volunteer_requests ?? 0) : 0;
+  const pendingMessages = isAdmin ? (pending?.unread_messages ?? 0) : 0;
+
+  // Every signed-in user polls their own unread count for the account-menu badge.
+  const { data: myUnread } = useQuery({
+    queryKey: ["my-unread"],
+    queryFn: messages.myUnread,
+    enabled: !!user,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
+  const unread = myUnread?.unread ?? 0;
+
+  const messagesLink = (onClick: () => void, mobile = false) => (
+    <Link
+      to="/messages"
+      onClick={onClick}
+      className={
+        mobile
+          ? "pl-2 flex items-center gap-2"
+          : "flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-50"
+      }
+    >
+      Messages
+      {unread > 0 && (
+        <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full bg-violet-600 text-white text-[11px] font-semibold leading-none">
+          {unread}
+        </span>
+      )}
+    </Link>
+  );
 
   return (
     <>
@@ -137,6 +167,14 @@ export default function Navbar() {
               onClick={() => setOpen(null)}
             />
           )}
+          {pendingMessages > 0 && (
+            <PendingPill
+              to="/admin/messages"
+              label="Messages"
+              count={pendingMessages}
+              onClick={() => setOpen(null)}
+            />
+          )}
 
           {user ? (
             /* Account — personal links grouped behind an avatar */
@@ -147,8 +185,11 @@ export default function Navbar() {
                 aria-haspopup="true"
                 className="flex items-center gap-2 hover:text-gray-900"
               >
-                <span className="w-7 h-7 rounded-full bg-violet-100 text-violet-700 text-xs font-semibold flex items-center justify-center uppercase">
+                <span className="relative w-7 h-7 rounded-full bg-violet-100 text-violet-700 text-xs font-semibold flex items-center justify-center uppercase">
                   {user.username.charAt(0)}
+                  {unread > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-violet-600 ring-2 ring-white" />
+                  )}
                 </span>
                 <span className="max-w-[8rem] truncate">{user.username}</span>
                 <Chevron />
@@ -158,6 +199,7 @@ export default function Navbar() {
                   <Link to="/shelf" onClick={() => setOpen(null)} className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                     My Shelf
                   </Link>
+                  {messagesLink(() => setOpen(null))}
                   {isContributor && (
                     <Link to="/my-submissions" onClick={() => setOpen(null)} className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                       My Submissions
@@ -228,7 +270,7 @@ export default function Navbar() {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                   {user.username}
                 </p>
-                {(pendingEdits > 0 || pendingRequests > 0) && (
+                {(pendingEdits > 0 || pendingRequests > 0 || pendingMessages > 0) && (
                   <div className="flex flex-wrap gap-2 pl-2">
                     {pendingEdits > 0 && (
                       <PendingPill to="/admin/queue" label="Edits" count={pendingEdits} onClick={() => setMenuOpen(false)} />
@@ -241,10 +283,19 @@ export default function Navbar() {
                         onClick={() => setMenuOpen(false)}
                       />
                     )}
+                    {pendingMessages > 0 && (
+                      <PendingPill
+                        to="/admin/messages"
+                        label="Messages"
+                        count={pendingMessages}
+                        onClick={() => setMenuOpen(false)}
+                      />
+                    )}
                   </div>
                 )}
                 <Link to="/contribute" onClick={() => setMenuOpen(false)} className="pl-2">Contribute</Link>
                 <Link to="/shelf" onClick={() => setMenuOpen(false)} className="pl-2">My Shelf</Link>
+                {messagesLink(() => setMenuOpen(false), true)}
                 {isContributor && (
                   <Link to="/my-submissions" onClick={() => setMenuOpen(false)} className="pl-2">My Submissions</Link>
                 )}

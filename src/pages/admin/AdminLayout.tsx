@@ -3,12 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../hooks/useAuth";
 import { admin } from "../../lib/api";
 
-type NavItem = { to: string; label: string; end?: boolean; badge?: "edit_queue" | "volunteer_requests" };
+type NavItem = {
+  to: string;
+  label: string;
+  end?: boolean;
+  badge?: "edit_queue" | "volunteer_requests" | "unread_messages";
+};
 
 const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", end: true },
   { to: "/admin/queue", label: "Edit Queue", badge: "edit_queue" },
   { to: "/admin/volunteer-requests", label: "Volunteer Requests", badge: "volunteer_requests" },
+  { to: "/admin/messages", label: "Messages", badge: "unread_messages" },
   { to: "/admin/news", label: "News" },
   { to: "/admin/users", label: "Users" },
   { to: "/admin/tagging", label: "Genre & Tag Tagging" },

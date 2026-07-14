@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, type AdminUser } from "../../lib/api";
@@ -75,6 +76,15 @@ export default function AdminUsers() {
                       <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-semibold uppercase tracking-wide">
                         You
                       </span>
+                    )}
+                    {u.id !== me?.id && (
+                      <Link
+                        to={`/admin/messages/${u.id}`}
+                        className="ml-2 text-[11px] text-violet-600 hover:underline"
+                        title={`Open the message thread with ${u.username}`}
+                      >
+                        Message
+                      </Link>
                     )}
                   </td>
                   <td className="px-4 py-3 text-gray-500">

@@ -219,6 +219,32 @@ export default function AdminGuide() {
         </p>
       </Section>
 
+      <Section title="Messages — the user inbox">
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li>
+            <Link to="/admin/messages" className="text-violet-700 hover:underline">Messages</Link>{" "}
+            holds one thread per user, shared by the whole admin team — any admin can read and
+            reply to any thread, and the nav badge counts user messages nobody has read yet.
+            Users see the reply in their own Messages page (account menu); no emails are sent.
+          </li>
+          <li>
+            To message a user who has never written in, open{" "}
+            <Link to="/admin/users" className="text-violet-700 hover:underline">Users</Link> and
+            click <em>Message</em> next to their name — that opens their (empty) thread.
+          </li>
+          <li>
+            Everything is plain text, both ways. Users are rate-limited (10 messages/hour,
+            30/day); admins are not.
+          </li>
+          <li>
+            <strong>Muting.</strong> The thread header has a mute control (1 hour to 30 days,
+            optional reason). A muted user can still read but not send; they see the expiry time.
+            Mutes are recorded in the activity log and can be lifted early with <em>Unmute</em>.
+            Admin accounts cannot be muted.
+          </li>
+        </ul>
+      </Section>
+
       <Section title="Users, roles & the owner account">
         <p>
           <Link to="/admin/users" className="text-violet-700 hover:underline">Users</Link> lists

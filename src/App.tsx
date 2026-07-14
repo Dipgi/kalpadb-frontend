@@ -33,6 +33,8 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminQueue from "./pages/admin/AdminQueue";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminMessages from "./pages/admin/AdminMessages";
+import MessagesPage from "./pages/MessagesPage";
 import AdminVolunteerRequests from "./pages/admin/AdminVolunteerRequests";
 import AdminTagging from "./pages/admin/AdminTagging";
 import AdminTags from "./pages/admin/AdminTags";
@@ -116,6 +118,7 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/shelf" element={<ShelfPage />} />
+                <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/contribute" element={<ContributePage />} />
                 <Route path="/my-submissions" element={<MySubmissionsPage />} />
                 <Route
@@ -202,6 +205,8 @@ export default function App() {
                   <Route path="queue" element={<AdminQueue />} />
                   <Route path="news" element={<AdminNews />} />
                   <Route path="users" element={<AdminUsers />} />
+                  <Route path="messages" element={<AdminMessages />} />
+                  <Route path="messages/:userId" element={<AdminMessages />} />
                   <Route path="volunteer-requests" element={<AdminVolunteerRequests />} />
                   <Route path="tagging" element={<AdminTagging />} />
                   <Route path="tags" element={<AdminTags />} />

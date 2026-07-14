@@ -1001,6 +1001,8 @@ export interface VolunteerRequest {
 export interface PendingCounts {
   volunteer_requests: number;
   edit_queue: number;
+  /** User messages no admin has read yet. */
+  unread_messages: number;
 }
 
 // ── Duplicate finder (admin) ──────────────────────────────────────────────
@@ -1788,4 +1790,66 @@ export const user = {
     }),
   deleteRating: (lw_id: number) =>
     request(`/ratings/${lw_id}`, { method: "DELETE" }),
+};
+
+// ── Messaging (admin ↔ user inbox) ────────────────────────────────────────
+
+export interface Message {
+  id: number;
+  body: string;
+  created_at: string;
+  /** True when sent by an admin (not by the thread's owner). */
+  from_admin: boolean;
+  sender_id: number;
+  sender_name: string;
+}
+
+export interface MessageThread {
+  messages: Message[];
+  /** Set (future ISO timestamp) while the current user is muted from sending. */
+  muted_until: string | null;
+}
+
+export interface MessageThreadSummary {
+  user_id: number;
+  username: string;
+  role: string;
+  last_body: string;
+  last_at: string;
+  last_from_admin: boolean;
+  unread: number;
+  muted_until: string | null;
+}
+
+export interface AdminThread {
+  user_id: number;
+  username: string;
+  role: string;
+  muted_until: string | null;
+  mute_reason: string | null;
+  messages: Message[];
+}
+
+export const messages = {
+  // User side — my own thread with the admins.
+  myThread: () => request<MessageThread>("/messages"),
+  myUnread: () => request<{ unread: number }>("/messages/unread-count"),
+  send: (body: string) =>
+    request<Message>("/messages", { method: "POST", body: JSON.stringify({ body }) }),
+
+  // Admin side.
+  threads: () => request<MessageThreadSummary[]>("/admin/messages/threads"),
+  thread: (userId: number) => request<AdminThread>(`/admin/messages/threads/${userId}`),
+  reply: (userId: number, body: string) =>
+    request<Message>(`/admin/messages/threads/${userId}`, {
+      method: "POST",
+      body: JSON.stringify({ body }),
+    }),
+  mute: (userId: number, hours: number, reason?: string) =>
+    request<AdminThread>(`/admin/messages/threads/${userId}/mute`, {
+      method: "POST",
+      body: JSON.stringify({ hours, reason: reason ?? null }),
+    }),
+  unmute: (userId: number) =>
+    request<AdminThread>(`/admin/messages/threads/${userId}/mute`, { method: "DELETE" }),
 };
