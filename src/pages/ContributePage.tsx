@@ -48,15 +48,44 @@ import PenNamesField, { type PenName } from "../components/PenNamesField";
 import PrimaryLanguageSelect from "../components/PrimaryLanguageSelect";
 import NativeNameField from "../components/NativeNameField";
 import CountrySelect from "../components/CountrySelect";
+import MediaCreditsEditor, {
+  type CreditRow,
+  creditPeople,
+  creditRowsToPayload,
+} from "../components/MediaCreditsEditor";
+import MediaAdaptationsEditor, {
+  type AdaptationRow,
+  adaptationRowsToPayload,
+} from "../components/MediaAdaptationsEditor";
+import MediaSeasonsEditor, {
+  type SeasonRow,
+  seasonRowsToPayload,
+} from "../components/MediaSeasonsEditor";
 import { WORLD_LANGUAGES } from "../lib/languages";
-import { WORK_TYPE_OPTIONS, STORY_TYPE_OPTIONS, COMIC_TYPE_OPTIONS } from "../lib/workTypes";
+import {
+  WORK_TYPE_OPTIONS,
+  STORY_TYPE_OPTIONS,
+  COMIC_TYPE_OPTIONS,
+  MEDIA_TYPE_OPTIONS,
+  EPISODIC_MEDIA_TYPES,
+} from "../lib/workTypes";
 
-type Tab = "book" | "story" | "comic" | "magazine" | "issue" | "person" | "publisher" | "series";
+type Tab =
+  | "book"
+  | "story"
+  | "comic"
+  | "media"
+  | "magazine"
+  | "issue"
+  | "person"
+  | "publisher"
+  | "series";
 
 const TAB_LABELS: Record<Tab, string> = {
   book: "Book",
   story: "Story",
   comic: "Comic",
+  media: "Media",
   magazine: "Magazine",
   issue: "Magazine issue",
   person: "Person",
@@ -109,7 +138,7 @@ export default function ContributePage() {
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {(["book", "story", "comic", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
+        {(["book", "story", "comic", "media", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -127,6 +156,7 @@ export default function ContributePage() {
       {tab === "book" && <BookForm />}
       {tab === "story" && <StoryForm />}
       {tab === "comic" && <ComicForm />}
+      {tab === "media" && <MediaForm />}
       {tab === "magazine" && <MagazineForm />}
       {tab === "issue" && <MagazineIssueChooser />}
       {tab === "person" && <PersonForm />}
@@ -1207,6 +1237,262 @@ function ComicForm() {
       </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit comic" />
+    </form>
+  );
+}
+
+// ── Media ─────────────────────────────────────────────────────────────────────
+
+function MediaForm() {
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [language, setLanguage] = useState("bn");
+  const [contentType, setContentType] = useState("film");
+  const [originalLanguage, setOriginalLanguage] = useState("");
+  const [year, setYear] = useState("");
+  const [runtime, setRuntime] = useState("");
+  const [platform, setPlatform] = useState("");
+  const [productionHouse, setProductionHouse] = useState("");
+  const [country, setCountry] = useState("IN");
+  const [ageRating, setAgeRating] = useState("");
+  const [posterUrl, setPosterUrl] = useState("");
+  const [credits, setCredits] = useState<CreditRow[]>([]);
+  // One byline map for the whole work: applies to every credit a person holds.
+  const [bylines, setBylines] = useState<Record<number, string>>({});
+  const [adaptations, setAdaptations] = useState<AdaptationRow[]>([]);
+  const [seasons, setSeasons] = useState<SeasonRow[]>([]);
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
+
+  const episodic = EPISODIC_MEDIA_TYPES.has(contentType);
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      const y = year ? Number(year) : null;
+      const seasonPayload = episodic ? seasonRowsToPayload(seasons) : [];
+      const episodeCounts = seasonPayload.map((s) => s.episode_count);
+      return volunteer.submitMedia({
+        title: title.trim(),
+        description: description.trim() || null,
+        language,
+        original_language: originalLanguage || null,
+        publication_date: y ? `${y}-01-01` : null,
+        content_type: contentType,
+        image_urls: posterUrl.trim() ? [posterUrl.trim()] : null,
+        credits: creditRowsToPayload(credits),
+        credited_as: bylinePayload(creditPeople(credits), bylines),
+        adaptations: adaptationRowsToPayload(adaptations),
+        seasons: seasonPayload,
+        runtime_minutes: runtime ? Number(runtime) : null,
+        total_seasons: seasonPayload.length || null,
+        total_episodes:
+          seasonPayload.length && episodeCounts.every((c) => c != null)
+            ? episodeCounts.reduce((a: number, c) => a + (c as number), 0)
+            : null,
+        platform: platform.trim() || null,
+        production_house: productionHouse.trim() || null,
+        country_of_origin: country || null,
+        age_rating: ageRating.trim() || null,
+        genre_ids: [...genreIds],
+        tag_ids: [...tagIds],
+      });
+    },
+    onSuccess: () => {
+      setSubmitted(true);
+      setTitle("");
+      setDescription("");
+      setContentType("film");
+      setOriginalLanguage("");
+      setYear("");
+      setRuntime("");
+      setPlatform("");
+      setProductionHouse("");
+      setAgeRating("");
+      setPosterUrl("");
+      setCredits([]);
+      setBylines({});
+      setAdaptations([]);
+      setSeasons([]);
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitted(false);
+        if (title.trim()) mutation.mutate();
+      }}
+      className="space-y-4"
+    >
+      {submitted && <PendingBanner />}
+
+      <FormSection title="Basics">
+        <div>
+          <label className={labelCls}>Title * (native script preferred)</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Description / synopsis</label>
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
+        </div>
+      </FormSection>
+
+      <FormSection title="Release details">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Media type</label>
+            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
+              {MEDIA_TYPE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Language</label>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+              {(languages ?? [{ code: "bn", name: "Bengali", name_local: "বাংলা" }]).map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Original language (if dub/translation)</label>
+            <select value={originalLanguage} onChange={(e) => setOriginalLanguage(e.target.value)} className={inputCls}>
+              <option value="">Not a dub / translation</option>
+              <optgroup label="World languages">
+                {WORLD_LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code}>{l.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Indian languages">
+                {(languages ?? [])
+                  .filter((l) => !WORLD_LANGUAGES.some((w) => w.code === l.code))
+                  .map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                    </option>
+                  ))}
+              </optgroup>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Release year</label>
+            <input type="number" min={1900} max={2100} value={year} onChange={(e) => setYear(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Runtime (minutes)</label>
+            <input
+              type="number"
+              min={1}
+              value={runtime}
+              onChange={(e) => setRuntime(e.target.value)}
+              placeholder={episodic ? "per episode" : ""}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Platform / venue</label>
+            <input
+              value={platform}
+              onChange={(e) => setPlatform(e.target.value)}
+              placeholder="Hoichoi, YouTube, theatrical, stage…"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Production house</label>
+            <input value={productionHouse} onChange={(e) => setProductionHouse(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Country of origin</label>
+            <CountrySelect value={country} onChange={setCountry} />
+          </div>
+          <div>
+            <label className={labelCls}>Age rating</label>
+            <input
+              value={ageRating}
+              onChange={(e) => setAgeRating(e.target.value)}
+              placeholder="U, U/A 13+, A…"
+              className={inputCls}
+            />
+          </div>
+        </div>
+      </FormSection>
+
+      {episodic && (
+        <FormSection title="Seasons" hint="One row per season — totals are derived automatically.">
+          <MediaSeasonsEditor rows={seasons} onChange={setSeasons} />
+        </FormSection>
+      )}
+
+      <FormSection
+        title="Cast & crew"
+        hint="Primary-creator credits (director, playwright, composer, singer) double as the work's byline in browse."
+      >
+        <MediaCreditsEditor
+          rows={credits}
+          onChange={setCredits}
+          contentType={contentType}
+          bylines={bylines}
+          onBylinesChange={setBylines}
+        />
+      </FormSection>
+
+      <FormSection
+        title="Based on (adaptations)"
+        hint="Link the catalogued book/story this work adapts. The source work's page will show it under Adaptations."
+      >
+        <MediaAdaptationsEditor rows={adaptations} onChange={setAdaptations} />
+      </FormSection>
+
+      <FormSection title="Poster & classification">
+        <ImageUploadField
+          label="Poster / cover image"
+          category="covers"
+          value={posterUrl}
+          onChange={(url) => setPosterUrl(url ?? "")}
+        />
+        <div>
+          <label className={labelCls}>Genres</label>
+          <div className="flex flex-wrap gap-2">
+            {(allGenres ?? []).map((g: GenreItem) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() =>
+                  setGenreIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(g.id)) next.delete(g.id);
+                    else next.add(g.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  genreIds.has(g.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {g.genre_name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <TagChipPicker selected={tagIds} onChange={setTagIds} />
+      </FormSection>
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit media work" />
     </form>
   );
 }
