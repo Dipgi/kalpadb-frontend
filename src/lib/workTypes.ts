@@ -34,15 +34,58 @@ export const COMIC_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "comic_strip", label: "Comic strip" },
 ];
 
-// ContentType values for MEDIA (screen / audio / interactive) works.
+// ContentType values for MEDIA (screen / audio / stage / interactive) works.
 export const MEDIA_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "film", label: "Film" },
   { value: "tv_series", label: "TV series" },
   { value: "web_series", label: "Web series" },
-  { value: "audio_drama", label: "Audio drama" },
+  { value: "audio_drama", label: "Audio drama (radio play)" },
   { value: "podcast", label: "Podcast" },
   { value: "audiobook", label: "Audiobook" },
   { value: "video_game", label: "Video game" },
+  { value: "song", label: "Song / album" },
+  { value: "drama", label: "Stage drama (theatre / jatra)" },
+];
+
+// Media content types that have seasons/episodes — drives whether the
+// Seasons editor and total_seasons/total_episodes fields are shown.
+export const EPISODIC_MEDIA_TYPES = new Set(["tv_series", "web_series", "podcast"]);
+
+// Curated cast & crew role suggestions per media content type. The credit
+// role is free text server-side; these seed the role dropdown, and the form
+// offers an "Other…" escape hatch for anything not listed.
+const SCREEN_ROLES = [
+  "director",
+  "writer",
+  "producer",
+  "actor",
+  "voice_actor",
+  "cinematographer",
+  "composer",
+  "editor",
+  "vfx_supervisor",
+  "narrator",
+];
+const AUDIO_ROLES = ["narrator", "voice_actor", "writer", "director", "producer", "sound_designer", "composer", "audio_engineer"];
+export const MEDIA_ROLE_OPTIONS: Record<string, string[]> = {
+  film: SCREEN_ROLES,
+  tv_series: SCREEN_ROLES,
+  web_series: SCREEN_ROLES,
+  audio_drama: AUDIO_ROLES,
+  podcast: AUDIO_ROLES,
+  audiobook: AUDIO_ROLES,
+  video_game: ["game_director", "game_designer", "game_writer", "game_composer", "lead_programmer", "art_director", "voice_actor"],
+  song: ["singer", "lyricist", "composer", "music_director", "arranger"],
+  drama: ["playwright", "director", "actor", "producer", "composer", "stage_designer", "costume_designer"],
+};
+
+// Adaptation relationship options (MediaAdaptation.adaptation_type).
+export const ADAPTATION_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "direct", label: "Direct (faithful adaptation)" },
+  { value: "partial", label: "Partial (adapts part of the source)" },
+  { value: "loose", label: "Loose (inspired by / based on)" },
+  { value: "sequel", label: "Sequel to the source work" },
+  { value: "prequel", label: "Prequel to the source work" },
 ];
 
 /**

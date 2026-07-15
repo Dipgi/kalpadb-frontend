@@ -9,7 +9,8 @@ import { romanisedTitle } from "../lib/title";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import { Stars, StarPicker } from "../components/StarRating";
 import PlaceholderCover from "../components/PlaceholderCover";
-import { PersonList } from "../components/PersonLink";
+import { PersonLink, PersonList } from "../components/PersonLink";
+import { COUNTRIES } from "../lib/countries";
 import { PublisherList } from "../components/PublisherLink";
 import { relationLabel } from "../lib/relations";
 import { useSeo } from "../hooks/useSeo";
@@ -35,6 +36,11 @@ function magazineLifespan(md: {
   else if (md.status === "ceased") end = "?";
   else end = "";
   return end === "" ? `${start}–` : `${start}–${end}`;
+}
+
+/** Country name for an ISO alpha-2 code, falling back to the raw code. */
+function countryName(code: string): string {
+  return COUNTRIES.find((c) => c.code === code)?.name ?? code;
 }
 
 export default function WorkDetailPage() {
@@ -173,7 +179,32 @@ export default function WorkDetailPage() {
             ? role === "admin"
               ? `/admin/edit-comic/${work.id}`
               : `/works/${work.id}/edit-comic`
-            : null;
+            : work.type === "MEDIA"
+              ? role === "admin"
+                ? `/admin/edit-media/${work.id}`
+                : `/works/${work.id}/edit-media`
+              : null;
+
+  // Trailer/watch links render as prominent buttons near the poster; the
+  // generic Links list below excludes them to avoid showing them twice.
+  const trailerLinks = work.external_links?.filter((l) => l.link_type === "trailer") ?? [];
+  const watchLinks = work.external_links?.filter((l) => l.link_type === "watch") ?? [];
+  const otherLinks =
+    work.external_links?.filter((l) => l.link_type !== "trailer" && l.link_type !== "watch") ?? [];
+
+  // Cast & crew grouped by role, lead credits first within each group.
+  const creditGroups = (() => {
+    const groups = new Map<string, NonNullable<typeof work.media>["credits"]>();
+    for (const c of work.media?.credits ?? []) {
+      const list = groups.get(c.role) ?? [];
+      list.push(c);
+      groups.set(c.role, list);
+    }
+    for (const list of groups.values()) {
+      list.sort((a, b) => Number(b.is_primary) - Number(a.is_primary));
+    }
+    return [...groups.entries()];
+  })();
 
   // Uncatalogued source attribution — books and stories carry the same fields.
   const externalSource = work.book?.original_title
@@ -259,6 +290,39 @@ export default function WorkDetailPage() {
               </span>
             ))}
           </div>
+
+          {(trailerLinks.length > 0 || watchLinks.length > 0) && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {watchLinks.map((l) => (
+                <a
+                  key={l.id}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm hover:bg-violet-800 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {l.label ?? "Watch now"}
+                </a>
+              ))}
+              {trailerLinks.map((l) => (
+                <a
+                  key={l.id}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 border border-violet-300 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded-md hover:bg-violet-50 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {l.label ?? "Watch trailer"}
+                </a>
+              ))}
+            </div>
+          )}
 
           {work.description && (
             <p className="text-gray-600 text-sm leading-relaxed mb-4 whitespace-pre-line">{work.description}</p>
@@ -382,6 +446,116 @@ export default function WorkDetailPage() {
                         <p>Price: {f.price}{f.currency ? ` ${f.currency}` : ""}</p>
                       )}
                       {f.notes && <p className="text-gray-500 whitespace-pre-line">{f.notes}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {work.media && (
+          <>
+            {(work.media.runtime_minutes != null ||
+              work.media.platform ||
+              work.media.production_house ||
+              work.media.country_of_origin ||
+              work.media.age_rating ||
+              work.media.total_seasons != null) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Media details</h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.media.runtime_minutes != null && (
+                    <p>Runtime: {work.media.runtime_minutes} min</p>
+                  )}
+                  {work.media.total_seasons != null && (
+                    <p>
+                      {work.media.total_seasons} season{work.media.total_seasons > 1 ? "s" : ""}
+                      {work.media.total_episodes != null
+                        ? ` · ${work.media.total_episodes} episodes`
+                        : ""}
+                    </p>
+                  )}
+                  {work.media.platform && <p>Platform: {work.media.platform}</p>}
+                  {work.media.production_house && <p>Production: {work.media.production_house}</p>}
+                  {work.media.country_of_origin && (
+                    <p>Country: {countryName(work.media.country_of_origin)}</p>
+                  )}
+                  {work.media.age_rating && <p>Rated: {work.media.age_rating}</p>}
+                </div>
+              </div>
+            )}
+
+            {work.media.seasons.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Seasons</h3>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  {work.media.seasons.map((s) => (
+                    <li key={s.id}>
+                      Season {s.season_number}
+                      {s.title ? ` — ${s.title}` : ""}
+                      <span className="text-gray-400">
+                        {s.episode_count != null ? ` · ${s.episode_count} ep.` : ""}
+                        {s.release_date ? ` · ${s.release_date.slice(0, 4)}` : ""}
+                        {s.platform ? ` · ${s.platform}` : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {work.media.adaptations.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Based on</h3>
+                <ul className="text-sm space-y-1">
+                  {work.media.adaptations.map((a) => (
+                    <li key={a.id}>
+                      <Link to={`/works/${a.source_work.id}`} className="text-violet-700 hover:underline">
+                        {a.source_work.title}
+                      </Link>
+                      {a.source_work.authors.length > 0 && (
+                        <span className="text-gray-500">
+                          {" "}by <PersonList people={a.source_work.authors} />
+                        </span>
+                      )}
+                      {a.adaptation_type !== "direct" && (
+                        <span className="text-gray-400 ml-1 text-xs">({a.adaptation_type})</span>
+                      )}
+                      {a.notes && <span className="text-gray-400 text-xs"> · {a.notes}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {creditGroups.length > 0 && (
+              <div className="md:col-span-2">
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Cast &amp; crew
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  {creditGroups.map(([roleName, people]) => (
+                    <div key={roleName} className="text-sm">
+                      <span className="text-gray-400 capitalize">{roleName.replace(/_/g, " ")}: </span>
+                      <span className="text-gray-700">
+                        {people.map((c, i) => (
+                          <span key={c.id}>
+                            {i > 0 && ", "}
+                            <PersonLink
+                              person={{
+                                id: c.stakeholder.id,
+                                name: c.stakeholder.name,
+                                credited_as: c.credited_as,
+                              }}
+                              className="text-violet-700 hover:underline"
+                            />
+                            {c.character_name && (
+                              <span className="text-gray-400"> — {c.character_name}</span>
+                            )}
+                          </span>
+                        ))}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -880,6 +1054,31 @@ export default function WorkDetailPage() {
           </div>
         )}
 
+        {work.adapted_by?.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+              Adaptations
+            </h3>
+            <ul className="text-sm space-y-1">
+              {work.adapted_by.map((a) => (
+                <li key={a.id}>
+                  <Link to={`/works/${a.media_work.id}`} className="text-violet-700 hover:underline">
+                    {a.media_work.title}
+                  </Link>
+                  <span className="text-gray-400 ml-1 text-xs capitalize">
+                    ({(a.media_work.content_type ?? "media").replace(/_/g, " ")}
+                    {a.media_work.publication_date
+                      ? `, ${a.media_work.publication_date.slice(0, 4)}`
+                      : ""}
+                    {a.adaptation_type !== "direct" ? ` · ${a.adaptation_type}` : ""})
+                  </span>
+                  {a.notes && <span className="text-gray-400 text-xs"> · {a.notes}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {(() => {
           // continues/continued_by are shown in the magazine "Related titles"
           // block above, so exclude them here to avoid showing the link twice.
@@ -906,11 +1105,11 @@ export default function WorkDetailPage() {
           ) : null;
         })()}
 
-        {work.external_links?.length > 0 && (
+        {otherLinks.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Links</h3>
             <ul className="text-sm space-y-1">
-              {work.external_links.map((l) => (
+              {otherLinks.map((l) => (
                 <li key={l.id}>
                   <a href={l.url} target="_blank" rel="noopener noreferrer"
                     className="text-violet-700 hover:underline">

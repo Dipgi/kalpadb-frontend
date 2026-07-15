@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "14 July 2026";
+const LAST_UPDATED = "15 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -109,6 +109,48 @@ export default function AdminGuide() {
             editions” for the <em>same</em> work in another language, and this section for a{" "}
             <em>different but connected</em> work in the same language. Approved links appear in the
             “Related works” block on both public work pages.
+          </li>
+        </ul>
+      </Section>
+
+      <Section title="Media works (films, series, songs, stage dramas)">
+        <p>
+          The <strong>Media</strong> tab on Add Records catalogues SF that <em>is</em> a screen,
+          audio, stage, or interactive work — films, TV/web series, audio dramas, podcasts,
+          audiobooks, video games, songs, and stage dramas. Discussions, interviews, and press{" "}
+          <em>about</em> SF are not media works; they get their own COVERAGE type later.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Cast &amp; crew.</strong> One row per person per role. The role dropdown follows
+            the media type (director/actor for films, singer/lyricist for songs, playwright for
+            stage dramas) with an “Other…” escape hatch for anything else. Primary-creator credits —
+            director, playwright, composer, singer, game director — double as the work’s byline in
+            browse, like a comic’s writers. Bylines (“credited as”, e.g. screen names) work the same
+            as everywhere else. Credit rows use replace-semantics: the set you save is the full set.
+          </li>
+          <li>
+            <strong>Based on (adaptations).</strong> Link the media work to the catalogued book(s)
+            or story(ies) it adapts, with a faithfulness type (direct / partial / loose / sequel /
+            prequel). The source work’s public page shows it under <em>Adaptations</em>{" "}
+            automatically — record it once, from the media side.
+          </li>
+          <li>
+            <strong>Seasons.</strong> For series and podcasts, one row per season (number, title,
+            episode count, year). Totals are derived automatically. Per-episode entry isn’t
+            supported yet.
+          </li>
+          <li>
+            <strong>Trailer &amp; watch buttons.</strong> On the media edit page, add external links
+            with type <em>trailer</em> (the trailer video) or <em>watch</em> (the OTT/YouTube/
+            Spotify page where it can be watched or heard). They render as play buttons at the top
+            of the public page instead of the plain links list. Use the label for the platform name
+            (“Watch on Hoichoi”).
+          </li>
+          <li>
+            <strong>Dubs &amp; remakes.</strong> A dubbed/translated version is its own media work,
+            linked through “Translations &amp; dubs” exactly like a translated book. A remake in
+            another language is a <em>Related work</em> (retelling/inspired by), not a translation.
           </li>
         </ul>
       </Section>

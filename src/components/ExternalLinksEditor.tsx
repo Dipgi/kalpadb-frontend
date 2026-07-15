@@ -4,7 +4,7 @@ import { admin, volunteer, type ExternalLinkItem } from "../lib/api";
 
 type Target = { kind: "work"; id: number } | { kind: "person"; id: number };
 
-const LINK_TYPES = ["goodreads", "wikipedia", "worldcat", "openlibrary", "other"];
+const LINK_TYPES = ["goodreads", "wikipedia", "worldcat", "openlibrary", "trailer", "watch", "other"];
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";

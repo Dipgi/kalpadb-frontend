@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "14 July 2026";
+const LAST_UPDATED = "15 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -271,8 +271,14 @@ export default function HelpPage() {
             section, not in the works browse.
           </li>
           <li>
-            <strong>Media</strong> — screen, audio, or interactive SF (films, web series, audio
-            dramas, games), with seasons/episodes and screen credits.
+            <strong>Media</strong> — SF that <em>is</em> a screen, audio, stage, or interactive
+            work: films, TV and web series, audio dramas (radio plays), podcasts, audiobooks, video
+            games, songs, and stage dramas (theatre/jatra). Carries a runtime, platform (Hoichoi,
+            YouTube, theatrical, stage…), production house, seasons for episodic works, and free
+            cast &amp; crew roles (director, actor, singer, playwright…). A media work can be
+            linked to the book or story it <strong>adapts</strong> — the source work’s page then
+            shows it under “Adaptations”, and the media page shows “Based on”. Trailer and watch
+            links appear as buttons on the work’s page.
           </li>
         </ul>
         <p>

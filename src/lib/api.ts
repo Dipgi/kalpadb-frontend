@@ -146,6 +146,13 @@ export interface WorkDetail extends WorkSummary {
     notes?: string | null;
     work: WorkSummary;
   }[];
+  /** Media works that adapt this work (film/series/audio versions). */
+  adapted_by: {
+    id: number;
+    media_work: WorkSummary;
+    adaptation_type: string;
+    notes: string | null;
+  }[];
   book: {
     publication_year: number | null;
     series_id: number | null;
@@ -267,6 +274,26 @@ export interface ComicFormat {
   notes: string | null;
 }
 
+export interface MediaCredit {
+  id: number;
+  stakeholder: PersonSummary;
+  role: string;
+  character_name: string | null;
+  is_primary: boolean;
+  notes: string | null;
+  credited_as: string | null;
+}
+
+export interface MediaSeason {
+  id: number;
+  season_number: number;
+  title: string | null;
+  episode_count: number | null;
+  release_date: string | null;
+  platform: string | null;
+  synopsis: string | null;
+}
+
 export interface MediaWorkDetail {
   id: number;
   runtime_minutes: number | null;
@@ -277,14 +304,8 @@ export interface MediaWorkDetail {
   country_of_origin: string | null;
   age_rating: string | null;
   source_lw_id: number | null;
-  credits: {
-    id: number;
-    stakeholder: PersonSummary;
-    role: string;
-    character_name: string | null;
-    is_primary: boolean;
-    notes: string | null;
-  }[];
+  seasons: MediaSeason[];
+  credits: MediaCredit[];
   adaptations: { id: number; source_work: WorkSummary; adaptation_type: string; notes: string | null }[];
 }
 
@@ -1423,6 +1444,63 @@ export interface ComicFormatInput {
 /** All fields optional — a present field replaces, an absent one is left unchanged. */
 export type ComicUpdateIn = Partial<ComicCreateIn>;
 
+export interface MediaCreditInput {
+  stakeholder_id: number;
+  role: string;
+  character_name?: string | null;
+  is_primary?: boolean;
+  notes?: string | null;
+}
+
+export interface MediaAdaptationInput {
+  source_lw_id: number;
+  adaptation_type: "direct" | "partial" | "loose" | "sequel" | "prequel";
+  notes?: string | null;
+}
+
+export interface MediaSeasonInput {
+  season_number: number;
+  title?: string | null;
+  episode_count?: number | null;
+  release_date?: string | null;
+  platform?: string | null;
+  synopsis?: string | null;
+}
+
+export interface MediaCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  content_type: string;
+  image_urls?: string[] | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  /**
+   * Cast & crew. Primary-creator roles (director, playwright, composer,
+   * singer, game_director) double as the work-level authors in browse/cards.
+   */
+  credits?: MediaCreditInput[];
+  /** {stakeholder_id: byline-as-credited} — applies to all of that person's credits. */
+  credited_as?: Record<number, string>;
+  adaptations?: MediaAdaptationInput[];
+  seasons?: MediaSeasonInput[];
+  runtime_minutes?: number | null;
+  total_seasons?: number | null;
+  total_episodes?: number | null;
+  platform?: string | null;
+  production_house?: string | null;
+  country_of_origin?: string | null;
+  age_rating?: string | null;
+  source_lw_id?: number | null;
+  /** Optional manual localised overrides: { field: { lang: value } }. */
+  localised?: Record<string, Record<string, string>>;
+}
+
+/** All fields optional — a present field replaces, an absent one is left unchanged. */
+export type MediaUpdateIn = Partial<MediaCreateIn>;
+
 export interface MagazineCreateIn {
   title: string;
   description?: string | null;
@@ -1663,6 +1741,13 @@ export const volunteer = {
     request<EditSubmission>("/works/comics", { method: "POST", body: JSON.stringify(data) }),
   updateComic: (work_id: number, data: ComicUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/comics/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitMedia: (data: MediaCreateIn) =>
+    request<EditSubmission>("/works/media", { method: "POST", body: JSON.stringify(data) }),
+  updateMedia: (work_id: number, data: MediaUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/media/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),

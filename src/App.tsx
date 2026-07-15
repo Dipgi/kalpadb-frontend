@@ -43,6 +43,7 @@ import AdminAdd from "./pages/admin/AdminAdd";
 import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditStory from "./pages/admin/AdminEditStory";
 import AdminEditComic from "./pages/admin/AdminEditComic";
+import AdminEditMedia from "./pages/admin/AdminEditMedia";
 import AdminEditMagazine from "./pages/admin/AdminEditMagazine";
 import AdminEditMagazineIssue from "./pages/admin/AdminEditMagazineIssue";
 import AdminEditPerson from "./pages/admin/AdminEditPerson";
@@ -146,6 +147,14 @@ export default function App() {
                   }
                 />
                 <Route
+                  path="/works/:id/edit-media"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditMedia />
+                    </div>
+                  }
+                />
+                <Route
                   path="/works/:id/edit-magazine"
                   element={
                     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -219,6 +228,7 @@ export default function App() {
                   <Route path="edit/:id" element={<AdminEditBook />} />
                   <Route path="edit-story/:id" element={<AdminEditStory />} />
                   <Route path="edit-comic/:id" element={<AdminEditComic />} />
+                  <Route path="edit-media/:id" element={<AdminEditMedia />} />
                   <Route path="edit-magazine/:id" element={<AdminEditMagazine />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />
