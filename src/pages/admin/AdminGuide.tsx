@@ -119,6 +119,9 @@ export default function AdminGuide() {
           audio, stage, or interactive work — films, TV/web series, audio dramas, podcasts,
           audiobooks, video games, songs, and stage dramas. Discussions, interviews, and press{" "}
           <em>about</em> SF are not media works; they get their own COVERAGE type later.
+          Volunteers have the same form on the Contribute page (minus inline person creation) —
+          their submissions arrive in the review queue like any other record, with credits,
+          adaptation links, and seasons applied on approval.
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>

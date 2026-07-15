@@ -200,8 +200,10 @@ export default function HelpPage() {
       <Section id="adding" title="Adding & editing records">
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <strong>Add</strong> new books, people, publishers, and series from the{" "}
-            <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link> page.
+            <strong>Add</strong> new books, stories, comics, media works (films, series, songs,
+            stage dramas…), magazines and their issues, people, publishers, and series from the{" "}
+            <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link>{" "}
+            page — one tab per record type.
           </li>
           <li>
             <strong>Suggest an edit</strong> from any work, person, publisher, or series page using
@@ -278,7 +280,17 @@ export default function HelpPage() {
             cast &amp; crew roles (director, actor, singer, playwright…). A media work can be
             linked to the book or story it <strong>adapts</strong> — the source work’s page then
             shows it under “Adaptations”, and the media page shows “Based on”. Trailer and watch
-            links appear as buttons on the work’s page.
+            links appear as buttons on the work’s page. Add media works from the{" "}
+            <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link>{" "}
+            page’s <em>Media</em> tab.
+            <div className="mt-1.5 text-gray-500">
+              <strong>What belongs here — and what doesn’t.</strong> Media works are SF that{" "}
+              <em>is</em> the film/series/song/performance itself. A YouTube discussion, interview,
+              or panel <em>about</em> SF is press coverage, not a media work — please don’t
+              catalogue those (a separate coverage section is planned). A dubbed or translated
+              version is its own record, linked to the original as a translation; a remake is a
+              related work.
+            </div>
           </li>
         </ul>
         <p>
