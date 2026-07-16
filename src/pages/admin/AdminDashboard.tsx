@@ -29,6 +29,8 @@ export default function AdminDashboard() {
     { label: "People", value: s.total_authors, to: "/persons" },
     { label: "Books", value: s.total_books, to: "/browse?type=BOOK" },
     { label: "Stories", value: s.total_stories, to: "/browse?type=STORY" },
+    { label: "Comics", value: s.total_comics, to: "/browse?type=COMIC" },
+    { label: "Media", value: s.total_media, to: "/browse?type=MEDIA" },
     { label: "Magazine Issues", value: s.total_magazine_issues, to: "/issues" },
     { label: "Publishers", value: s.total_publishers, to: "/publishers" },
     { label: "Languages", value: s.total_languages, to: "/browse" },

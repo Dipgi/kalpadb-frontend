@@ -22,6 +22,15 @@ const SHELF_STATUSES: { value: string; label: string }[] = [
   { value: "abandoned", label: "Dropped" },
 ];
 
+// The shelf tracks watch/listen/play progress for media works too — same
+// statuses, watch-flavoured labels so a film doesn't say "Want to Read".
+const MEDIA_SHELF_STATUSES: { value: string; label: string }[] = [
+  { value: "want", label: "Want to Watch" },
+  { value: "in_progress", label: "Watching" },
+  { value: "finished", label: "Watched" },
+  { value: "abandoned", label: "Dropped" },
+];
+
 /** Human lifespan for a magazine title, e.g. "1963–1973", "1963–present", "1963–?". */
 function magazineLifespan(md: {
   founded_year: number | null;
@@ -330,7 +339,7 @@ export default function WorkDetailPage() {
 
           {me && (
             <div className="flex flex-wrap gap-2">
-              {SHELF_STATUSES.map(({ value, label }) => (
+              {(work.type === "MEDIA" ? MEDIA_SHELF_STATUSES : SHELF_STATUSES).map(({ value, label }) => (
                 <button
                   key={value}
                   disabled={shelfMutation.isPending}
@@ -499,6 +508,9 @@ export default function WorkDetailPage() {
                         {s.release_date ? ` · ${s.release_date.slice(0, 4)}` : ""}
                         {s.platform ? ` · ${s.platform}` : ""}
                       </span>
+                      {s.synopsis && (
+                        <p className="text-xs text-gray-500 whitespace-pre-line">{s.synopsis}</p>
+                      )}
                     </li>
                   ))}
                 </ul>

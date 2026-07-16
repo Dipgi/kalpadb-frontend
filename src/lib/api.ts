@@ -423,6 +423,8 @@ export interface StatsOut {
     total_authors?: number;
     total_books?: number;
     total_stories?: number;
+    total_comics?: number;
+    total_media?: number;
     total_magazines?: number;
     total_magazine_issues?: number;
     total_publishers?: number;

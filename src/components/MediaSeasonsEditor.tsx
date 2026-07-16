@@ -6,6 +6,7 @@ export interface SeasonRow {
   episode_count: string;
   release_year: string;
   platform: string;
+  synopsis: string;
 }
 
 const inputCls =
@@ -84,6 +85,15 @@ export default function MediaSeasonsEditor({
                 />
               </div>
             </div>
+            <div>
+              <label className="block text-[11px] text-gray-400 mb-0.5">Synopsis (optional)</label>
+              <textarea
+                value={row.synopsis}
+                onChange={(e) => update(i, { synopsis: e.target.value })}
+                rows={2}
+                className={inputCls}
+              />
+            </div>
             <button
               type="button"
               onClick={() => onChange(rows.filter((_, idx) => idx !== i))}
@@ -105,6 +115,7 @@ export default function MediaSeasonsEditor({
               episode_count: "",
               release_year: "",
               platform: "",
+              synopsis: "",
             },
           ])
         }
@@ -124,6 +135,7 @@ export function seasonRowsFromExisting(seasons: MediaSeason[]): SeasonRow[] {
     episode_count: s.episode_count?.toString() ?? "",
     release_year: s.release_date ? s.release_date.slice(0, 4) : "",
     platform: s.platform ?? "",
+    synopsis: s.synopsis ?? "",
   }));
 }
 
@@ -137,5 +149,6 @@ export function seasonRowsToPayload(rows: SeasonRow[]): MediaSeasonInput[] {
       episode_count: r.episode_count ? Number(r.episode_count) : null,
       release_date: r.release_year ? `${r.release_year}-01-01` : null,
       platform: r.platform.trim() || null,
+      synopsis: r.synopsis.trim() || null,
     }));
 }
