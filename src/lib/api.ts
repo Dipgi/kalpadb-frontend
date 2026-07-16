@@ -820,6 +820,8 @@ export const catalogue = {
     request<Page<{ id: number; name: string }>>(
       `/publishers?q=${encodeURIComponent(q)}&page_size=${size}`
     ),
+  // Roles that have at least one credit — drives the Browse People role filter.
+  personRoles: () => request<string[]>(`/persons/roles`),
   // Browse listings (paginated, richer than the picker helpers above)
   personsList: (params: { q?: string; role_type?: string; sort?: string; page?: number } = {}) => {
     const p = new URLSearchParams();

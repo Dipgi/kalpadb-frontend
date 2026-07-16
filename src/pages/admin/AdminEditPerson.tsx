@@ -15,12 +15,11 @@ import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import AwardsEditor from "../../components/AwardsEditor";
 import ExternalLinksEditor from "../../components/ExternalLinksEditor";
 import FormSection from "../../components/FormSection";
+import RoleHintSelect from "../../components/RoleHintSelect";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
-
-const ROLE_TYPES = ["author", "illustrator", "editor", "translator"];
 
 export default function AdminEditPerson() {
   const { id } = useParams<{ id: string }>();
@@ -46,7 +45,7 @@ function EditForm({ person }: { person: Person }) {
   const isAdmin = user?.role.toLowerCase() === "admin";
 
   const [name, setName] = useState(person.name);
-  const [roleType, setRoleType] = useState(person.role_type ?? "author");
+  const [roleType, setRoleType] = useState(person.role_type ?? "");
   const [nationality, setNationality] = useState(person.nationality ?? "");
   const [primaryLanguage, setPrimaryLanguage] = useState(person.primary_language ?? "");
   const [nativeName, setNativeName] = useState(
@@ -192,14 +191,7 @@ function EditForm({ person }: { person: Person }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Primary role (hint)</label>
-          <select value={roleType} onChange={(e) => setRoleType(e.target.value)} className={inputCls}>
-            {ROLE_TYPES.map((r) => (
-              <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-            ))}
-            {person.role_type && !ROLE_TYPES.includes(person.role_type) && (
-              <option value={person.role_type}>{person.role_type}</option>
-            )}
-          </select>
+          <RoleHintSelect value={roleType} onChange={setRoleType} className={inputCls} />
         </div>
         <div>
           <label className={labelCls}>Nationality</label>

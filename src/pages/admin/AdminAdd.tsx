@@ -35,6 +35,7 @@ import SourceAttributionFields, {
   sourceAttributionPayload,
 } from "../../components/SourceAttributionFields";
 import DuplicateMatchPrompt from "../../components/DuplicateMatchPrompt";
+import RoleHintSelect from "../../components/RoleHintSelect";
 import ImageUploadField from "../../components/ImageUploadField";
 import MagazineIssuePicker, { type IssueRef } from "../../components/MagazineIssuePicker";
 import FirstPublishedField, {
@@ -1892,7 +1893,7 @@ function PersonForm() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [nationality, setNationality] = useState("Indian");
-  const [roleType, setRoleType] = useState("author");
+  const [roleType, setRoleType] = useState("");
   const [primaryLanguage, setPrimaryLanguage] = useState("");
   const [nativeName, setNativeName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -1982,11 +1983,7 @@ function PersonForm() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
           <label className={labelCls}>Primary role (hint)</label>
-          <select value={roleType} onChange={(e) => setRoleType(e.target.value)} className={inputCls}>
-            {["author", "illustrator", "editor", "translator"].map((r) => (
-              <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-            ))}
-          </select>
+          <RoleHintSelect value={roleType} onChange={setRoleType} className={inputCls} />
         </div>
         <div>
           <label className={labelCls}>Nationality</label>

@@ -6,13 +6,9 @@ import { formatRole } from "../lib/roles";
 import Pagination from "../components/Pagination";
 import { useSeo } from "../hooks/useSeo";
 
-const ROLE_OPTIONS = [
-  { value: "", label: "All roles" },
-  { value: "author", label: "Authors" },
-  { value: "illustrator", label: "Illustrators" },
-  { value: "editor", label: "Editors" },
-  { value: "translator", label: "Translators" },
-];
+// Roles come from /persons/roles (only roles with at least one credit), so the
+// filter grows by itself as new credit kinds appear; this is the pre-load stub.
+const DEFAULT_ROLE_OPTIONS = [{ value: "", label: "All roles" }];
 
 const SORT_OPTIONS = [
   { value: "name_asc", label: "Name A–Z" },
@@ -36,6 +32,20 @@ export default function BrowsePersonsPage() {
     queryKey: ["persons-list", q, role, sort, page],
     queryFn: () => catalogue.personsList({ q: q || undefined, role_type: role || undefined, sort, page }),
   });
+
+  const { data: rolesInUse } = useQuery({
+    queryKey: ["person-roles"],
+    queryFn: catalogue.personRoles,
+    staleTime: 10 * 60 * 1000,
+  });
+  const roleOptions = [
+    ...DEFAULT_ROLE_OPTIONS,
+    ...(rolesInUse ?? []).map((r) => ({ value: r, label: `${formatRole(r)}s` })),
+  ];
+  // A role from the URL that the list hasn't loaded (or no longer offers) stays selectable.
+  if (role && !roleOptions.some((o) => o.value === role)) {
+    roleOptions.push({ value: role, label: `${formatRole(role)}s` });
+  }
 
   function set(key: string, value: string) {
     setSearchParams((prev) => {
@@ -95,7 +105,7 @@ export default function BrowsePersonsPage() {
           onChange={(e) => set("role_type", e.target.value)}
           className="border border-gray-200 rounded-md px-3 py-1.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-500"
         >
-          {ROLE_OPTIONS.map((o) => (
+          {roleOptions.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
