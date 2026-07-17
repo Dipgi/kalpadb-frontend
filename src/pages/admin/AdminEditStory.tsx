@@ -36,20 +36,11 @@ import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 import { STORY_TYPE_OPTIONS } from "../../lib/workTypes";
+import { createPersonInline } from "../../lib/inlineCreate";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
-
-/** Inline-create a person (name only), auto-approved, returned as a picker item. */
-async function createPersonInline(
-  name: string,
-  opts?: { allowDuplicate?: boolean },
-): Promise<PickerItem> {
-  const sub = await volunteer.submitPerson({ name }, opts?.allowDuplicate);
-  const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
-  return { id: entry.record_id!, name };
-}
 
 export default function AdminEditStory() {
   const { id } = useParams<{ id: string }>();
@@ -83,6 +74,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const qc = useQueryClient();
   const { user } = useAuth();
   const isAdmin = user?.role.toLowerCase() === "admin";
+  const canInlineCreate = isAdmin || !!user?.auto_approve;
   const navigate = useNavigate();
   const [note, setNote] = useState("");
 
@@ -372,7 +364,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={authors}
         onChange={setAuthors}
-        onCreate={isAdmin ? createPersonInline : undefined}
+        onCreate={canInlineCreate ? createPersonInline : undefined}
       />
       <BylineFields people={authors} bylines={bylines} onChange={setBylines} admin />
 
@@ -383,7 +375,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         fetcher={(q) => catalogue.persons(q)}
         selected={translators}
         onChange={setTranslators}
-        onCreate={isAdmin ? createPersonInline : undefined}
+        onCreate={canInlineCreate ? createPersonInline : undefined}
       />
       <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
       </FormSection>

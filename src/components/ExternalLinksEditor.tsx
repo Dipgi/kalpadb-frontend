@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, volunteer, type ExternalLinkItem } from "../lib/api";
+import { useAuth } from "../hooks/useAuth";
 
 type Target = { kind: "work"; id: number } | { kind: "person"; id: number };
 
@@ -26,6 +27,9 @@ export default function ExternalLinksEditor({
   isAdmin: boolean;
 }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
+  // Admins and trusted volunteers write live; others queue for review.
+  const applied = isAdmin || !!user?.auto_approve;
   const [submittedNote, setSubmittedNote] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -48,13 +52,13 @@ export default function ExternalLinksEditor({
               <li key={l.id} className="px-3 py-3 bg-violet-50/40">
                 <LinkForm
                   initial={l}
-                  submitLabel={isAdmin ? "Save changes" : "Submit changes for review"}
+                  submitLabel={applied ? "Save changes" : "Submit changes for review"}
                   onCancel={() => setEditingId(null)}
                   onSubmit={async (values) => {
                     const sub = await volunteer.updateLink(l.id, values);
                     if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
                     setEditingId(null);
-                    if (isAdmin) refresh();
+                    if (applied) refresh();
                     else setSubmittedNote(true);
                   }}
                 />
@@ -102,7 +106,7 @@ export default function ExternalLinksEditor({
           Add a link
         </p>
         <LinkForm
-          submitLabel={isAdmin ? "Add link" : "Submit link for review"}
+          submitLabel={applied ? "Add link" : "Submit link for review"}
           resetOnSubmit
           onSubmit={async (values) => {
             const sub =
@@ -110,13 +114,13 @@ export default function ExternalLinksEditor({
                 ? await volunteer.addWorkLink(target.id, values)
                 : await volunteer.addPersonLink(target.id, values);
             if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
-            if (isAdmin) refresh();
+            if (applied) refresh();
             else setSubmittedNote(true);
           }}
         />
       </div>
 
-      {submittedNote && !isAdmin && (
+      {submittedNote && !applied && (
         <p className="text-xs text-emerald-600">
           Submitted for review — it’ll appear here once an admin approves it.
         </p>

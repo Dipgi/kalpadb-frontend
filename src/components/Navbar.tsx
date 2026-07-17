@@ -196,6 +196,19 @@ export default function Navbar() {
               </button>
               {open === "account" && (
                 <div className="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 bg-white shadow-lg py-1">
+                  {user.auto_approve && (
+                    <>
+                      <div
+                        className="px-4 py-2"
+                        title="Your contributions publish immediately, without admin review"
+                      >
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold uppercase tracking-wide">
+                          Trusted volunteer
+                        </span>
+                      </div>
+                      <div className="my-1 border-t border-gray-100" />
+                    </>
+                  )}
                   <Link to="/shelf" onClick={() => setOpen(null)} className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                     My Shelf
                   </Link>
@@ -267,8 +280,13 @@ export default function Navbar() {
           <div className="border-t border-gray-100 pt-3 flex flex-col gap-3">
             {user ? (
               <>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-2">
                   {user.username}
+                  {user.auto_approve && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold normal-case tracking-wide">
+                      Trusted volunteer
+                    </span>
+                  )}
                 </p>
                 {(pendingEdits > 0 || pendingRequests > 0 || pendingMessages > 0) && (
                   <div className="flex flex-wrap gap-2 pl-2">

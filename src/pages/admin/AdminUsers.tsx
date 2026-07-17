@@ -27,8 +27,13 @@ export default function AdminUsers() {
   const [pendingRole, setPendingRole] = useState<{ id: number; role: string } | null>(null);
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: { role?: string; is_active?: boolean } }) =>
-      admin.users.update(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: { role?: string; auto_approve?: boolean; is_active?: boolean };
+    }) => admin.users.update(id, data),
     onSuccess: () => {
       setPendingRole(null);
       qc.invalidateQueries({ queryKey: ["admin-users"] });
@@ -58,6 +63,12 @@ export default function AdminUsers() {
                 <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">User</th>
                 <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</th>
                 <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Role</th>
+                <th
+                  className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                  title="Trusted volunteers: their contributions publish immediately, without review (still logged)"
+                >
+                  Auto-approve
+                </th>
                 <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Active</th>
               </tr>
             </thead>
@@ -128,6 +139,30 @@ export default function AdminUsers() {
                         </>
                       )}
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {u.role.toLowerCase() === "volunteer" ? (
+                      <button
+                        onClick={() =>
+                          updateMutation.mutate({ id: u.id, data: { auto_approve: !u.auto_approve } })
+                        }
+                        disabled={updateMutation.isPending || rowLocked(u)}
+                        title={
+                          u.auto_approve
+                            ? "Trusted volunteer — contributions publish immediately. Click to revoke."
+                            : "Contributions go to the review queue. Click to trust this volunteer."
+                        }
+                        className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors disabled:cursor-default ${
+                          u.auto_approve
+                            ? "bg-amber-100 text-amber-700 enabled:hover:bg-amber-200"
+                            : "bg-gray-100 text-gray-500 enabled:hover:bg-gray-200"
+                        }`}
+                      >
+                        {u.auto_approve ? "Trusted" : "Reviewed"}
+                      </button>
+                    ) : (
+                      <span className="text-gray-300">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <button

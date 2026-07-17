@@ -508,6 +508,8 @@ export interface UserOut {
   email: string;
   role: string;
   is_owner?: boolean;
+  /** Trusted volunteer: submissions publish immediately (still logged). */
+  auto_approve?: boolean;
   is_active: boolean;
   agreed_terms_at?: string | null;
 }
@@ -997,6 +999,7 @@ export interface AdminUser {
   email: string | null;
   role: string;
   is_owner?: boolean;
+  auto_approve?: boolean;
   is_active: boolean;
   created_at?: string;
 }
@@ -1130,7 +1133,7 @@ export const admin = {
   users: {
     list: (page = 1) =>
       request<Page<AdminUser>>(`/admin/users?page=${page}&page_size=25`),
-    update: (id: number, data: { role?: string; is_active?: boolean }) =>
+    update: (id: number, data: { role?: string; auto_approve?: boolean; is_active?: boolean }) =>
       request<AdminUser>(`/admin/users/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   },
 
@@ -1295,6 +1298,9 @@ export const admin = {
 export interface EditSubmission {
   edit_id: number;
   status: string;
+  /** Live record id — set when the submission was auto-applied (admins and
+   *  trusted volunteers), so inline-created entities can be referenced. */
+  record_id?: number | null;
 }
 
 export interface BookCreateIn {

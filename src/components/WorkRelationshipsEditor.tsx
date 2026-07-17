@@ -16,6 +16,8 @@ export default function WorkRelationshipsEditor({ work }: { work: WorkDetail }) 
   const qc = useQueryClient();
   const { user } = useAuth();
   const isAdmin = user?.role.toLowerCase() === "admin";
+  // Admins and trusted volunteers write live; others queue for review.
+  const applied = isAdmin || !!user?.auto_approve;
 
   const options = relationOptionsFor(work.type);
   const [other, setOther] = useState<PickerItem | null>(null);
@@ -45,7 +47,7 @@ export default function WorkRelationshipsEditor({ work }: { work: WorkDetail }) 
       setOther(null);
       setNotes("");
       setSubmitted(true);
-      if (isAdmin) refresh();
+      if (applied) refresh();
     },
   });
 
@@ -130,12 +132,12 @@ export default function WorkRelationshipsEditor({ work }: { work: WorkDetail }) 
             disabled={!other || addMutation.isPending}
             className="text-sm bg-violet-700 text-white px-4 py-1.5 rounded-md hover:bg-violet-800 disabled:opacity-40 transition-colors"
           >
-            {addMutation.isPending ? "Saving…" : isAdmin ? "Add link" : "Submit link for review"}
+            {addMutation.isPending ? "Saving…" : applied ? "Add link" : "Submit link for review"}
           </button>
           {addMutation.isError && (
             <span className="text-sm text-red-500">Couldn’t add — try again.</span>
           )}
-          {submitted && !isAdmin && (
+          {submitted && !applied && (
             <span className="text-sm text-emerald-600">Submitted for review.</span>
           )}
         </div>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "15 July 2026";
+const LAST_UPDATED = "17 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -119,9 +119,9 @@ export default function AdminGuide() {
           audio, stage, or interactive work — films, TV/web series, audio dramas, podcasts,
           audiobooks, video games, songs, and stage dramas. Discussions, interviews, and press{" "}
           <em>about</em> SF are not media works; they get their own COVERAGE type later.
-          Volunteers have the same form on the Contribute page (minus inline person creation) —
-          their submissions arrive in the review queue like any other record, with credits,
-          adaptation links, and seasons applied on approval.
+          Volunteers have the same form on the Contribute page (inline person creation is reserved
+          for admins and trusted volunteers) — their submissions arrive in the review queue like
+          any other record, with credits, adaptation links, and seasons applied on approval.
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
@@ -302,6 +302,16 @@ export default function AdminGuide() {
           <Link to="/admin/users" className="text-violet-700 hover:underline">Users</Link> lists
           accounts and lets you manage roles (user / volunteer / admin) and account state. Promote
           trusted contributors; be conservative granting admin.
+        </p>
+        <p>
+          <strong>Auto-approve (trusted volunteers):</strong> each volunteer row has an
+          Auto-approve toggle (“Reviewed” ↔ “Trusted”). A trusted volunteer’s submissions are
+          applied immediately instead of waiting in the Edit Queue — duplicate warnings and data
+          checks are shown to them at submit time, and they can inline-create people and
+          publishers from pickers like an admin. Every auto-applied change still lands in the edit
+          log (reviewer note “Auto-approved (trusted volunteer)”); filter the queue’s Approved view
+          by auto-approved to spot-check their work. The flag is revoked automatically if the role
+          changes, and deletes remain admin-only.
         </p>
         <p>
           One account carries the <strong>Owner</strong> badge — the site owner. The privilege

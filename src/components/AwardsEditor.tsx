@@ -8,6 +8,7 @@ import {
   type WorkAward,
   type PersonAward,
 } from "../lib/api";
+import { useAuth } from "../hooks/useAuth";
 
 /** Target the editor is attached to — a literary work or a person. */
 type Target = { kind: "work"; id: number } | { kind: "person"; id: number };
@@ -52,6 +53,9 @@ export default function AwardsEditor({
   isAdmin: boolean;
 }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
+  // Admins and trusted volunteers write live; others queue for review.
+  const applied = isAdmin || !!user?.auto_approve;
   const [submittedNote, setSubmittedNote] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -123,7 +127,7 @@ export default function AwardsEditor({
                   awardTypes={awardTypes ?? []}
                   isAdmin={isAdmin}
                   initial={r}
-                  submitLabel={isAdmin ? "Save changes" : "Submit changes for review"}
+                  submitLabel={applied ? "Save changes" : "Submit changes for review"}
                   onCancel={() => setEditingId(null)}
                   onSubmit={async (values) => {
                     const sub = await volunteer.updateAward(r.id, {
@@ -134,7 +138,7 @@ export default function AwardsEditor({
                     });
                     if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
                     setEditingId(null);
-                    if (isAdmin) refresh();
+                    if (applied) refresh();
                     else setSubmittedNote(true);
                   }}
                 />
@@ -181,7 +185,7 @@ export default function AwardsEditor({
         <AwardForm
           awardTypes={awardTypes ?? []}
           isAdmin={isAdmin}
-          submitLabel={isAdmin ? "Add award" : "Submit award for review"}
+          submitLabel={applied ? "Add award" : "Submit award for review"}
           resetOnSubmit
           onSubmit={async (values) => {
             const payload = {
@@ -195,13 +199,13 @@ export default function AwardsEditor({
                 ? await volunteer.addWorkAward(target.id, payload)
                 : await volunteer.addPersonAward(target.id, payload);
             if (isAdmin) await admin.queue.review(sub.edit_id, true, "Direct admin edit");
-            if (isAdmin) refresh();
+            if (applied) refresh();
             else setSubmittedNote(true);
           }}
         />
       </div>
 
-      {submittedNote && !isAdmin && (
+      {submittedNote && !applied && (
         <p className="text-xs text-emerald-600">
           Submitted for review — it’ll appear here once an admin approves it.
         </p>

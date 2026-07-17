@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
-import { type PickerItem } from "../../components/EntityPicker";
 import { bylinePayload } from "../../components/BylineFields";
 import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
@@ -36,20 +35,11 @@ import ClearedFieldsPrompt from "../../components/ClearedFieldsPrompt";
 import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import { WORLD_LANGUAGES } from "../../lib/languages";
 import { MEDIA_TYPE_OPTIONS, EPISODIC_MEDIA_TYPES } from "../../lib/workTypes";
+import { createPersonInline } from "../../lib/inlineCreate";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
-
-/** Inline-create a person (name only), auto-approved, returned as a picker item. */
-async function createPersonInline(
-  name: string,
-  opts?: { allowDuplicate?: boolean },
-): Promise<PickerItem> {
-  const sub = await volunteer.submitPerson({ name }, opts?.allowDuplicate);
-  const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
-  return { id: entry.record_id!, name };
-}
 
 export default function AdminEditMedia() {
   const { id } = useParams<{ id: string }>();
@@ -83,6 +73,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const qc = useQueryClient();
   const { user } = useAuth();
   const isAdmin = user?.role.toLowerCase() === "admin";
+  const canInlineCreate = isAdmin || !!user?.auto_approve;
   const navigate = useNavigate();
   const [note, setNote] = useState("");
 
@@ -395,7 +386,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           contentType={contentType}
           bylines={bylines}
           onBylinesChange={setBylines}
-          onCreatePerson={isAdmin ? createPersonInline : undefined}
+          onCreatePerson={canInlineCreate ? createPersonInline : undefined}
           admin={!!isAdmin}
         />
       </FormSection>

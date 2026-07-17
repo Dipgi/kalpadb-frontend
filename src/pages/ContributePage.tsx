@@ -13,6 +13,7 @@ import {
   type MagazineStatus,
 } from "../lib/api";
 import EntityPicker, { type PickerItem } from "../components/EntityPicker";
+import { createPersonInline, createPublisherInline } from "../lib/inlineCreate";
 import FormSection from "../components/FormSection";
 import TagChipPicker from "../components/TagChipPicker";
 import { slugify } from "../lib/slugify";
@@ -133,9 +134,21 @@ export default function ContributePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Contribute</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+        Contribute
+        {user.auto_approve && (
+          <span
+            className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold uppercase tracking-wide"
+            title="Your contributions publish immediately, without admin review"
+          >
+            Trusted volunteer
+          </span>
+        )}
+      </h1>
       <p className="text-sm text-gray-500 mb-6">
-        Submissions go to the edit queue and become public once an admin approves them.
+        {user.auto_approve
+          ? "As a trusted volunteer, your contributions publish immediately — no review step. They're still logged, so please double-check before saving."
+          : "Submissions go to the edit queue and become public once an admin approves them."}
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
@@ -298,11 +311,25 @@ function ContributorTermsGate({ onAgree }: { onAgree: () => void }) {
 }
 
 function PendingBanner() {
+  const { user } = useAuth();
   return (
     <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-md px-4 py-3 mb-4">
-      Thanks! Your submission is pending admin review.
+      {user?.auto_approve
+        ? "Thanks! Your contribution is published — as a trusted volunteer your submissions go live immediately."
+        : "Thanks! Your submission is pending admin review."}
     </div>
   );
+}
+
+/** onCreate handlers for the pickers — defined only for trusted volunteers
+ *  (their submissions auto-apply, so the live id comes straight back), so
+ *  everyone else keeps the pick-existing-only behaviour. */
+function useInlineCreators() {
+  const { user } = useAuth();
+  return {
+    onCreatePerson: user?.auto_approve ? createPersonInline : undefined,
+    onCreatePublisher: user?.auto_approve ? createPublisherInline : undefined,
+  };
 }
 
 function SubmitRow({ pending, error, label }: { pending: boolean; error: boolean; label: string }) {
@@ -323,6 +350,7 @@ function SubmitRow({ pending, error, label }: { pending: boolean; error: boolean
 // ── Book ────────────────────────────────────────────────────────────────────
 
 function BookForm() {
+  const { onCreatePerson, onCreatePublisher } = useInlineCreators();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
@@ -550,6 +578,7 @@ function BookForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={authors}
         onChange={setAuthors}
       />
@@ -560,6 +589,7 @@ function BookForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={editors}
         onChange={setEditors}
       />
@@ -570,6 +600,7 @@ function BookForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={translators}
         onChange={setTranslators}
       />
@@ -580,6 +611,7 @@ function BookForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={illustrators}
         onChange={setIllustrators}
       />
@@ -590,6 +622,7 @@ function BookForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={coverArtists}
         onChange={setCoverArtists}
       />
@@ -600,6 +633,7 @@ function BookForm() {
         placeholder="Search publishers…"
         fetchKey="picker-publishers"
         fetcher={(q) => catalogue.publishers(q)}
+        onCreate={onCreatePublisher}
         selected={publishers}
         onChange={setPublishers}
       />
@@ -658,6 +692,7 @@ function BookForm() {
 // ── Story ───────────────────────────────────────────────────────────────────
 
 function StoryForm() {
+  const { onCreatePerson } = useInlineCreators();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
 
@@ -816,6 +851,7 @@ function StoryForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={authors}
         onChange={setAuthors}
       />
@@ -826,6 +862,7 @@ function StoryForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={translators}
         onChange={setTranslators}
       />
@@ -907,6 +944,7 @@ function StoryForm() {
 // ── Comic ─────────────────────────────────────────────────────────────────────
 
 function ComicForm() {
+  const { onCreatePerson, onCreatePublisher } = useInlineCreators();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
   const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
@@ -1029,6 +1067,7 @@ function ComicForm() {
         placeholder="Search persons…"
         fetchKey="picker-persons"
         fetcher={(q) => catalogue.persons(q)}
+        onCreate={onCreatePerson}
         selected={selected}
         onChange={onChange}
       />
@@ -1196,6 +1235,7 @@ function ComicForm() {
           placeholder="Search publishers…"
           fetchKey="picker-publishers"
           fetcher={(q) => catalogue.publishers(q)}
+          onCreate={onCreatePublisher}
           selected={publishers}
           onChange={setPublishers}
         />
@@ -1245,6 +1285,7 @@ function ComicForm() {
 // ── Media ─────────────────────────────────────────────────────────────────────
 
 function MediaForm() {
+  const { onCreatePerson } = useInlineCreators();
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
   const { data: languages } = useQuery({ queryKey: ["all-languages"], queryFn: catalogue.allLanguages });
 
@@ -1447,6 +1488,7 @@ function MediaForm() {
           contentType={contentType}
           bylines={bylines}
           onBylinesChange={setBylines}
+          onCreatePerson={onCreatePerson}
         />
       </FormSection>
 

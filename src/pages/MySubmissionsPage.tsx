@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { volunteer, type EditLogEntry } from "../lib/api";
+import { useAuth } from "../hooks/useAuth";
 import ContributorGate from "../components/ContributorGate";
 import EditDiff from "../components/EditDiff";
 
@@ -34,6 +35,7 @@ export default function MySubmissionsPage() {
 
 function Submissions() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   const [tab, setTab] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
 
@@ -51,9 +53,21 @@ function Submissions() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-xl font-bold text-gray-900 mb-1">My submissions</h1>
+      <h1 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+        My submissions
+        {user?.auto_approve && (
+          <span
+            className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold uppercase tracking-wide"
+            title="Your contributions publish immediately, without admin review"
+          >
+            Trusted volunteer
+          </span>
+        )}
+      </h1>
       <p className="text-sm text-gray-500 mb-6">
-        Edits and additions you've proposed. Nothing goes live until an admin approves it.
+        {user?.auto_approve
+          ? "Edits and additions you've made. As a trusted volunteer, they publish immediately."
+          : "Edits and additions you've proposed. Nothing goes live until an admin approves it."}
       </p>
 
       <div className="flex gap-1 mb-6 border-b border-gray-200">

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { works, search, volunteer, admin, type WorkSummary } from "../lib/api";
 import { romanisedTitle } from "../lib/title";
+import { useAuth } from "../hooks/useAuth";
 
 const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 
@@ -25,6 +26,9 @@ export default function TranslationLinksEditor({
   isAdmin: boolean;
 }) {
   const qc = useQueryClient();
+  const { user } = useAuth();
+  // Admins and trusted volunteers write live; others queue for review.
+  const applied = isAdmin || !!user?.auto_approve;
   const [q, setQ] = useState("");
   const [submittedNote, setSubmittedNote] = useState(false);
   // Whether THIS work is the original or the translation of the work being added.
@@ -57,7 +61,7 @@ export default function TranslationLinksEditor({
     },
     onSuccess: () => {
       setQ("");
-      if (isAdmin) {
+      if (applied) {
         qc.invalidateQueries({ queryKey: ["work-translations", workId] });
       } else {
         setSubmittedNote(true);
@@ -120,7 +124,7 @@ export default function TranslationLinksEditor({
         </ul>
       )}
 
-      {submittedNote && !isAdmin && (
+      {submittedNote && !applied && (
         <p className="text-xs text-green-700">
           Submitted for review — it’ll appear here once an admin approves it.
         </p>

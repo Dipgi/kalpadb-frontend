@@ -18,6 +18,7 @@ import ImageUploadField from "../../components/ImageUploadField";
 import ContributorGate from "../../components/ContributorGate";
 import FormSection from "../../components/FormSection";
 import EditNoteField from "../../components/EditNoteField";
+import { createPersonInline, createPublisherInline } from "../../lib/inlineCreate";
 
 const inputCls =
   "w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500";
@@ -25,24 +26,6 @@ const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 
 const SCAN_TYPES = ["full_issue", "partial", "text_only", "cover_only"] as const;
 const LEGAL_STATUSES = ["open_access", "public_domain", "permission", "unknown"] as const;
-
-async function createPersonInline(
-  name: string,
-  opts?: { allowDuplicate?: boolean },
-): Promise<PickerItem> {
-  const sub = await volunteer.submitPerson({ name }, opts?.allowDuplicate);
-  const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
-  return { id: entry.record_id!, name };
-}
-
-async function createPublisherInline(
-  name: string,
-  opts?: { allowDuplicate?: boolean },
-): Promise<PickerItem> {
-  const sub = await volunteer.submitPublisher({ name }, opts?.allowDuplicate);
-  const entry = await admin.queue.review(sub.edit_id, true, "Direct admin entry");
-  return { id: entry.record_id!, name };
-}
 
 export default function AdminEditMagazineIssue() {
   const { magId, issueId } = useParams<{ magId: string; issueId?: string }>();
@@ -101,6 +84,7 @@ function IssueForm({
   const qc = useQueryClient();
   const { user } = useAuth();
   const isAdmin = user?.role.toLowerCase() === "admin";
+  const canInlineCreate = isAdmin || !!user?.auto_approve;
   const navigate = useNavigate();
   const [note, setNote] = useState("");
 
@@ -377,7 +361,7 @@ function IssueForm({
         fetcher={(q) => catalogue.persons(q)}
         selected={editors}
         onChange={setEditors}
-        onCreate={isAdmin ? createPersonInline : undefined}
+        onCreate={canInlineCreate ? createPersonInline : undefined}
       />
       <BylineFields people={editors} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
@@ -387,7 +371,7 @@ function IssueForm({
         fetcher={(q) => catalogue.persons(q)}
         selected={coverArtists}
         onChange={setCoverArtists}
-        onCreate={isAdmin ? createPersonInline : undefined}
+        onCreate={canInlineCreate ? createPersonInline : undefined}
       />
       <BylineFields people={coverArtists} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
@@ -397,7 +381,7 @@ function IssueForm({
         fetcher={(q) => catalogue.persons(q)}
         selected={illustrators}
         onChange={setIllustrators}
-        onCreate={isAdmin ? createPersonInline : undefined}
+        onCreate={canInlineCreate ? createPersonInline : undefined}
       />
       <BylineFields people={illustrators} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
@@ -407,7 +391,7 @@ function IssueForm({
         fetcher={(q) => catalogue.persons(q)}
         selected={translators}
         onChange={setTranslators}
-        onCreate={isAdmin ? createPersonInline : undefined}
+        onCreate={canInlineCreate ? createPersonInline : undefined}
       />
       <BylineFields people={translators} bylines={bylines} onChange={setBylines} admin />
       <EntityPicker
@@ -417,7 +401,7 @@ function IssueForm({
         fetcher={(q) => catalogue.publishers(q)}
         selected={publishers}
         onChange={setPublishers}
-        onCreate={isAdmin ? createPublisherInline : undefined}
+        onCreate={canInlineCreate ? createPublisherInline : undefined}
       />
       </FormSection>
 

@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "15 July 2026";
+const LAST_UPDATED = "17 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -194,6 +194,12 @@ export default function HelpPage() {
           checked by an admin before they go live. You can watch the status of everything you’ve
           submitted under <Link to="/my-submissions" className="text-violet-700 hover:underline">My
           Submissions</Link>, and withdraw a pending submission if you change your mind.
+        </p>
+        <p>
+          <strong>Trusted volunteers:</strong> admins can mark experienced volunteers as trusted.
+          Their contributions publish immediately, without waiting for review (everything is still
+          logged and can be checked later), and they can create new people and publishers directly
+          from the credit pickers while filling in a form.
         </p>
       </Section>
 
@@ -479,7 +485,8 @@ export default function HelpPage() {
 
         <p className="font-medium text-gray-800 mt-3">My edit hasn’t appeared yet.</p>
         <p>
-          Volunteer edits wait in the review queue until an admin approves them. Track status under{" "}
+          Volunteer edits wait in the review queue until an admin approves them (unless you’re a
+          trusted volunteer, in which case they publish immediately). Track status under{" "}
           <Link to="/my-submissions" className="text-violet-700 hover:underline">My Submissions</Link>.
         </p>
 

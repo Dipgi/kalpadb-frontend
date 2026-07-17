@@ -63,6 +63,7 @@ import MediaSeasonsEditor, {
 import { WORLD_LANGUAGES } from "../../lib/languages";
 import { slugify } from "../../lib/slugify";
 import TagChipPicker from "../../components/TagChipPicker";
+import { createPersonInline, createPublisherInline } from "../../lib/inlineCreate";
 import {
   WORK_TYPE_OPTIONS,
   STORY_TYPE_OPTIONS,
@@ -90,28 +91,6 @@ const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 async function submitAndApprove(submit: () => Promise<EditSubmission>) {
   const sub = await submit();
   return admin.queue.review(sub.edit_id, true, "Direct admin entry");
-}
-
-/** Inline-create a person (name only) and return it as a picker item. */
-async function createPersonInline(
-  name: string,
-  opts?: { allowDuplicate?: boolean },
-): Promise<PickerItem> {
-  const entry = await submitAndApprove(() =>
-    volunteer.submitPerson({ name }, opts?.allowDuplicate),
-  );
-  return { id: entry.record_id!, name };
-}
-
-/** Inline-create a publisher (name only) and return it as a picker item. */
-async function createPublisherInline(
-  name: string,
-  opts?: { allowDuplicate?: boolean },
-): Promise<PickerItem> {
-  const entry = await submitAndApprove(() =>
-    volunteer.submitPublisher({ name }, opts?.allowDuplicate),
-  );
-  return { id: entry.record_id!, name };
 }
 
 export default function AdminAdd() {
