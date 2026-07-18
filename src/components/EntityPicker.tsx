@@ -5,6 +5,11 @@ import { getDuplicateError, type DuplicateCandidate } from "../lib/api";
 export interface PickerItem {
   id: number;
   name: string;
+  /** Subtitle shown under the name (roles · nationality · native-script name). */
+  hint?: string;
+  /** "Known for" line — top credited works, to tell namesakes apart. */
+  knownFor?: string;
+  image_url?: string | null;
 }
 
 const inputCls =
@@ -113,9 +118,27 @@ export default function EntityPicker({
               <button
                 type="button"
                 onClick={() => pick(r)}
-                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-violet-50"
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-violet-50 flex items-start gap-2"
               >
-                {r.name} <span className="text-xs text-gray-400">#{r.id}</span>
+                {r.image_url && (
+                  <img
+                    src={r.image_url}
+                    alt=""
+                    className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5"
+                    loading="lazy"
+                  />
+                )}
+                <span className="min-w-0">
+                  <span className="block">
+                    {r.name} <span className="text-xs text-gray-400">#{r.id}</span>
+                  </span>
+                  {r.hint && <span className="block text-xs text-gray-500 truncate">{r.hint}</span>}
+                  {r.knownFor && (
+                    <span className="block text-xs text-gray-400 truncate">
+                      known for: {r.knownFor}
+                    </span>
+                  )}
+                </span>
               </button>
             </li>
           ))}

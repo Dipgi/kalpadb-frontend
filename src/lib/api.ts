@@ -818,6 +818,37 @@ export const catalogue = {
     request<Page<{ id: number; name: string; image_url: string | null }>>(
       `/persons?q=${encodeURIComponent(q)}&page_size=${size}`
     ),
+  // Person search enriched for pickers: each item carries a `hint` (roles ·
+  // nationality · native-script name) and `knownFor` line so namesakes are
+  // distinguishable before picking.
+  personPicker: async (q: string, size = 10) => {
+    const page = await request<
+      Page<{
+        id: number;
+        name: string;
+        image_url: string | null;
+        roles: string[];
+        localised: Record<string, Record<string, string>>;
+        nationality: string | null;
+        known_for: string[];
+      }>
+    >(`/persons?q=${encodeURIComponent(q)}&page_size=${size}`);
+    return {
+      items: page.items.map((p) => {
+        const nativeName = Object.values(p.localised?.name ?? {})[0];
+        const hint = [p.roles.slice(0, 3).join(", "), p.nationality, nativeName]
+          .filter(Boolean)
+          .join(" · ");
+        return {
+          id: p.id,
+          name: p.name,
+          hint: hint || undefined,
+          knownFor: p.known_for.length ? p.known_for.join(", ") : undefined,
+          image_url: p.image_url,
+        };
+      }),
+    };
+  },
   publishers: (q: string, size = 10) =>
     request<Page<{ id: number; name: string }>>(
       `/publishers?q=${encodeURIComponent(q)}&page_size=${size}`

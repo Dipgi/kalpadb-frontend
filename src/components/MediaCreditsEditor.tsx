@@ -78,7 +78,7 @@ export default function MediaCreditsEditor({
                 label="Person"
                 placeholder="Search or create a person…"
                 fetchKey="picker-persons"
-                fetcher={(q) => catalogue.persons(q)}
+                fetcher={(q) => catalogue.personPicker(q)}
                 selected={row.person ? [row.person] : []}
                 onChange={(items) => update(i, { person: items[items.length - 1] ?? null })}
                 onCreate={onCreatePerson}

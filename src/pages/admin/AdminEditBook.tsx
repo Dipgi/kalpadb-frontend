@@ -433,7 +433,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Authors"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={authors}
         onChange={setAuthors}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -444,7 +444,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Editors"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={editors}
         onChange={setEditors}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -455,7 +455,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Translators"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={translators}
         onChange={setTranslators}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -466,7 +466,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Illustrators"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={illustrators}
         onChange={setIllustrators}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -477,7 +477,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Cover artists"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={coverArtists}
         onChange={setCoverArtists}
         onCreate={canInlineCreate ? createPersonInline : undefined}

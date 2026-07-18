@@ -44,7 +44,7 @@ export default function MagazineEditorshipEditor({
               label="Editor"
               placeholder="Search a person…"
               fetchKey="picker-persons"
-              fetcher={(q) => catalogue.persons(q)}
+              fetcher={(q) => catalogue.personPicker(q)}
               selected={row.person ? [row.person] : []}
               onChange={(items) => update(i, { person: items[items.length - 1] ?? null })}
             />

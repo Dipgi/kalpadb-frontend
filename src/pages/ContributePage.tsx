@@ -577,7 +577,7 @@ function BookForm() {
         label="Authors"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={authors}
         onChange={setAuthors}
@@ -588,7 +588,7 @@ function BookForm() {
         label="Editors"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={editors}
         onChange={setEditors}
@@ -599,7 +599,7 @@ function BookForm() {
         label="Translators"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={translators}
         onChange={setTranslators}
@@ -610,7 +610,7 @@ function BookForm() {
         label="Illustrators"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={illustrators}
         onChange={setIllustrators}
@@ -621,7 +621,7 @@ function BookForm() {
         label="Cover artists"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={coverArtists}
         onChange={setCoverArtists}
@@ -850,7 +850,7 @@ function StoryForm() {
         label="Authors"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={authors}
         onChange={setAuthors}
@@ -861,7 +861,7 @@ function StoryForm() {
         label="Translators"
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={translators}
         onChange={setTranslators}
@@ -1066,7 +1066,7 @@ function ComicForm() {
         label={label}
         placeholder="Search persons…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         onCreate={onCreatePerson}
         selected={selected}
         onChange={onChange}

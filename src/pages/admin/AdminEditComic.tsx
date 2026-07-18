@@ -250,7 +250,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label={label}
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={selected}
         onChange={onChange}
         onCreate={canInlineCreate ? createPersonInline : undefined}

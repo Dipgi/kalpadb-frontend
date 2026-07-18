@@ -358,7 +358,7 @@ function IssueForm({
         label="Editors"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={editors}
         onChange={setEditors}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -368,7 +368,7 @@ function IssueForm({
         label="Cover artists"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={coverArtists}
         onChange={setCoverArtists}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -378,7 +378,7 @@ function IssueForm({
         label="Illustrators"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={illustrators}
         onChange={setIllustrators}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -388,7 +388,7 @@ function IssueForm({
         label="Translators"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={translators}
         onChange={setTranslators}
         onCreate={canInlineCreate ? createPersonInline : undefined}

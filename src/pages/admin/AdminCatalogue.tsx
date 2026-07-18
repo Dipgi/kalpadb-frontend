@@ -21,7 +21,7 @@ export default function AdminCatalogue() {
         <ManageSection
           title="Edit / delete persons"
           placeholder="Search persons…"
-          fetcher={(q) => catalogue.persons(q)}
+          fetcher={(q) => catalogue.personPicker(q)}
           editPath="/admin/edit-person"
         />
         <ManageSection

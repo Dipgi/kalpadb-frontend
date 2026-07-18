@@ -361,7 +361,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Authors"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={authors}
         onChange={setAuthors}
         onCreate={canInlineCreate ? createPersonInline : undefined}
@@ -372,7 +372,7 @@ function EditForm({ work }: { work: WorkDetail }) {
         label="Translators"
         placeholder="Search or create a person…"
         fetchKey="picker-persons"
-        fetcher={(q) => catalogue.persons(q)}
+        fetcher={(q) => catalogue.personPicker(q)}
         selected={translators}
         onChange={setTranslators}
         onCreate={canInlineCreate ? createPersonInline : undefined}
