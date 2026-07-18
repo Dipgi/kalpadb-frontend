@@ -12,11 +12,18 @@ const TARGET_FILTERS = [
   { value: "review", label: "Reviews" },
   { value: "user", label: "Users" },
   { value: "news", label: "News" },
+  { value: "error", label: "Errors (failed saves)" },
 ];
 
 /** Colour an action badge by its outcome keyword. */
 function actionStyle(action: string): string {
-  if (action.includes("deleted") || action.includes("removed") || action.includes("rejected"))
+  if (
+    action.includes("deleted") ||
+    action.includes("removed") ||
+    action.includes("rejected") ||
+    action.includes("error") ||
+    action.includes("conflict")
+  )
     return "bg-red-100 text-red-700";
   if (action.includes("approved") || action.includes("created"))
     return "bg-green-100 text-green-700";
