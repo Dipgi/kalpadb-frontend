@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "17 July 2026";
+const LAST_UPDATED = "18 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -406,6 +406,12 @@ export default function AdminGuide() {
           <Link to="/admin/audit" className="text-violet-700 hover:underline">Activity Log</Link>{" "}
           records who changed what and when — use it to audit recent edits and trace mistakes.
           Merges appear as <em>duplicates_merged</em> with a full breakdown of repointed links.
+        </p>
+        <p>
+          Failed saves are logged here too (filter <em>Errors</em>): <em>save_conflict</em> is a
+          change rejected because it clashed with existing data, <em>server_error</em> an
+          unexpected crash. Each entry records who attempted it, the endpoint, and the underlying
+          error — if a contributor reports “failed to save”, look here first.
         </p>
       </Section>
 
