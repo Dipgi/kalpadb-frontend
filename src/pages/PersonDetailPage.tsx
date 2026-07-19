@@ -11,7 +11,7 @@ import { useSeo } from "../hooks/useSeo";
 // standalone "issue" work type to group on).
 const WORK_CATEGORIES: { type: string; label: string }[] = [
   { type: "BOOK", label: "Books" },
-  { type: "STORY", label: "Short Stories" },
+  { type: "STORY", label: "Short Works" },
   { type: "MAGAZINE", label: "Magazines" },
   { type: "COMIC", label: "Comics" },
   { type: "MEDIA", label: "Screen & Audio" },
@@ -216,7 +216,7 @@ export default function PersonDetailPage() {
         </div>
       )}
 
-      {/* Works — grouped by type (Books, Short Stories, Magazines, …) */}
+      {/* Works — grouped by type (Books, Short Works, Magazines, …) */}
       {allWorks && allWorks.length > 0 && (
         <div className="space-y-10">
           {(() => {

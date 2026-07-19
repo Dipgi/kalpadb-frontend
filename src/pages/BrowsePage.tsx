@@ -4,7 +4,7 @@ import { works, catalogue } from "../lib/api";
 import WorkCard from "../components/WorkCard";
 import { useSeo } from "../hooks/useSeo";
 import Pagination from "../components/Pagination";
-import { contentTypeOptionsFor } from "../lib/workTypes";
+import { contentTypeOptionsFor, workTypeLabel } from "../lib/workTypes";
 
 // Magazines are serial containers with their own index (/magazines), so they're
 // intentionally excluded from the general works browse.
@@ -93,7 +93,7 @@ export default function BrowsePage() {
           <option value="">All types</option>
           {WORK_TYPES.map((t) => (
             <option key={t} value={t}>
-              {t.charAt(0) + t.slice(1).toLowerCase()}
+              {workTypeLabel(t)}
             </option>
           ))}
         </select>

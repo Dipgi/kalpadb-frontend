@@ -55,7 +55,7 @@ export default function AdminEditStory() {
     return <div className="text-gray-400 py-12 text-center">Loading story…</div>;
   }
   if (!work) {
-    return <div className="text-gray-400 py-12 text-center">Story not found.</div>;
+    return <div className="text-gray-400 py-12 text-center">Short work not found.</div>;
   }
   if (work.type !== "STORY") {
     return (
@@ -233,7 +233,7 @@ function EditForm({ work }: { work: WorkDetail }) {
       className="max-w-2xl space-y-4"
     >
       <h1 className="text-xl font-bold text-gray-900">
-        Edit Story
+        Edit Short Work
         <span className="ml-2 text-sm font-normal text-gray-400">#{work.id}</span>
       </h1>
 
@@ -277,7 +277,7 @@ function EditForm({ work }: { work: WorkDetail }) {
       <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
-          <label className={labelCls}>Story type</label>
+          <label className={labelCls}>Category</label>
           <select value={storyType} onChange={(e) => setStoryType(e.target.value)} className={inputCls}>
             {STORY_TYPE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -524,7 +524,7 @@ function EditForm({ work }: { work: WorkDetail }) {
               ? "Deleting…"
               : confirmDelete
                 ? "Click again to permanently delete"
-                : "Delete story"}
+                : "Delete short work"}
           </button>
         )}
         {isAdmin && deleteMutation.isError && (

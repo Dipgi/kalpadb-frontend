@@ -188,9 +188,9 @@ export default function AdminGuide() {
         </ul>
       </Section>
 
-      <Section title="Stories, anthologies & magazine issues">
+      <Section title="Short works, anthologies & magazine issues">
         <p>
-          A story is a single record linked to every container it appears in. The same machinery
+          A short work (story, poem, essay, interview, review…) is a single record linked to every container it appears in. The same machinery
           drives both the contributor forms and the read-only roll-ups, so it helps to know how the
           links behave when you add/edit or approve a story.
         </p>
@@ -243,7 +243,7 @@ export default function AdminGuide() {
           <li>
             <strong>Deleting an issue (admin only).</strong> The “Delete issue” button on an
             issue’s edit form removes that one issue with its credits and scan links — immediate,
-            like all admin deletes. Stories that appeared in it are only unlinked, never deleted;
+            like all admin deletes. Short works that appeared in it are only unlinked, never deleted;
             a story whose “first published in” pointed at the issue keeps its record but loses
             that link.
           </li>

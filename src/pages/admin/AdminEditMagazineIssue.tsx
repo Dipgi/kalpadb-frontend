@@ -411,7 +411,7 @@ function IssueForm({
         hint="The stories that appeared in this issue. Page ranges set elsewhere are preserved."
       >
       <EntityPicker
-        label="Stories in this issue"
+        label="Short works in this issue"
         placeholder="Search existing stories…"
         fetchKey="picker-issue-stories"
         fetcher={(q) =>
@@ -558,7 +558,7 @@ function IssueForm({
       )}
       {isAdmin && existing && (
         <p className="text-xs text-gray-400 text-right">
-          Deleting removes this issue, its credits and scan links. Stories that appeared in it
+          Deleting removes this issue, its credits and scan links. Short works that appeared in it
           stay in the catalogue — they're only unlinked.
         </p>
       )}

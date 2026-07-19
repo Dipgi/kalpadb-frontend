@@ -579,7 +579,7 @@ export default function WorkDetailPage() {
         {work.story &&
           (work.story.word_count != null || work.story.page_count != null) && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Story details</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Short work details</h3>
               <div className="text-sm text-gray-700 space-y-1">
                 {work.story.word_count != null && (
                   <p>Word count: {work.story.word_count.toLocaleString()}</p>

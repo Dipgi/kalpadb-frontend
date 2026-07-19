@@ -94,6 +94,18 @@ async function submitAndApprove(submit: () => Promise<EditSubmission>) {
   return admin.queue.review(sub.edit_id, true, "Direct admin entry");
 }
 
+const TAB_LABELS: Record<Tab, string> = {
+  book: "Book",
+  story: "Short work",
+  comic: "Comic",
+  media: "Media",
+  magazine: "Magazine",
+  issue: "Issue",
+  person: "Person",
+  publisher: "Publisher",
+  series: "Series",
+};
+
 export default function AdminAdd() {
   const [tab, setTab] = useState<Tab>("book");
 
@@ -106,13 +118,13 @@ export default function AdminAdd() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`text-sm px-4 py-1.5 rounded-md border capitalize transition-colors ${
+            className={`text-sm px-4 py-1.5 rounded-md border transition-colors ${
               tab === t
                 ? "bg-violet-700 text-white border-violet-700"
                 : "border-gray-300 text-gray-600 hover:border-violet-400"
             }`}
           >
-            {t}
+            {TAB_LABELS[t]}
           </button>
         ))}
       </div>
@@ -649,7 +661,7 @@ function StoryForm() {
     >
       {createdId != null && (
         <SuccessBanner
-          message="Story created."
+          message="Short work created."
           link={`/works/${createdId}`}
           linkText="View story →"
           editLink={`/admin/edit-story/${createdId}`}
@@ -693,7 +705,7 @@ function StoryForm() {
       <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
-          <label className={labelCls}>Story type</label>
+          <label className={labelCls}>Category</label>
           <select value={storyType} onChange={(e) => setStoryType(e.target.value)} className={inputCls}>
             {STORY_TYPE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>

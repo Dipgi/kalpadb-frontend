@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "17 July 2026";
+const LAST_UPDATED = "19 July 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -26,7 +26,7 @@ const TOC: { id: string; label: string }[] = [
   { id: "contributing", label: "Becoming a contributor" },
   { id: "adding", label: "Adding & editing records" },
   { id: "work-types", label: "Work types" },
-  { id: "stories", label: "Stories, anthologies & magazines" },
+  { id: "stories", label: "Short works, anthologies & magazines" },
   { id: "conventions", label: "Data conventions" },
   { id: "faq", label: "FAQ" },
   { id: "reuse", label: "Reuse & citation" },
@@ -239,8 +239,9 @@ export default function HelpPage() {
             <em>Kalpabigyan Samagra</em> (an anthology of many authors’ stories).
           </li>
           <li>
-            <strong>Story</strong> — a single short story, novelette, or novella. A story usually
-            lives <em>inside</em> one or more books or magazine issues rather than on its own.{" "}
+            <strong>Short work</strong> — a single piece that usually lives <em>inside</em> one or
+            more books or magazine issues rather than on its own: a short story, novelette, novella,
+            poem, essay, interview, review, or other nonfiction piece.{" "}
             <em>Example:</em> Satyajit Ray’s “ব্যোমযাত্রীর ডায়রি” (<em>Byomjatrir Diary</em>).
           </li>
           <li>
@@ -301,28 +302,28 @@ export default function HelpPage() {
         </ul>
         <p>
           On the <Link to="/browse" className="text-violet-700 hover:underline">Browse</Link> page
-          you can filter by type to see only books, only stories, and so on.
+          you can filter by type to see only books, only short works, and so on.
         </p>
       </Section>
 
-      <Section id="stories" title="Stories, anthologies & magazines">
+      <Section id="stories" title="Short works, anthologies & magazines">
         <p>
-          Indian SF has a deep magazine and anthology tradition: the <em>same</em> story is often
+          Indian SF has a deep magazine and anthology tradition: the <em>same</em> piece is often
           first printed in a magazine, then reprinted in one or more “best of” collections over the
-          years. KalpaDB models this so a story is recorded <strong>once</strong> and linked to every
-          place it appears.
+          years. KalpaDB models this so a short work — a story, poem, essay, interview, or review —
+          is recorded <strong>once</strong> and linked to every place it appears.
         </p>
 
-        <p className="font-medium text-gray-800 mt-3">Adding a story</p>
+        <p className="font-medium text-gray-800 mt-3">Adding a short work</p>
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            Add a story from the <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link>{" "}
-            page (Story tab). Give it a title in its original script — a romanised title for search is
+            Add it from the <Link to="/contribute" className="text-violet-700 hover:underline">Contribute</Link>{" "}
+            page (Short work tab). Give it a title in its original script — a romanised title for search is
             generated automatically.
           </li>
           <li>
-            Set the <strong>story type</strong> (short story, novelette, or novella) and, optionally,
-            a word/page count.
+            Set the <strong>category</strong> (short story, novelette, novella, poem, essay,
+            interview, review…) and, optionally, a word/page count.
           </li>
           <li>
             Credit its <strong>author(s)</strong>, and any <strong>translator(s)</strong> if it’s a

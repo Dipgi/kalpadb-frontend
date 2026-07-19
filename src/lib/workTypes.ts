@@ -1,3 +1,21 @@
+// Display names for the top-level work types. STORY is deliberately shown as
+// "Short work": the type also holds poems, essays, interviews, reviews and
+// nonfiction pieces (~34% of rows) — "Story" was a lie. The API/DB value stays
+// STORY; only labels changed (renaming the enum would break URLs and history).
+export const WORK_TYPE_LABELS: Record<string, { singular: string; plural: string }> = {
+  BOOK: { singular: "Book", plural: "Books" },
+  STORY: { singular: "Short work", plural: "Short works" },
+  MAGAZINE: { singular: "Magazine", plural: "Magazines" },
+  COMIC: { singular: "Comic", plural: "Comics" },
+  MEDIA: { singular: "Media", plural: "Media" },
+};
+
+export function workTypeLabel(type: string, plural = false): string {
+  const l = WORK_TYPE_LABELS[type.toUpperCase()];
+  if (!l) return type.charAt(0) + type.slice(1).toLowerCase();
+  return plural ? l.plural : l.singular;
+}
+
 // Book-relevant ContentType values for the admin work-type dropdown.
 // `value` is the API enum value (lowercase); blank means "unspecified".
 export const WORK_TYPE_OPTIONS: { value: string; label: string }[] = [

@@ -86,7 +86,7 @@ type Tab =
 
 const TAB_LABELS: Record<Tab, string> = {
   book: "Book",
-  story: "Story",
+  story: "Short work",
   comic: "Comic",
   media: "Media",
   magazine: "Magazine",
@@ -832,7 +832,7 @@ function StoryForm() {
       <FormSection title="Publication details">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
-          <label className={labelCls}>Story type</label>
+          <label className={labelCls}>Category</label>
           <select value={storyType} onChange={(e) => setStoryType(e.target.value)} className={inputCls}>
             {STORY_TYPE_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>

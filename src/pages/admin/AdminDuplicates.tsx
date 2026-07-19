@@ -16,7 +16,7 @@ const TABS: { kind: DuplicateScanKind; label: string }[] = [
   { kind: "person", label: "People" },
   { kind: "publisher", label: "Publishers" },
   { kind: "book", label: "Books" },
-  { kind: "story", label: "Stories" },
+  { kind: "story", label: "Short works" },
   { kind: "magazine", label: "Magazines" },
   { kind: "comic", label: "Comics" },
   { kind: "media", label: "Media" },
