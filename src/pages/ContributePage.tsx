@@ -704,7 +704,7 @@ function BookForm() {
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit book" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit book" />
     </form>
   );
 }
@@ -976,7 +976,7 @@ function StoryForm() {
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit story" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit story" />
     </form>
   );
 }
@@ -1337,7 +1337,7 @@ function ComicForm() {
         <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit comic" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit comic" />
     </form>
   );
 }
@@ -1615,7 +1615,7 @@ function MediaForm() {
         <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit media work" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit media work" />
     </form>
   );
 }
@@ -1898,7 +1898,7 @@ function MagazineForm() {
         approved, the two works can be linked from its Edit page (“Translations”).
       </p>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit magazine" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit magazine" />
     </form>
   );
 }

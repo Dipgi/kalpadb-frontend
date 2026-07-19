@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import type { DuplicateCandidate } from "../lib/api";
 
@@ -22,8 +23,18 @@ export default function DuplicateMatchPrompt({
   busy?: boolean;
 }) {
   const base = BASE_PATH[kind];
+  // The prompt mounts at the top of forms whose submit button may be far below
+  // the fold — bring it into view so the rejection isn't mistaken for a
+  // generic failure.
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
   return (
-    <div className="bg-amber-50 border border-amber-300 text-amber-900 text-sm rounded-md px-4 py-3 mb-4 space-y-3">
+    <div
+      ref={ref}
+      className="bg-amber-50 border border-amber-300 text-amber-900 text-sm rounded-md px-4 py-3 mb-4 space-y-3"
+    >
       <p className="font-medium">
         A {kind} with a similar {kind === "work" ? "title" : "name"} already exists. Is it one of
         these?

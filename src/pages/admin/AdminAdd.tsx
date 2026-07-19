@@ -545,7 +545,7 @@ function BookForm() {
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create book" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create book" />
     </form>
   );
 }
@@ -869,7 +869,7 @@ function StoryForm() {
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create story" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create story" />
     </form>
   );
 }
@@ -1328,7 +1328,7 @@ function ComicForm() {
         <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create comic" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create comic" />
     </form>
   );
 }
@@ -1697,7 +1697,9 @@ function MediaForm() {
       >
         {mutation.isPending ? "Creating…" : "Create media work"}
       </button>
-      {mutation.isError && <span className="ml-3 text-sm text-red-500">Create failed — try again.</span>}
+      {mutation.isError && !dup && (
+        <span className="ml-3 text-sm text-red-500">Create failed — try again.</span>
+      )}
     </form>
   );
 }
@@ -1961,7 +1963,7 @@ function MagazineForm() {
         link the two works from its Edit page (“Translations”).
       </p>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Create magazine" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Create magazine" />
     </form>
   );
 }
