@@ -47,7 +47,8 @@ export function emptyFormatRow(defaultType = "paperback"): FormatRow {
     page_count: "",
     availability: "",
     price: "",
-    currency: "",
+    // Indian database — prices are in rupees unless someone says otherwise.
+    currency: "INR",
     notes: "",
   };
 }
@@ -82,12 +83,13 @@ export function formatRowsFromExisting(formats: ExistingFormat[] | undefined | n
 
 /** Has the user actually entered anything beyond the default format type? */
 function rowHasDetail(r: FormatRow): boolean {
+  // Currency doesn't count: it is prefilled with INR, and without a price it
+  // carries no information anyway.
   return Boolean(
     r.isbn.trim() ||
       r.page_count.trim() ||
       r.availability ||
       r.price.trim() ||
-      r.currency.trim() ||
       r.notes.trim() ||
       r.cover_image_url,
   );
@@ -113,7 +115,9 @@ export function formatRowsToPayload(rows: FormatRow[], keepAll = false, includeA
     page_count: r.page_count ? Number(r.page_count) : null,
     ...(includeAvailability ? { availability: r.availability || null } : {}),
     price: r.price.trim() || null,
-    currency: r.currency.trim() || null,
+    // Currency only qualifies a price — never store it on price-less rows
+    // (the INR default would otherwise stick to every row).
+    currency: r.price.trim() ? r.currency.trim() || null : null,
     notes: r.notes.trim() || null,
     publication_date: r.publication_date ?? null,
     cover_image_url: r.cover_image_url ?? null,
