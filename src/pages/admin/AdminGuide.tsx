@@ -369,10 +369,14 @@ export default function AdminGuide() {
       <Section title="Find Duplicates — scan & merge">
         <p>
           <Link to="/admin/duplicates" className="text-violet-700 hover:underline">Find Duplicates</Link>{" "}
-          scans a whole category (people, publishers, books, stories, magazines, issues) for records
-          that look like the same thing entered twice. Matching is fuzzy and cross-script: honorifics
-          (ড., শ্রী, Dr.) and byline labels (মূল রচনা:, অনুবাদ:) are ignored, and Bengali names are
-          compared against romanised ones. A scan can take up to a minute.
+          scans one category at a time (people, publishers, books, stories, magazines, comics,
+          media, issues) for records that look like the same thing entered twice — each tab compares
+          only its own category, never the whole catalogue. Matching is fuzzy and cross-script:
+          honorifics (ড., শ্রী, Dr.) and byline labels (মূল রচনা:, অনুবাদ:) are ignored, and Bengali
+          names are compared against romanised ones. Scans start only when you press{" "}
+          <strong>Start scan</strong>, can take a few minutes on the current server (the site stays
+          responsive), and can be stopped mid-run — a stopped scan discards its partial results.
+          Only one scan runs at a time, across all admins.
         </p>
         <ul className="list-disc pl-5 space-y-1">
           <li>

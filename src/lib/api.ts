@@ -1086,6 +1086,8 @@ export type DuplicateScanKind =
   | "book"
   | "story"
   | "magazine"
+  | "comic"
+  | "media"
   | "issue";
 
 /** Id namespace used by merge/dismiss (all work types share "work"). */
@@ -1123,6 +1125,9 @@ export interface DuplicateScanResult {
   clusters: DuplicateCluster[];
   scanned: number;
   dismissed_pairs: number;
+  // True when the scan was cancelled: clusters is empty and prior results
+  // should be kept.
+  cancelled?: boolean;
 }
 
 export interface DuplicateMergeResult {
@@ -1294,9 +1299,12 @@ export const admin = {
   },
 
   duplicates: {
-    // The full-catalogue fuzzy scan can take up to ~1 min on the bigger kinds.
+    // The fuzzy scan can take minutes on the bigger kinds (small server).
     scan: (kind: DuplicateScanKind) =>
       request<DuplicateScanResult>(`/admin/duplicates?kind=${kind}`),
+    scanStatus: () => request<{ running: boolean }>("/admin/duplicates/scan-status"),
+    cancelScan: () =>
+      request<{ running: boolean }>("/admin/duplicates/scan-cancel", { method: "POST" }),
     merge: (merge_kind: DuplicateMergeKind, keep_id: number, merge_ids: number[]) =>
       request<DuplicateMergeResult>("/admin/duplicates/merge", {
         method: "POST",

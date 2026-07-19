@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   admin,
+  apiErrorMessage,
   type DuplicateCluster,
   type DuplicateMember,
   type DuplicateMergeKind,
@@ -17,8 +18,21 @@ const TABS: { kind: DuplicateScanKind; label: string }[] = [
   { kind: "book", label: "Books" },
   { kind: "story", label: "Stories" },
   { kind: "magazine", label: "Magazines" },
+  { kind: "comic", label: "Comics" },
+  { kind: "media", label: "Media" },
   { kind: "issue", label: "Issues" },
 ];
+
+const TAB_LABEL = Object.fromEntries(TABS.map((t) => [t.kind, t.label])) as Record<
+  DuplicateScanKind,
+  string
+>;
+
+function formatElapsed(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m ? `${m}m ${s.toString().padStart(2, "0")}s` : `${s}s`;
+}
 
 const FLAG_LABELS: Record<string, string> = {
   surname_differs: "⚠ surname differs",
@@ -70,17 +84,76 @@ export default function AdminDuplicates() {
   const [showIgnored, setShowIgnored] = useState(false);
   const [lastMerge, setLastMerge] = useState<string | null>(null);
 
-  const scan = useQuery({
-    queryKey: ["dup-scan", tab],
-    queryFn: () => admin.duplicates.scan(tab),
-    staleTime: Infinity, // rescan only on demand — the scan is expensive
-    retry: false,
+  // Scans run only on an explicit Start; completed results are kept per tab so
+  // switching tabs never re-triggers the (expensive) scan.
+  const [results, setResults] = useState<
+    Partial<Record<DuplicateScanKind, DuplicateScanResult>>
+  >({});
+  const [scanningKind, setScanningKind] = useState<DuplicateScanKind | null>(null);
+  const [stopping, setStopping] = useState(false);
+  const [scanNotice, setScanNotice] = useState<string | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+
+  // Detect a scan started by another admin (one scan at a time server-side).
+  const status = useQuery({
+    queryKey: ["dup-scan-status"],
+    queryFn: admin.duplicates.scanStatus,
+    refetchInterval: (q) => (q.state.data?.running ? 5000 : 20000),
+  });
+  const remoteScanRunning = !!status.data?.running && scanningKind === null;
+
+  useEffect(() => {
+    if (scanningKind === null) return;
+    setElapsed(0);
+    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(t);
+  }, [scanningKind]);
+
+  const scanMutation = useMutation({
+    mutationFn: (kind: DuplicateScanKind) => admin.duplicates.scan(kind),
+    onSuccess: (res, kind) => {
+      if (res.cancelled) {
+        setScanNotice(
+          `Scan of ${TAB_LABEL[kind].toLowerCase()} was stopped — partial results are discarded, previous results (if any) are kept.`
+        );
+      } else {
+        setResults((prev) => ({ ...prev, [kind]: res }));
+      }
+    },
+    onError: (err) => {
+      setScanError(apiErrorMessage(err) ?? (err as Error).message ?? "Scan failed");
+    },
+    onSettled: () => {
+      setScanningKind(null);
+      setStopping(false);
+      qc.invalidateQueries({ queryKey: ["dup-scan-status"] });
+    },
   });
 
+  const startScan = (kind: DuplicateScanKind) => {
+    setScanNotice(null);
+    setScanError(null);
+    setLastMerge(null);
+    setScanningKind(kind);
+    scanMutation.mutate(kind);
+  };
+
+  const stopScan = async () => {
+    setStopping(true);
+    try {
+      await admin.duplicates.cancelScan();
+    } catch {
+      setStopping(false);
+    }
+  };
+
+  const current = results[tab];
+
   const dismissed = useQuery({
-    queryKey: ["dup-dismissed", scan.data?.merge_kind],
-    queryFn: () => admin.duplicates.listDismissed(scan.data!.merge_kind),
-    enabled: !!scan.data,
+    queryKey: ["dup-dismissed", current?.merge_kind],
+    queryFn: () => admin.duplicates.listDismissed(current!.merge_kind),
+    enabled: !!current,
   });
 
   const switchTab = (k: DuplicateScanKind) => {
@@ -88,15 +161,20 @@ export default function AdminDuplicates() {
     setIgnored(loadIgnored(k));
     setShowIgnored(false);
     setLastMerge(null);
+    setScanNotice(null);
+    setScanError(null);
   };
 
-  /** Drop a cluster from the cached scan without refetching (scans are slow). */
+  /** Drop a cluster from the kept results without rescanning (scans are slow). */
   const removeCluster = (key: string) => {
-    qc.setQueryData<DuplicateScanResult>(["dup-scan", tab], (old) =>
-      old
-        ? { ...old, clusters: old.clusters.filter((c) => clusterKey(c) !== key) }
-        : old
-    );
+    setResults((prev) => {
+      const res = prev[tab];
+      if (!res) return prev;
+      return {
+        ...prev,
+        [tab]: { ...res, clusters: res.clusters.filter((c) => clusterKey(c) !== key) },
+      };
+    });
   };
 
   const ignoreCluster = (key: string) => {
@@ -111,12 +189,14 @@ export default function AdminDuplicates() {
     saveIgnored(tab, new Set());
   };
 
-  const clusters = scan.data?.clusters ?? [];
+  const clusters = current?.clusters ?? [];
   const visible = useMemo(
     () => clusters.filter((c) => showIgnored || !ignored.has(clusterKey(c))),
     [clusters, ignored, showIgnored]
   );
   const ignoredCount = clusters.length - clusters.filter((c) => !ignored.has(clusterKey(c))).length;
+  const scanningThisTab = scanningKind === tab;
+  const anyScanRunning = scanningKind !== null || remoteScanRunning;
 
   return (
     <div>
@@ -148,29 +228,71 @@ export default function AdminDuplicates() {
           {lastMerge}
         </div>
       )}
+      {scanNotice && (
+        <div className="mb-4 text-sm bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-4 py-2.5">
+          {scanNotice}
+        </div>
+      )}
+      {scanError && (
+        <div className="mb-4 text-sm bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2.5">
+          Scan failed: {scanError}
+        </div>
+      )}
 
-      {scan.isLoading ? (
+      {scanningThisTab ? (
         <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
           <div className="inline-block h-6 w-6 border-2 border-violet-600 border-t-transparent rounded-full animate-spin mb-3" />
-          <p className="text-sm text-gray-500">
-            Scanning the whole catalogue — this can take up to a minute…
+          <p className="text-sm text-gray-600 font-medium">
+            Scanning {TAB_LABEL[tab].toLowerCase()}… {formatElapsed(elapsed)}
           </p>
-        </div>
-      ) : scan.isError ? (
-        <p className="text-sm text-red-600">
-          Scan failed: {(scan.error as Error).message}{" "}
-          <button onClick={() => scan.refetch()} className="underline">
-            Retry
+          <p className="text-xs text-gray-400 mt-1 mb-4">
+            Only {TAB_LABEL[tab].toLowerCase()} are compared. This can take a few minutes on the
+            current server — the rest of the site stays responsive.
+          </p>
+          <button
+            onClick={stopScan}
+            disabled={stopping}
+            className="text-sm px-4 py-1.5 rounded-md border border-red-300 text-red-600 hover:bg-red-50 disabled:opacity-50"
+          >
+            {stopping ? "Stopping…" : "Stop scan"}
           </button>
-        </p>
+        </div>
+      ) : scanningKind !== null ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center text-sm text-gray-500">
+          A scan of <span className="font-medium">{TAB_LABEL[scanningKind].toLowerCase()}</span> is
+          running ({formatElapsed(elapsed)}) — switch to that tab to watch or stop it.
+        </div>
+      ) : remoteScanRunning ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 text-center text-sm text-gray-500">
+          Another admin is running a scan right now — starting is disabled until it finishes (one
+          scan at a time keeps the server responsive).
+        </div>
+      ) : !current ? (
+        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+          <p className="text-sm text-gray-600 mb-1">
+            Scan <span className="font-medium">{TAB_LABEL[tab].toLowerCase()}</span> for likely
+            duplicates.
+          </p>
+          <p className="text-xs text-gray-400 mb-4">
+            Compares only {TAB_LABEL[tab].toLowerCase()} against each other — not the whole
+            catalogue. Takes up to a few minutes; you can stop it at any time.
+          </p>
+          <button
+            onClick={() => startScan(tab)}
+            disabled={anyScanRunning}
+            className="text-sm px-5 py-2 rounded-md bg-violet-700 text-white font-medium hover:bg-violet-800 disabled:opacity-50"
+          >
+            Start scan
+          </button>
+        </div>
       ) : (
         <>
-          <div className="flex items-center justify-between mb-4 text-sm text-gray-500">
+          <div className="flex items-center justify-between mb-4 text-sm text-gray-500 flex-wrap gap-2">
             <span>
               {visible.length} candidate cluster{visible.length === 1 ? "" : "s"} ·{" "}
-              {scan.data?.scanned} records scanned
-              {(scan.data?.dismissed_pairs ?? 0) > 0 &&
-                ` · ${scan.data?.dismissed_pairs} pair(s) previously ruled not-duplicate`}
+              {current.scanned} records scanned
+              {current.dismissed_pairs > 0 &&
+                ` · ${current.dismissed_pairs} pair(s) previously ruled not-duplicate`}
             </span>
             <span className="flex items-center gap-3">
               {ignoredCount > 0 && (
@@ -187,11 +309,12 @@ export default function AdminDuplicates() {
                 </>
               )}
               <button
-                onClick={() => scan.refetch()}
-                disabled={scan.isFetching}
+                onClick={() => startScan(tab)}
+                disabled={anyScanRunning}
                 className="px-3 py-1.5 border border-gray-300 rounded-md hover:border-violet-400 disabled:opacity-50"
+                title={anyScanRunning ? "A scan is already running" : ""}
               >
-                {scan.isFetching ? "Rescanning…" : "Rescan"}
+                Rescan
               </button>
             </span>
           </div>
@@ -206,7 +329,7 @@ export default function AdminDuplicates() {
                 <ClusterCard
                   key={clusterKey(cluster)}
                   kind={tab}
-                  mergeKind={scan.data!.merge_kind}
+                  mergeKind={current.merge_kind}
                   cluster={cluster}
                   isIgnored={ignored.has(clusterKey(cluster))}
                   onDone={(key, message) => {
