@@ -48,6 +48,16 @@ function formatDetail(detail: unknown): string | null {
   return null;
 }
 
+/** Human-readable server error message, or null when the error carries none —
+ * only messages derived from a real `detail` payload count (a bare statusText
+ * like "Conflict" is no better than the caller's generic text). */
+export function apiErrorMessage(err: unknown): string | null {
+  if (err instanceof ApiError && (typeof err.detail === "string" || Array.isArray(err.detail))) {
+    return err.message || null;
+  }
+  return null;
+}
+
 export class ApiError extends Error {
   status: number;
   detail: unknown;
@@ -1847,8 +1857,11 @@ export const volunteer = {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  submitSeries: (data: SeriesCreateIn) =>
-    request<EditSubmission>("/series", { method: "POST", body: JSON.stringify(data) }),
+  submitSeries: (data: SeriesCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/series${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   addTranslation: (workId: number, data: TranslationLinkInput) =>
     request<EditSubmission>(`/works/${workId}/translations`, {
       method: "POST",

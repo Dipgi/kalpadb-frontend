@@ -2,7 +2,12 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import type { DuplicateCandidate } from "../lib/api";
 
-const BASE_PATH = { person: "/persons", publisher: "/publishers", work: "/works" } as const;
+const BASE_PATH = {
+  person: "/persons",
+  publisher: "/publishers",
+  work: "/works",
+  series: "/series",
+} as const;
 
 /**
  * Shown after a create is rejected (409) because a person/publisher/work with a
@@ -16,7 +21,7 @@ export default function DuplicateMatchPrompt({
   onDismiss,
   busy,
 }: {
-  kind: "person" | "publisher" | "work";
+  kind: "person" | "publisher" | "work" | "series";
   candidates: DuplicateCandidate[];
   onCreateAnyway: () => void;
   onDismiss?: () => void;

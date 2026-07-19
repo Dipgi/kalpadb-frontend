@@ -7,6 +7,7 @@ import {
   catalogue,
   search,
   volunteer,
+  apiErrorMessage,
   getDuplicateError,
   type DuplicateError,
   type GenreItem,
@@ -332,7 +333,7 @@ function useInlineCreators() {
   };
 }
 
-function SubmitRow({ pending, error, label }: { pending: boolean; error: boolean; label: string }) {
+function SubmitRow({ pending, error, errorMessage, label }: { pending: boolean; error: boolean; errorMessage?: string | null; label: string }) {
   return (
     <div className="flex items-center gap-3 pt-2">
       <button
@@ -342,7 +343,11 @@ function SubmitRow({ pending, error, label }: { pending: boolean; error: boolean
       >
         {pending ? "Submitting…" : label}
       </button>
-      {error && <span className="text-sm text-red-500">Failed — check fields and try again.</span>}
+      {error && (
+        <span className="text-sm text-red-500">
+          {errorMessage ?? "Failed — check fields and try again."}
+        </span>
+      )}
     </div>
   );
 }
@@ -704,7 +709,7 @@ function BookForm() {
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit book" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit book" />
     </form>
   );
 }
@@ -976,7 +981,7 @@ function StoryForm() {
       <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit story" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit story" />
     </form>
   );
 }
@@ -1337,7 +1342,7 @@ function ComicForm() {
         <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit comic" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit comic" />
     </form>
   );
 }
@@ -1615,7 +1620,7 @@ function MediaForm() {
         <TagChipPicker selected={tagIds} onChange={setTagIds} />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit media work" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit media work" />
     </form>
   );
 }
@@ -1898,7 +1903,7 @@ function MagazineForm() {
         approved, the two works can be linked from its Edit page (“Translations”).
       </p>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit magazine" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit magazine" />
     </form>
   );
 }
@@ -2042,7 +2047,7 @@ function PersonForm() {
       />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit person" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit person" />
     </form>
   );
 }
@@ -2205,7 +2210,7 @@ function PublisherForm() {
       />
       </FormSection>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} label="Submit publisher" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit publisher" />
     </form>
   );
 }
@@ -2218,14 +2223,18 @@ function SeriesForm() {
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  const [dup, setDup] = useState<DuplicateError | null>(null);
+
   const mutation = useMutation({
-    mutationFn: () =>
+    mutationFn: (allowDuplicate: boolean) =>
       volunteer.submitSeries({
         name: name.trim(),
         slug: slug.trim() || null,
         description: description.trim() || null,
-      }),
+      }, allowDuplicate),
+    onError: (err) => setDup(getDuplicateError(err)),
     onSuccess: () => {
+      setDup(null);
       setSubmitted(true);
       setName("");
       setSlug("");
@@ -2238,11 +2247,28 @@ function SeriesForm() {
       onSubmit={(e) => {
         e.preventDefault();
         setSubmitted(false);
-        if (name.trim()) mutation.mutate();
+        if (name.trim()) {
+          setDup(null);
+          mutation.mutate(false);
+        }
       }}
       className="space-y-4"
     >
       {submitted && <PendingBanner />}
+
+      {dup && (
+        <DuplicateMatchPrompt
+          kind="series"
+          candidates={dup.candidates}
+          busy={mutation.isPending}
+          onCreateAnyway={() => mutation.mutate(true)}
+          onDismiss={() => {
+            setDup(null);
+            mutation.reset();
+          }}
+        />
+      )}
+
 
       <div>
         <label className={labelCls}>Name *</label>
@@ -2273,7 +2299,7 @@ function SeriesForm() {
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className={inputCls} />
       </div>
 
-      <SubmitRow pending={mutation.isPending} error={mutation.isError} label="Submit series" />
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit series" />
     </form>
   );
 }
