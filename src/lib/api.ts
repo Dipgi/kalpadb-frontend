@@ -972,6 +972,11 @@ export const profiles = {
     bio?: string | null;
     image_url?: string | null;
   }) => request<UserOut>("/users/me", { method: "PATCH", body: JSON.stringify(data) }),
+  changePassword: (current_password: string, new_password: string) =>
+    request<{ message: string }>("/users/me/change-password", {
+      method: "POST",
+      body: JSON.stringify({ current_password, new_password }),
+    }),
   // Multipart — must NOT set Content-Type (browser adds the boundary).
   uploadAvatar: async (file: File): Promise<{ url: string }> => {
     const form = new FormData();

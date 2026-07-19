@@ -13,7 +13,7 @@ const labelCls = "block text-xs font-semibold text-gray-500 mb-1";
 export default function AccountPage() {
   const { user, loading, refreshUser } = useAuth();
   const navigate = useNavigate();
-  useSeo({ title: "Edit profile" });
+  useSeo({ title: "Edit profile", noindex: true });
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -203,6 +203,106 @@ export default function AccountPage() {
           {error && <span className="text-sm text-red-500">{error}</span>}
         </div>
       </form>
+
+      <ChangePasswordSection />
     </div>
+  );
+}
+
+function ChangePasswordSection() {
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const change = useMutation({
+    mutationFn: () => profiles.changePassword(current, next),
+    onSuccess: () => {
+      setDone(true);
+      setError(null);
+      setCurrent("");
+      setNext("");
+      setConfirm("");
+    },
+    onError: (e) => {
+      setDone(false);
+      setError(e instanceof ApiError ? e.message : "Password change failed — try again.");
+    },
+  });
+
+  const mismatch = confirm.length > 0 && next !== confirm;
+  const tooShort = next.length > 0 && next.length < 8;
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (mismatch || tooShort) return;
+        change.mutate();
+      }}
+      className="mt-10 pt-6 border-t border-gray-200 space-y-4"
+    >
+      <div>
+        <h2 className="text-base font-bold text-gray-900">Change password</h2>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Forgot your current password? Use the “Forgot password” link on the sign-in page instead.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div>
+          <label className={labelCls}>Current password</label>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={current}
+            onChange={(e) => {
+              setCurrent(e.target.value);
+              setDone(false);
+            }}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>New password</label>
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={next}
+            onChange={(e) => {
+              setNext(e.target.value);
+              setDone(false);
+            }}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Repeat new password</label>
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => {
+              setConfirm(e.target.value);
+              setDone(false);
+            }}
+            className={inputCls}
+          />
+        </div>
+      </div>
+      {tooShort && <p className="text-xs text-red-500">New password must be at least 8 characters.</p>}
+      {mismatch && <p className="text-xs text-red-500">New passwords don’t match.</p>}
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={change.isPending || !current || !next || !confirm || mismatch || tooShort}
+          className="bg-gray-800 text-white text-sm font-medium px-5 py-2 rounded-md hover:bg-gray-900 disabled:opacity-50 transition-colors"
+        >
+          {change.isPending ? "Changing…" : "Change password"}
+        </button>
+        {done && <span className="text-sm text-emerald-600">Password changed.</span>}
+        {error && <span className="text-sm text-red-500">{error}</span>}
+      </div>
+    </form>
   );
 }

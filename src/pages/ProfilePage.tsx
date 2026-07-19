@@ -41,9 +41,11 @@ export default function ProfilePage() {
   const displayName =
     [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || profile?.username;
 
+  // noindex: profiles are public but shouldn't be Google-indexed by name.
   useSeo({
     title: profile ? `${displayName} (@${profile.username})` : "Profile",
     description: profile?.bio ?? (profile ? `${displayName} on KalpaDB.` : undefined),
+    noindex: true,
   });
 
   if (isLoading) {

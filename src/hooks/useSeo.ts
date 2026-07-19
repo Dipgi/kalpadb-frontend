@@ -38,16 +38,25 @@ export function useSeo({
   title,
   description,
   path,
+  noindex = false,
 }: {
   title?: string;
   description?: string | null;
   path?: string;
+  /** Keep this page out of search engines (user profiles etc.). Managed on
+   *  every call, so navigating from a noindex page to a normal one clears it. */
+  noindex?: boolean;
 }) {
   useEffect(() => {
     document.title = title ? `${title} · ${SITE_NAME}` : DEFAULT_TITLE;
     upsertMeta("description", clamp(description) || DEFAULT_DESCRIPTION);
     upsertCanonical(ORIGIN + (path ?? window.location.pathname));
-  }, [title, description, path]);
+    if (noindex) {
+      upsertMeta("robots", "noindex");
+    } else {
+      document.head.querySelector('meta[name="robots"]')?.remove();
+    }
+  }, [title, description, path, noindex]);
 }
 
 /** Trim a description to a search-snippet-friendly length. */
