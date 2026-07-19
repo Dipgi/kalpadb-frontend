@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "18 July 2026";
+const LAST_UPDATED = "19 July 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -399,6 +399,14 @@ export default function AdminGuide() {
             different people or works with similar names — check before merging.
           </li>
         </ul>
+        <p>
+          Prevention: adding a <strong>new work</strong> of any type now warns when a
+          similar-titled work of that type already exists (matching includes native-script and
+          romanised titles). The prompt shows what each candidate is (type · language · year) —
+          pick the existing record, or use “None of these — create new” for a legitimate
+          same-title work (remakes, translations). The same check has always guarded new people
+          and publishers.
+        </p>
       </Section>
 
       <Section title="Activity log">

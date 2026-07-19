@@ -65,6 +65,9 @@ export interface DuplicateCandidate {
   similarity: number;
   localised_match: boolean;
   alias_match?: boolean;
+  // Work candidates only: "film · hi · 2010" — same-title works are often
+  // legitimately distinct, so the prompt shows what each candidate is.
+  context?: string | null;
 }
 
 export interface DuplicateError {
@@ -1764,36 +1767,51 @@ function noteQuery(note?: string | null): string {
 }
 
 export const volunteer = {
-  submitBook: (data: BookCreateIn) =>
-    request<EditSubmission>("/works/books", { method: "POST", body: JSON.stringify(data) }),
+  submitBook: (data: BookCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/books${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updateBook: (work_id: number, data: BookUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/books/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  submitStory: (data: StoryCreateIn) =>
-    request<EditSubmission>("/works/stories", { method: "POST", body: JSON.stringify(data) }),
+  submitStory: (data: StoryCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/stories${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updateStory: (work_id: number, data: StoryUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/stories/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  submitComic: (data: ComicCreateIn) =>
-    request<EditSubmission>("/works/comics", { method: "POST", body: JSON.stringify(data) }),
+  submitComic: (data: ComicCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/comics${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updateComic: (work_id: number, data: ComicUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/comics/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  submitMedia: (data: MediaCreateIn) =>
-    request<EditSubmission>("/works/media", { method: "POST", body: JSON.stringify(data) }),
+  submitMedia: (data: MediaCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/media${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updateMedia: (work_id: number, data: MediaUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/media/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
-  submitMagazine: (data: MagazineCreateIn) =>
-    request<EditSubmission>("/works/magazines", { method: "POST", body: JSON.stringify(data) }),
+  submitMagazine: (data: MagazineCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/magazines${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
   updateMagazine: (work_id: number, data: MagazineUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/magazines/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
