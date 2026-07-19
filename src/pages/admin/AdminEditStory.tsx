@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   admin,
+  ApiError,
   catalogue,
   search,
   volunteer,
@@ -527,7 +528,11 @@ function EditForm({ work }: { work: WorkDetail }) {
           </button>
         )}
         {isAdmin && deleteMutation.isError && (
-          <span className="text-sm text-red-500">Delete failed.</span>
+          <span className="text-sm text-red-500">
+            {deleteMutation.error instanceof ApiError
+              ? deleteMutation.error.message
+              : "Delete failed."}
+          </span>
         )}
       </div>
     </form>

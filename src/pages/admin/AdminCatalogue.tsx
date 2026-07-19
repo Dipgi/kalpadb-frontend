@@ -129,7 +129,11 @@ function SeriesSection() {
           ))}
         </ul>
       )}
-      {del.isError && <p className="text-sm text-red-500 mt-2">Delete failed.</p>}
+      {del.isError && (
+        <p className="text-sm text-red-500 mt-2">
+          {del.error instanceof ApiError ? del.error.message : "Delete failed."}
+        </p>
+      )}
     </div>
   );
 }

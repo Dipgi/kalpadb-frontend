@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
+import { admin, ApiError, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import EntityPicker, { type PickerItem } from "../../components/EntityPicker";
 import BylineFields, { bylinePayload } from "../../components/BylineFields";
@@ -599,7 +599,11 @@ function EditForm({ work }: { work: WorkDetail }) {
           </button>
         )}
         {isAdmin && deleteMutation.isError && (
-          <span className="text-sm text-red-500">Delete failed.</span>
+          <span className="text-sm text-red-500">
+            {deleteMutation.error instanceof ApiError
+              ? deleteMutation.error.message
+              : "Delete failed."}
+          </span>
         )}
       </div>
     </form>

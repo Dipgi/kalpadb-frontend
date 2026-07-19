@@ -95,8 +95,8 @@ function EditForm({ series }: { series: BookSeriesOut }) {
   });
 
   const deleteErr =
-    deleteMutation.error instanceof ApiError && deleteMutation.error.status === 409
-      ? "Still linked to works — unlink them first."
+    deleteMutation.error instanceof ApiError
+      ? deleteMutation.error.message
       : deleteMutation.isError
         ? "Delete failed."
         : null;

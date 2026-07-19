@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   admin,
+  ApiError,
   catalogue,
   search,
   volunteer,
@@ -550,7 +551,9 @@ function IssueForm({
       </div>
       {isAdmin && existing && deleteMutation.isError && (
         <p className="text-sm text-red-500 text-right">
-          Delete failed — try again.
+          {deleteMutation.error instanceof ApiError
+            ? deleteMutation.error.message
+            : "Delete failed — try again."}
         </p>
       )}
       {isAdmin && existing && (

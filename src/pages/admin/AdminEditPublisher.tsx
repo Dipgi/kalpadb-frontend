@@ -138,8 +138,8 @@ function EditForm({ publisher }: { publisher: PublisherDetail }) {
   });
 
   const deleteErr =
-    deleteMutation.error instanceof ApiError && deleteMutation.error.status === 409
-      ? "Still linked to books — unlink it first."
+    deleteMutation.error instanceof ApiError
+      ? deleteMutation.error.message
       : deleteMutation.isError
         ? "Delete failed."
         : null;

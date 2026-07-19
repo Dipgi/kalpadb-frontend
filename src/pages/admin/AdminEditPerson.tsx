@@ -152,8 +152,8 @@ function EditForm({ person }: { person: Person }) {
   });
 
   const deleteErr =
-    deleteMutation.error instanceof ApiError && deleteMutation.error.status === 409
-      ? "Still credited on works — remove those credits first."
+    deleteMutation.error instanceof ApiError
+      ? deleteMutation.error.message
       : deleteMutation.isError
         ? "Delete failed."
         : null;
