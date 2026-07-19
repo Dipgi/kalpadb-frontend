@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { auth, getToken, setToken, type UserOut } from "../lib/api";
+import { ApiError, auth, getToken, setToken, type UserOut } from "../lib/api";
 
 interface AuthState {
   user: UserOut | null;
@@ -19,7 +19,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!getToken()) { setLoading(false); return; }
     auth.me()
       .then(setUser)
-      .catch(() => setToken(null))
+      .catch((err) => {
+        // Discard the token only when the server actually rejected it. A
+        // network error / timeout / 5xx means the server was unreachable
+        // (e.g. briefly overloaded) — dropping the token then silently logs
+        // everyone out for no reason.
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+          setToken(null);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
