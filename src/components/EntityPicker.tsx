@@ -50,9 +50,12 @@ export default function EntityPicker({
 
   const results = (data?.items ?? []).filter((r) => !selected.some((s) => s.id === r.id));
   const term = q.trim();
-  // Offer create when there's no exact (case-insensitive) name match already visible/selected.
+  // Always offer create — an exact name match may be a genuine namesake (two
+  // people can share a name). The backend same-name check still runs on create
+  // and surfaces the existing record(s) with a "create anyway" escape hatch,
+  // so this can't silently produce duplicates.
   const exactMatch = [...results, ...selected].some((r) => r.name.toLowerCase() === term.toLowerCase());
-  const showCreate = !!onCreate && term.length >= 1 && !exactMatch;
+  const showCreate = !!onCreate && term.length >= 1;
 
   function pick(item: PickerItem) {
     onChange([...selected, item]);
@@ -150,7 +153,11 @@ export default function EntityPicker({
                 disabled={creating}
                 className="w-full text-left px-3 py-2 text-sm text-violet-700 font-medium hover:bg-violet-50 disabled:opacity-50"
               >
-                {creating ? "Creating…" : `+ Create “${term}”`}
+                {creating
+                  ? "Creating…"
+                  : exactMatch
+                    ? `+ Create “${term}” (same name, separate record)`
+                    : `+ Create “${term}”`}
               </button>
             </li>
           )}
