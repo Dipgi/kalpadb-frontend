@@ -1218,20 +1218,27 @@ function ReviewItem({
 
   return (
     <li className="flex gap-3">
-      {review.user.image_url ? (
-        <img
-          src={review.user.image_url}
-          alt={review.user.username}
-          className="w-9 h-9 rounded-full object-cover shrink-0"
-        />
-      ) : (
-        <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center shrink-0 text-violet-500 text-sm font-medium">
-          {review.user.username.charAt(0).toUpperCase()}
-        </div>
-      )}
+      <Link to={`/users/${encodeURIComponent(review.user.username)}`} className="shrink-0">
+        {review.user.image_url ? (
+          <img
+            src={review.user.image_url}
+            alt={review.user.username}
+            className="w-9 h-9 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center text-violet-500 text-sm font-medium">
+            {review.user.username.charAt(0).toUpperCase()}
+          </div>
+        )}
+      </Link>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-gray-900">{review.user.username}</span>
+          <Link
+            to={`/users/${encodeURIComponent(review.user.username)}`}
+            className="text-sm font-medium text-gray-900 hover:text-violet-700"
+          >
+            {review.user.username}
+          </Link>
           <Stars value={review.rating} />
           {date && (
             <span className="text-xs text-gray-400">

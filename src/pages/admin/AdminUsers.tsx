@@ -32,7 +32,7 @@ export default function AdminUsers() {
       data,
     }: {
       id: number;
-      data: { role?: string; auto_approve?: boolean; is_active?: boolean };
+      data: { role?: string; auto_approve?: boolean; is_active?: boolean; clear_bio?: boolean; clear_image?: boolean };
     }) => admin.users.update(id, data),
     onSuccess: () => {
       setPendingRole(null);
@@ -76,7 +76,13 @@ export default function AdminUsers() {
               {(data?.items ?? []).map((u: AdminUser) => (
                 <tr key={u.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-800">
-                    {u.username}
+                    <Link
+                      to={`/users/${encodeURIComponent(u.username)}`}
+                      className="hover:text-violet-700"
+                      title="Open public profile"
+                    >
+                      {u.username}
+                    </Link>
                     <span className="ml-1.5 text-xs text-gray-400">#{u.id}</span>
                     {u.is_owner && (
                       <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded-full bg-violet-100 text-violet-700 font-semibold uppercase tracking-wide">
@@ -96,6 +102,21 @@ export default function AdminUsers() {
                       >
                         Message
                       </Link>
+                    )}
+                    {u.id !== me?.id && !u.is_owner && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Clear ${u.username}'s bio and profile picture?`))
+                            updateMutation.mutate({
+                              id: u.id,
+                              data: { clear_bio: true, clear_image: true },
+                            });
+                        }}
+                        className="ml-2 text-[11px] text-red-500 hover:underline"
+                        title="Moderation: blank this user's bio and picture"
+                      >
+                        Clear bio
+                      </button>
                     )}
                   </td>
                   <td className="px-4 py-3 text-gray-500">

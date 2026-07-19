@@ -28,6 +28,8 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ShelfPage from "./pages/ShelfPage";
+import ProfilePage from "./pages/ProfilePage";
+import AccountPage from "./pages/AccountPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminQueue from "./pages/admin/AdminQueue";
@@ -119,6 +121,8 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/shelf" element={<ShelfPage />} />
+                <Route path="/users/:username" element={<ProfilePage />} />
+                <Route path="/account" element={<AccountPage />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/contribute" element={<ContributePage />} />
                 <Route path="/my-submissions" element={<MySubmissionsPage />} />

@@ -209,6 +209,12 @@ export default function Navbar() {
                       <div className="my-1 border-t border-gray-100" />
                     </>
                   )}
+                  <Link to={`/users/${encodeURIComponent(user.username)}`} onClick={() => setOpen(null)} className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
+                    My Profile
+                  </Link>
+                  <Link to="/account" onClick={() => setOpen(null)} className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
+                    Edit Profile
+                  </Link>
                   <Link to="/shelf" onClick={() => setOpen(null)} className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                     My Shelf
                   </Link>
@@ -312,6 +318,8 @@ export default function Navbar() {
                   </div>
                 )}
                 <Link to="/contribute" onClick={() => setMenuOpen(false)} className="pl-2">Contribute</Link>
+                <Link to={`/users/${encodeURIComponent(user.username)}`} onClick={() => setMenuOpen(false)} className="pl-2">My Profile</Link>
+                <Link to="/account" onClick={() => setMenuOpen(false)} className="pl-2">Edit Profile</Link>
                 <Link to="/shelf" onClick={() => setMenuOpen(false)} className="pl-2">My Shelf</Link>
                 {messagesLink(() => setMenuOpen(false), true)}
                 {isContributor && (

@@ -7,6 +7,8 @@ interface AuthState {
   login: (email: string, password: string, turnstileToken?: string | null) => Promise<void>;
   setSession: (token: string) => Promise<void>;
   logout: () => void;
+  /** Re-fetch /users/me after a profile edit so the navbar etc. update. */
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -48,8 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  async function refreshUser() {
+    if (!getToken()) return;
+    setUser(await auth.me());
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, setSession, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, setSession, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

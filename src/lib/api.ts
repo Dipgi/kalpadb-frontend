@@ -519,12 +519,42 @@ export interface UserOut {
   id: number;
   username: string;
   email: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  bio?: string | null;
+  image_url?: string | null;
   role: string;
   is_owner?: boolean;
   /** Trusted volunteer: submissions publish immediately (still logged). */
   auto_approve?: boolean;
   is_active: boolean;
   agreed_terms_at?: string | null;
+}
+
+/** Public profile — no email, no private flags. */
+export interface UserPublic {
+  id: number;
+  username: string;
+  first_name: string | null;
+  last_name: string | null;
+  bio: string | null;
+  image_url: string | null;
+  created_at: string | null;
+  role: string;
+  auto_approve: boolean;
+}
+
+export interface UserStats {
+  entries_created: number;
+  entries_edited: number;
+  by_type: Record<string, number>;
+  works_rated: number;
+  reviews_written: number;
+  public_lists: number;
+  people_followed: number;
+  /** Only present when viewing your own profile (or as admin). */
+  pending_submissions: number | null;
+  rejected_submissions: number | null;
 }
 
 export interface ShelfEntry {
@@ -929,6 +959,33 @@ export const search = {
 // ── Image uploads (Cloudflare R2) ─────────────────────────────────────────
 
 export type ImageCategory = "covers" | "illustrations" | "people" | "publishers";
+
+// ── User profiles ───────────────────────────────────────────────────────────
+
+export const profiles = {
+  get: (username: string) => request<UserPublic>(`/users/${encodeURIComponent(username)}`),
+  stats: (username: string) =>
+    request<UserStats>(`/users/${encodeURIComponent(username)}/stats`),
+  updateMe: (data: {
+    first_name?: string | null;
+    last_name?: string | null;
+    bio?: string | null;
+    image_url?: string | null;
+  }) => request<UserOut>("/users/me", { method: "PATCH", body: JSON.stringify(data) }),
+  // Multipart — must NOT set Content-Type (browser adds the boundary).
+  uploadAvatar: async (file: File): Promise<{ url: string }> => {
+    const form = new FormData();
+    form.append("file", file);
+    const headers: Record<string, string> = {};
+    if (_token) headers["Authorization"] = `Bearer ${_token}`;
+    const res = await fetch(`${BASE}/uploads/avatar`, { method: "POST", headers, body: form });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(res.status, formatDetail(body.detail) ?? res.statusText, body.detail);
+    }
+    return res.json();
+  },
+};
 
 export const uploads = {
   // Multipart file upload — must NOT set Content-Type (browser adds the boundary).

@@ -142,6 +142,13 @@ export default function HelpPage() {
             forget your password, use the “Forgot password” link to reset it by email.
           </li>
           <li>A basic account lets you rate, bookmark, track reading, and build lists.</li>
+          <li>
+            Every account has a <strong>public profile</strong> at{" "}
+            <code className="text-xs bg-gray-100 px-1 rounded">/users/&lt;username&gt;</code> showing
+            your name, bio, picture and contribution stats — set them up under{" "}
+            <Link to="/account" className="text-violet-700 hover:underline">Edit Profile</Link> in
+            your account menu. Your email is never shown publicly.
+          </li>
         </ul>
       </Section>
 
