@@ -82,6 +82,8 @@ function EditForm({ work }: { work: WorkDetail }) {
     queryFn: catalogue.allLanguages,
   });
   const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const seriesList = seriesPage?.items ?? [];
 
   const media = work.media;
   const [title, setTitle] = useState(work.title);
@@ -98,6 +100,11 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [productionHouse, setProductionHouse] = useState(media?.production_house ?? "");
   const [country, setCountry] = useState(media?.country_of_origin ?? "");
   const [ageRating, setAgeRating] = useState(media?.age_rating ?? "");
+  const [seriesId, setSeriesId] = useState(media?.series_id?.toString() ?? "");
+  const [seriesPosition, setSeriesPosition] = useState(media?.series_position?.toString() ?? "");
+  const [seriesPositionLabel, setSeriesPositionLabel] = useState(
+    media?.series_position_label ?? ""
+  );
   const [posterUrl, setPosterUrl] = useState(work.image_urls?.[0] ?? "");
   const [credits, setCredits] = useState<CreditRow[]>(
     creditRowsFromExisting(media?.credits ?? [], work.content_type ?? "film")
@@ -168,6 +175,9 @@ function EditForm({ work }: { work: WorkDetail }) {
           production_house: productionHouse.trim() || null,
           country_of_origin: country || null,
           age_rating: ageRating.trim() || null,
+          series_id: seriesId ? Number(seriesId) : null,
+          series_position: seriesId && seriesPosition ? Number(seriesPosition) : null,
+          series_position_label: (seriesId && seriesPositionLabel.trim()) || null,
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         },
@@ -365,6 +375,50 @@ function EditForm({ work }: { work: WorkDetail }) {
             />
           </div>
         </div>
+      </FormSection>
+
+      <FormSection
+        title="Series / franchise"
+        hint="Group sequels under one named series (e.g. Koi… Mil Gaya and Krrish under “Krrish”). Create the series first under Add → Series. Not for seasons of one show — those go under Seasons below."
+      >
+        {seriesList.length === 0 ? (
+          <p className="text-xs text-gray-400">
+            No series exist yet. Create one under Add → Series, then link it here.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls}>Series</label>
+              <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
+                <option value="">Not part of a series</option>
+                {seriesList.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Position</label>
+              <input
+                type="number"
+                min={1}
+                value={seriesPosition}
+                onChange={(e) => setSeriesPosition(e.target.value)}
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Position label (optional)</label>
+              <input
+                value={seriesPositionLabel}
+                onChange={(e) => setSeriesPositionLabel(e.target.value)}
+                placeholder="e.g. prequel, spin-off, 2.5"
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+          </div>
+        )}
       </FormSection>
 
       {episodic && (

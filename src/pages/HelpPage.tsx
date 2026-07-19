@@ -89,7 +89,8 @@ export default function HelpPage() {
           </li>
           <li>
             <Link to="/series" className="text-violet-700 hover:underline">Series</Link> — browse
-            book and comic series; each series page lists its works in reading order.
+            named series; each series page lists its works in reading order. A series can hold
+            books, comics, or films (e.g. the <em>Krrish</em> film franchise).
           </li>
           <li>
             <Link to="/magazines" className="text-violet-700 hover:underline">Magazines</Link> —

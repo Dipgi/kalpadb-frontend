@@ -309,6 +309,11 @@ export interface MediaSeason {
 
 export interface MediaWorkDetail {
   id: number;
+  /** Named franchise/series (Koi... Mil Gaya → Krrish) — shared with books/comics. */
+  series_id: number | null;
+  series: { id: number; name: string; slug: string | null } | null;
+  series_position: number | null;
+  series_position_label: string | null;
   runtime_minutes: number | null;
   total_seasons: number | null;
   total_episodes: number | null;
@@ -1610,6 +1615,10 @@ export interface MediaCreateIn {
   credited_as?: Record<number, string>;
   adaptations?: MediaAdaptationInput[];
   seasons?: MediaSeasonInput[];
+  /** Named franchise/series link (shared book_series table, like comics). */
+  series_id?: number | null;
+  series_position?: number | null;
+  series_position_label?: string | null;
   runtime_minutes?: number | null;
   total_seasons?: number | null;
   total_episodes?: number | null;

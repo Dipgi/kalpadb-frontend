@@ -1395,6 +1395,8 @@ function MediaForm() {
     queryKey: ["all-languages"],
     queryFn: catalogue.allLanguages,
   });
+  const { data: seriesPage } = useQuery({ queryKey: ["all-series"], queryFn: catalogue.series });
+  const seriesList = seriesPage?.items ?? [];
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -1407,6 +1409,9 @@ function MediaForm() {
   const [productionHouse, setProductionHouse] = useState("");
   const [country, setCountry] = useState("IN");
   const [ageRating, setAgeRating] = useState("");
+  const [seriesId, setSeriesId] = useState("");
+  const [seriesPosition, setSeriesPosition] = useState("");
+  const [seriesPositionLabel, setSeriesPositionLabel] = useState("");
   const [posterUrl, setPosterUrl] = useState("");
   const [credits, setCredits] = useState<CreditRow[]>([]);
   // One byline map for the whole work: applies to every credit a person holds.
@@ -1449,6 +1454,9 @@ function MediaForm() {
           production_house: productionHouse.trim() || null,
           country_of_origin: country || null,
           age_rating: ageRating.trim() || null,
+          series_id: seriesId ? Number(seriesId) : null,
+          series_position: seriesId && seriesPosition ? Number(seriesPosition) : null,
+          series_position_label: (seriesId && seriesPositionLabel.trim()) || null,
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         }, allowDuplicate)
@@ -1467,6 +1475,9 @@ function MediaForm() {
       setPlatform("");
       setProductionHouse("");
       setAgeRating("");
+      setSeriesId("");
+      setSeriesPosition("");
+      setSeriesPositionLabel("");
       setPosterUrl("");
       setCredits([]);
       setBylines({});
@@ -1630,6 +1641,46 @@ function MediaForm() {
           </div>
         </div>
       </FormSection>
+
+      {seriesList.length > 0 && (
+        <FormSection
+          title="Series / franchise"
+          hint="Optional — group sequels under one named series (e.g. Koi… Mil Gaya and Krrish under “Krrish”). Not for seasons of one show."
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls}>Series</label>
+              <select value={seriesId} onChange={(e) => setSeriesId(e.target.value)} className={inputCls}>
+                <option value="">Not part of a series</option>
+                {seriesList.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Position</label>
+              <input
+                type="number"
+                min={1}
+                value={seriesPosition}
+                onChange={(e) => setSeriesPosition(e.target.value)}
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Position label (optional)</label>
+              <input
+                value={seriesPositionLabel}
+                onChange={(e) => setSeriesPositionLabel(e.target.value)}
+                placeholder="e.g. prequel, spin-off, 2.5"
+                disabled={!seriesId}
+                className={inputCls}
+              />
+            </div>
+          </div>
+        </FormSection>
+      )}
 
       {episodic && (
         <FormSection

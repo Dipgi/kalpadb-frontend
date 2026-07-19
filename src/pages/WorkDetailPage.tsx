@@ -465,6 +465,21 @@ export default function WorkDetailPage() {
 
         {work.media && (
           <>
+            {work.media.series_id != null && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Series</h3>
+                <p className="text-sm text-gray-700">
+                  <Link to={`/series/${work.media.series_id}`} className="text-violet-700 hover:underline">
+                    {work.media.series?.name ?? `Series #${work.media.series_id}`}
+                  </Link>
+                  {work.media.series_position_label
+                    ? ` (${work.media.series_position_label})`
+                    : work.media.series_position != null
+                      ? ` (part ${work.media.series_position})`
+                      : ""}
+                </p>
+              </div>
+            )}
             {(work.media.runtime_minutes != null ||
               work.media.platform ||
               work.media.production_house ||

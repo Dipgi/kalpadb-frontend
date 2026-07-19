@@ -139,6 +139,14 @@ export default function AdminGuide() {
             automatically — record it once, from the media side.
           </li>
           <li>
+            <strong>Series / franchise.</strong> Group film sequels under one named series — e.g.{" "}
+            <em>Koi… Mil Gaya</em> and <em>Krrish</em> under a “Krrish” series — with an optional
+            position and label (prequel, spin-off…). It’s the same series entity books and comics
+            use (create it under Add → Series), and the series page lists all member works in
+            order. Don’t confuse it with <em>Seasons</em> below, which live inside one episodic
+            work.
+          </li>
+          <li>
             <strong>Seasons.</strong> For series and podcasts, one row per season (number, title,
             episode count, year). Totals are derived automatically. Per-episode entry isn’t
             supported yet.
