@@ -70,11 +70,13 @@ export default function Navbar() {
 
   // Admins see live pending-work counts at the top level so they don't have to
   // dig into the dashboard. Polls periodically so new items surface without a reload.
+  // Interval kept above Neon's 5-min scale-to-zero window — this runs on every
+  // page, so a shorter interval keeps compute awake for any open admin tab.
   const { data: pending } = useQuery({
     queryKey: ["admin-pending-counts"],
     queryFn: admin.pendingCounts,
     enabled: !!isAdmin,
-    refetchInterval: 60_000,
+    refetchInterval: 360_000,
     refetchOnWindowFocus: true,
   });
   const pendingEdits = isAdmin ? (pending?.edit_queue ?? 0) : 0;
@@ -82,11 +84,13 @@ export default function Navbar() {
   const pendingMessages = isAdmin ? (pending?.unread_messages ?? 0) : 0;
 
   // Every signed-in user polls their own unread count for the account-menu badge.
+  // Same reasoning as above — this is sitewide, so keep it above the 5-min
+  // scale-to-zero window rather than the tighter interval a single page could get away with.
   const { data: myUnread } = useQuery({
     queryKey: ["my-unread"],
     queryFn: messages.myUnread,
     enabled: !!user,
-    refetchInterval: 60_000,
+    refetchInterval: 360_000,
     refetchOnWindowFocus: true,
   });
   const unread = myUnread?.unread ?? 0;

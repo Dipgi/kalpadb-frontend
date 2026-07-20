@@ -96,10 +96,12 @@ export default function AdminDuplicates() {
   const [elapsed, setElapsed] = useState(0);
 
   // Detect a scan started by another admin (one scan at a time server-side).
+  // Idle poll kept above Neon's 5-min scale-to-zero window — a scan actually
+  // running is genuine activity, but sitting idle on this page shouldn't be.
   const status = useQuery({
     queryKey: ["dup-scan-status"],
     queryFn: admin.duplicates.scanStatus,
-    refetchInterval: (q) => (q.state.data?.running ? 5000 : 20000),
+    refetchInterval: (q) => (q.state.data?.running ? 5000 : 360_000),
   });
   const remoteScanRunning = !!status.data?.running && scanningKind === null;
 
