@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "19 July 2026";
+const LAST_UPDATED = "4 August 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -251,6 +251,14 @@ export default function HelpPage() {
             more books or magazine issues rather than on its own: a short story, novelette, novella,
             poem, essay, interview, review, or other nonfiction piece.{" "}
             <em>Example:</em> Satyajit Ray’s “ব্যোমযাত্রীর ডায়রি” (<em>Byomjatrir Diary</em>).
+            <div className="mt-1.5 text-gray-500">
+              <strong>Play / drama script.</strong> Both Book and Short work offer a “Play / drama
+              script” category for the published text of a play — the playwright is credited as
+              author, same as a novel or story. This is different from a <em>stage drama
+              production</em> under Media, which documents a specific staging with cast &amp; crew;
+              a production can link back to its published script using the Media form’s “Based on”
+              field.
+            </div>
           </li>
           <li>
             <strong>Comic</strong> — a graphic work: a comic, graphic novel, or manga. Carries its

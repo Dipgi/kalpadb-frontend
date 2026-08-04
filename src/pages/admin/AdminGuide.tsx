@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "19 July 2026";
+const LAST_UPDATED = "4 August 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -137,6 +137,14 @@ export default function AdminGuide() {
             or story(ies) it adapts, with a faithfulness type (direct / partial / loose / sequel /
             prequel). The source work’s public page shows it under <em>Adaptations</em>{" "}
             automatically — record it once, from the media side.
+          </li>
+          <li>
+            <strong>Stage drama: script vs. production.</strong> Media’s “drama” content type is a
+            specific <em>staged production</em> — cast &amp; crew credited (playwright, director,
+            actor…). The published play <em>text</em> itself is catalogued as a Book or Short work
+            with content type “Play / drama script” (author-credited, like a novel or story). If a
+            production has a published script in the catalogue, link them with Based on above,
+            same as a film adapting a novel.
           </li>
           <li>
             <strong>Series / franchise.</strong> Group film sequels under one named series — e.g.{" "}

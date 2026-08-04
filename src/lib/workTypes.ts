@@ -26,6 +26,11 @@ export const WORK_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "nonfiction", label: "Nonfiction" },
   { value: "essay", label: "Essay" },
   { value: "poem", label: "Poetry" },
+  // Published play TEXT (a book-length script), author-credited like any
+  // other book — distinct from MEDIA's "drama", which documents a specific
+  // STAGED PRODUCTION (cast/crew credits). A production can link back to its
+  // published script via the media form's "Based on" adaptation field.
+  { value: "drama", label: "Play / drama script" },
   // "Comics / Graphic Novel" was retired here: graphic works are catalogued as
   // the COMIC work type (its own tab), not a BOOK content_type. See the Comic
   // consolidation. Existing BOOK+graphic_novel records were migrated to COMIC.
@@ -42,6 +47,10 @@ export const STORY_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "nonfiction", label: "Nonfiction" },
   { value: "interview", label: "Interview" },
   { value: "review", label: "Review" },
+  // Published play text run in a magazine/anthology — see WORK_TYPE_OPTIONS'
+  // "drama" entry for the book-length counterpart and the distinction from
+  // MEDIA's staged-production "drama".
+  { value: "drama", label: "Play / drama script" },
 ];
 
 // ContentType values for COMIC works.
@@ -62,7 +71,10 @@ export const MEDIA_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "audiobook", label: "Audiobook" },
   { value: "video_game", label: "Video game" },
   { value: "song", label: "Song / album" },
-  { value: "drama", label: "Stage drama (theatre / jatra)" },
+  // A specific STAGED PRODUCTION of a play — cast/crew credited. For the
+  // published play TEXT itself, use Book/Short work's "Play / drama script"
+  // instead and link a production to it via "Based on" below.
+  { value: "drama", label: "Stage drama production (theatre / jatra)" },
 ];
 
 // Media content types that have seasons/episodes — drives whether the
