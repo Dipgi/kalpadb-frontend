@@ -771,6 +771,36 @@ export interface PersonAward {
   for_work: boolean;
 }
 
+export interface PersonRelationship {
+  id: number;
+  subject_id: number;
+  object_id: number;
+  relation_type: string;
+  notes: string | null;
+  start_year: number | null;
+  end_year: number | null;
+  is_public: boolean;
+  subject: PersonSummary;
+  object_stakeholder: PersonSummary;
+}
+
+export interface PersonRelationshipInput {
+  other_person_id: number;
+  relation_type:
+    | "pen_name_of"
+    | "collective_pseudonym"
+    | "mentor_of"
+    | "influenced_by"
+    | "co_author_group"
+    | "spouse_of"
+    | "parent_of"
+    | "sibling_of";
+  notes?: string | null;
+  start_year?: number | null;
+  end_year?: number | null;
+  is_public?: boolean;
+}
+
 export interface AwardCategoryItem {
   id: number;
   name: string;
@@ -853,6 +883,8 @@ export interface ExternalLinkInput {
 export const catalogue = {
   person: (id: number) => request<Person>(`/persons/${id}`),
   personAwards: (id: number) => request<PersonAward[]>(`/persons/${id}/awards`),
+  personRelationships: (id: number) =>
+    request<PersonRelationship[]>(`/persons/${id}/relationships`),
   workAwards: (id: number) => request<WorkAward[]>(`/works/${id}/awards`),
   awardTypes: () => request<AwardTypeItem[]>(`/awards?active_only=false`),
   awardTypesActive: () => request<AwardTypeItem[]>(`/awards`),
@@ -1359,6 +1391,8 @@ export const admin = {
   relationships: {
     delete: (relId: number) =>
       request(`/works/relationships/${relId}`, { method: "DELETE" }),
+    deletePerson: (relId: number) =>
+      request(`/persons/relationships/${relId}`, { method: "DELETE" }),
   },
 
   reviews: {
@@ -1948,6 +1982,11 @@ export const volunteer = {
     }),
   addWorkRelationship: (workId: number, data: WorkRelationshipInput) =>
     request<EditSubmission>(`/works/${workId}/relationships`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addPersonRelationship: (personId: number, data: PersonRelationshipInput) =>
+    request<EditSubmission>(`/persons/${personId}/relationships`, {
       method: "POST",
       body: JSON.stringify(data),
     }),

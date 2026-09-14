@@ -4,6 +4,8 @@ import { catalogue, type WorkSummary } from "../lib/api";
 import { formatRole } from "../lib/roles";
 import { useAuth } from "../hooks/useAuth";
 import WorkCard from "../components/WorkCard";
+import { PersonLink } from "../components/PersonLink";
+import { personRelationFrom, personRelationLabel } from "../lib/personRelations";
 import { useSeo } from "../hooks/useSeo";
 
 // Work-type sections, in display order. A person's credits collapse to whole
@@ -49,6 +51,12 @@ export default function PersonDetailPage() {
   const { data: awards } = useQuery({
     queryKey: ["person-awards", id],
     queryFn: () => catalogue.personAwards(Number(id)),
+    enabled: !!id,
+  });
+
+  const { data: relationships } = useQuery({
+    queryKey: ["person-relationships", Number(id)],
+    queryFn: () => catalogue.personRelationships(Number(id)),
     enabled: !!id,
   });
 
@@ -213,6 +221,31 @@ export default function PersonDetailPage() {
               {person.awards}
             </p>
           )}
+        </div>
+      )}
+
+      {/* Relationships — pen names, collective pseudonyms, mentorships, biographical ties */}
+      {relationships && relationships.length > 0 && (
+        <div className="mb-10">
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+            Relationships
+            <span className="ml-2 text-sm font-normal text-gray-400">
+              ({relationships.length})
+            </span>
+          </h2>
+          <ul className="text-sm text-gray-700 space-y-1.5">
+            {relationships.map((r) => {
+              const linkedPerson = r.subject_id === person.id ? r.object_stakeholder : r.subject;
+              const fromHere = personRelationFrom(r.relation_type, person.id, r.subject_id);
+              return (
+                <li key={r.id}>
+                  <span className="text-gray-400">{personRelationLabel(fromHere)}: </span>
+                  <PersonLink person={linkedPerson} className="text-violet-700 hover:underline" />
+                  {r.notes && <span className="text-gray-400"> · {r.notes}</span>}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
 

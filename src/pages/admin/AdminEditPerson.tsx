@@ -14,6 +14,7 @@ import { findClearedFields, type ClearedField } from "../../lib/clearedFields";
 import PenNamesField, { type PenName } from "../../components/PenNamesField";
 import AwardsEditor from "../../components/AwardsEditor";
 import ExternalLinksEditor from "../../components/ExternalLinksEditor";
+import PersonRelationshipsEditor from "../../components/PersonRelationshipsEditor";
 import FormSection from "../../components/FormSection";
 import RoleHintSelect from "../../components/RoleHintSelect";
 
@@ -247,6 +248,13 @@ function EditForm({ person }: { person: Person }) {
           links={person.external_links}
           isAdmin={!!isAdmin}
         />
+      </FormSection>
+
+      <FormSection
+        title="Relationships"
+        hint="Pen names, collective pseudonyms, mentorships, and biographical ties to other people. Saved immediately, separately from the fields above — no need to click Save."
+      >
+        <PersonRelationshipsEditor personId={person.id} />
       </FormSection>
 
       <p className="text-xs text-gray-400">
