@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "4 August 2026";
+const LAST_UPDATED = "14 September 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -109,6 +109,39 @@ export default function AdminGuide() {
             editions” for the <em>same</em> work in another language, and this section for a{" "}
             <em>different but connected</em> work in the same language. Approved links appear in the
             “Related works” block on both public work pages.
+          </li>
+        </ul>
+      </Section>
+
+      <Section title="Person relationships">
+        <p>
+          The <strong>“Relationships”</strong> section on a person’s edit page records a
+          directional link to <em>another catalogued person</em> — a pen name, a collective
+          pseudonym, a mentorship, or a biographical tie. Pick the other person, choose the
+          relationship, add an optional note, and save (auto-approved for you; volunteers’ links
+          queue for review). “Remove” deletes a link (admin only; immediate).
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Not the same as Pen names.</strong> The “Names &amp; scripts” section’s{" "}
+            <em>Pen names</em> field stores a plain alternate-name string on this one record — use
+            it for the ordinary case, where the pen name has no independent identity of its own.
+            Only use <em>“Pen name of”</em> / <em>“Contributes to collective pseudonym”</em> here
+            when the pseudonym is itself catalogued as a separate person (its own bio, its own
+            credits) — most often because more than one real person writes under it. Linking two
+            records that really describe the same simple 1-to-1 alias just duplicates what Pen
+            names already covers.
+          </li>
+          <li>
+            <strong>Record it once — it shows on both people.</strong> The reverse side reads
+            automatically from the other person’s point of view: mark A <em>Mentor of</em> B and
+            B’s page reads <em>Mentee of</em> A; <em>Pen name of</em> reads <em>Pen name</em> from
+            the pseudonym’s side. Symmetric links (<em>Spouse of</em>, <em>Sibling of</em>) read
+            the same on both sides.
+          </li>
+          <li>
+            <strong>No edit, only add/remove.</strong> To change a relationship’s type or note,
+            remove it and add the corrected version — same as Related works on a book/story page.
           </li>
         </ul>
       </Section>

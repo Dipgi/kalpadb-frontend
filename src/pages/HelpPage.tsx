@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "4 August 2026";
+const LAST_UPDATED = "14 September 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -454,11 +454,22 @@ export default function HelpPage() {
             &amp; author).
           </li>
           <li>
-            <strong>Pen names &amp; bylines:</strong> every real person has <em>one</em> record —
-            pen names are listed on that record as aliases, never entered as a separate person. If
-            a work was <em>printed</em> under a different name, credit the real person and put the
-            printed name in the optional <em>credited as</em> field under the author/translator
-            picker; the page then shows “Name (as byline)”.
+            <strong>Pen names &amp; bylines:</strong> the ordinary case is one record per real
+            person — pen names go on that record as aliases (“Names &amp; scripts” section), never
+            entered as a separate person. If a work was <em>printed</em> under a different name,
+            credit the real person and put the printed name in the optional <em>credited as</em>{" "}
+            field under the author/translator picker; the page then shows “Name (as byline)”. The
+            rare exception is a pseudonym that’s catalogued as its <em>own</em> person record —
+            usually because more than one real author writes under it — which is linked instead
+            via that person’s “Relationships” section (see below), not entered as an alias.
+          </li>
+          <li>
+            <strong>Person relationships:</strong> the “Relationships” section on a person’s edit
+            page links them to <em>another catalogued person</em> — a shared pseudonym, a
+            mentorship, or a biographical tie (spouse, parent, sibling). Record it once and it
+            shows on both people’s pages, worded from each side (mark one <em>Mentor of</em> the
+            other and their page reads <em>Mentee of</em> you). Don’t use it for a simple
+            alternate name that isn’t its own catalogued person — that’s what Pen names is for.
           </li>
           <li>
             <strong>Genres vs tags:</strong> genres are broad categories (e.g. Hard SF); tags are

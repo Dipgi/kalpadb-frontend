@@ -139,6 +139,13 @@ export default function PersonRelationshipsEditor({ personId }: { personId: numb
             />
           </div>
         </div>
+        {(relationType === "pen_name_of" || relationType === "collective_pseudonym") && (
+          <p className="text-xs text-amber-600">
+            Only for a pseudonym that’s catalogued as its own person record (e.g. shared by more
+            than one author). For a simple alternate name, use <strong>Pen names</strong> in Names
+            &amp; scripts above instead — don’t duplicate it here.
+          </p>
+        )}
         <div className="flex items-center gap-3">
           <button
             type="button"
