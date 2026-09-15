@@ -8,6 +8,8 @@ export const WORK_TYPE_LABELS: Record<string, { singular: string; plural: string
   MAGAZINE: { singular: "Magazine", plural: "Magazines" },
   COMIC: { singular: "Comic", plural: "Comics" },
   MEDIA: { singular: "Media", plural: "Media" },
+  ACADEMIC: { singular: "Academic article", plural: "Academic articles" },
+  COVERAGE: { singular: "Coverage item", plural: "Coverage items" },
 };
 
 export function workTypeLabel(type: string, plural = false): string {
@@ -109,6 +111,41 @@ export const MEDIA_ROLE_OPTIONS: Record<string, string[]> = {
   drama: ["playwright", "director", "actor", "producer", "composer", "stage_designer", "costume_designer"],
 };
 
+// ContentType values for ACADEMIC (scholarship about Indian SF) works.
+export const ACADEMIC_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "journal_article", label: "Journal article" },
+  { value: "conference_paper", label: "Conference paper" },
+  { value: "book_chapter", label: "Book chapter" },
+  { value: "thesis", label: "Thesis / dissertation" },
+  { value: "preprint", label: "Preprint" },
+];
+
+// ContentType values for COVERAGE (press coverage & interviews about Indian
+// SF) works. NOT MediaWork — a video interview about an author is COVERAGE,
+// not MEDIA (MediaWork is SF that IS a screen/audio work).
+export const COVERAGE_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "newspaper_article", label: "Newspaper article" },
+  { value: "press_feature", label: "Press feature" },
+  { value: "tv_coverage", label: "TV coverage" },
+  { value: "radio_coverage", label: "Radio coverage" },
+  { value: "video_interview", label: "Video interview" },
+  { value: "web_interview", label: "Web / text interview" },
+  { value: "podcast_interview", label: "Podcast interview" },
+  { value: "blog_post", label: "Blog post" },
+  { value: "obituary", label: "Obituary" },
+];
+
+// Curated contributor role suggestions for a CoverageItem. Free text
+// server-side; 'author' is the role that doubles as the work-level byline.
+export const COVERAGE_ROLE_OPTIONS = [
+  "author",
+  "interviewer",
+  "interviewee",
+  "host",
+  "subject",
+  "photographer",
+];
+
 // Adaptation relationship options (MediaAdaptation.adaptation_type).
 export const ADAPTATION_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: "direct", label: "Direct (faithful adaptation)" },
@@ -133,6 +170,10 @@ export function contentTypeOptionsFor(workType: string): { value: string; label:
       return COMIC_TYPE_OPTIONS;
     case "MEDIA":
       return MEDIA_TYPE_OPTIONS;
+    case "ACADEMIC":
+      return ACADEMIC_TYPE_OPTIONS;
+    case "COVERAGE":
+      return COVERAGE_TYPE_OPTIONS;
     default:
       return [];
   }

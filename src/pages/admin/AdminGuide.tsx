@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "14 September 2026";
+const LAST_UPDATED = "15 September 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -203,6 +203,48 @@ export default function AdminGuide() {
             <strong>Dubs &amp; remakes.</strong> A dubbed/translated version is its own media work,
             linked through “Translations &amp; dubs” exactly like a translated book. A remake in
             another language is a <em>Related work</em> (retelling/inspired by), not a translation.
+          </li>
+        </ul>
+      </Section>
+
+      <Section title="Academic articles & coverage items">
+        <p>
+          The <strong>Academic</strong> and <strong>Coverage</strong> tabs on Add Records catalogue
+          secondary material <em>about</em> Indian SF, not primary works — scholarship (journal
+          articles, conference papers, book chapters, theses, preprints) and press coverage
+          (newspaper pieces, TV/radio segments, video/text/podcast interviews, blog posts,
+          obituaries). Reference/citation metadata only, no full text. Both are excluded from the
+          default Browse listing (like magazines) — reachable via search, a linked work’s
+          “Discussed in” section, or a contributor’s profile page.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            <strong>Academic authors are ordered</strong> (unlike every other work type’s unordered
+            author credits) — citation order matters. Use the ▲▼ buttons on each row to reorder;
+            the order you leave them in is saved exactly, never re-sorted. Each author can carry an
+            affiliation, a corresponding-author flag, and their own byline.
+          </li>
+          <li>
+            <strong>Coverage contributors carry a role</strong> (author, interviewer, interviewee,
+            host, subject, photographer) — same free-text-role pattern as media cast &amp; crew.
+            Only the <em>author</em> role doubles as the item’s byline on cards and in search;
+            interviewer/interviewee/host/subject/photographer don’t.
+          </li>
+          <li>
+            <strong>DOI duplicate guard.</strong> Academic articles with a DOI matching an existing
+            record are blocked the same way a same-ISBN book is — pick the existing record or
+            confirm “create anyway” if it’s genuinely a different work sharing a malformed DOI.
+          </li>
+          <li>
+            <strong>Not the same as Media.</strong> A video interview about an author, or a
+            YouTube panel discussing SF, is <em>Coverage</em> — Media is reserved for SF that{" "}
+            <em>is</em> a screen/audio work itself.
+          </li>
+          <li>
+            <strong>Linking to the SF work(s) discussed.</strong> Use the edit page’s “Related
+            works” section with relation type <em>Discusses</em> — the linked work’s own page then
+            shows it under “Discussed in”, same auto-generated-reverse-side pattern as every other
+            relationship type.
           </li>
         </ul>
       </Section>

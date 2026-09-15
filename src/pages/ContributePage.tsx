@@ -64,6 +64,15 @@ import MediaSeasonsEditor, {
   type SeasonRow,
   seasonRowsToPayload,
 } from "../components/MediaSeasonsEditor";
+import AcademicAuthorsEditor, {
+  type AuthorRow,
+  authorRowsToPayload,
+} from "../components/AcademicAuthorsEditor";
+import CoverageContributorsEditor, {
+  type ContributorRow,
+  contributorRowsToPayload,
+  contributorPeople,
+} from "../components/CoverageContributorsEditor";
 import { WORLD_LANGUAGES } from "../lib/languages";
 import {
   WORK_TYPE_OPTIONS,
@@ -71,6 +80,8 @@ import {
   COMIC_TYPE_OPTIONS,
   MEDIA_TYPE_OPTIONS,
   EPISODIC_MEDIA_TYPES,
+  ACADEMIC_TYPE_OPTIONS,
+  COVERAGE_TYPE_OPTIONS,
 } from "../lib/workTypes";
 
 type Tab =
@@ -78,6 +89,8 @@ type Tab =
   | "story"
   | "comic"
   | "media"
+  | "academic"
+  | "coverage"
   | "magazine"
   | "issue"
   | "person"
@@ -89,6 +102,8 @@ const TAB_LABELS: Record<Tab, string> = {
   story: "Short work",
   comic: "Comic",
   media: "Media",
+  academic: "Academic",
+  coverage: "Coverage",
   magazine: "Magazine",
   issue: "Magazine issue",
   person: "Person",
@@ -153,7 +168,21 @@ export default function ContributePage() {
       </p>
 
       <div className="flex gap-2 mb-6 flex-wrap">
-        {(["book", "story", "comic", "media", "magazine", "issue", "person", "publisher", "series"] as Tab[]).map((t) => (
+        {(
+          [
+            "book",
+            "story",
+            "comic",
+            "media",
+            "academic",
+            "coverage",
+            "magazine",
+            "issue",
+            "person",
+            "publisher",
+            "series",
+          ] as Tab[]
+        ).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -172,6 +201,8 @@ export default function ContributePage() {
       {tab === "story" && <StoryForm />}
       {tab === "comic" && <ComicForm />}
       {tab === "media" && <MediaForm />}
+      {tab === "academic" && <AcademicForm />}
+      {tab === "coverage" && <CoverageForm />}
       {tab === "magazine" && <MagazineForm />}
       {tab === "issue" && <MagazineIssueChooser />}
       {tab === "person" && <PersonForm />}
@@ -1672,6 +1703,445 @@ function MediaForm() {
       </FormSection>
 
       <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit media work" />
+    </form>
+  );
+}
+
+// ── Academic ──────────────────────────────────────────────────────────────────
+
+function AcademicForm() {
+  const { onCreatePerson } = useInlineCreators();
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({
+    queryKey: ["all-languages"],
+    queryFn: catalogue.allLanguages,
+  });
+
+  const [title, setTitle] = useState("");
+  const [language, setLanguage] = useState("en");
+  const [contentType, setContentType] = useState("journal_article");
+  const [year, setYear] = useState("");
+  const [abstract, setAbstract] = useState("");
+  const [containerTitle, setContainerTitle] = useState("");
+  const [publisher, setPublisher] = useState("");
+  const [volume, setVolume] = useState("");
+  const [issue, setIssue] = useState("");
+  const [pages, setPages] = useState("");
+  const [doi, setDoi] = useState("");
+  const [url, setUrl] = useState("");
+  const [peerReviewed, setPeerReviewed] = useState(false);
+  const [openAccess, setOpenAccess] = useState(false);
+  const [authors, setAuthors] = useState<AuthorRow[]>([]);
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
+
+  const [dup, setDup] = useState<DuplicateError | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: (allowDuplicate: boolean) => {
+      const y = year ? Number(year) : null;
+      return volunteer.submitAcademic(
+        {
+          title: title.trim(),
+          language,
+          publication_date: y ? `${y}-01-01` : null,
+          content_type: contentType,
+          authors: authorRowsToPayload(authors),
+          abstract: abstract.trim() || null,
+          container_title: containerTitle.trim() || null,
+          publisher: publisher.trim() || null,
+          volume: volume.trim() || null,
+          issue: issue.trim() || null,
+          pages: pages.trim() || null,
+          doi: doi.trim() || null,
+          url: url.trim() || null,
+          peer_reviewed: peerReviewed,
+          open_access: openAccess,
+          genre_ids: [...genreIds],
+          tag_ids: [...tagIds],
+        },
+        allowDuplicate
+      );
+    },
+    onError: (err) => setDup(getDuplicateError(err)),
+    onSuccess: () => {
+      setDup(null);
+      setSubmitted(true);
+      setTitle("");
+      setYear("");
+      setAbstract("");
+      setContainerTitle("");
+      setPublisher("");
+      setVolume("");
+      setIssue("");
+      setPages("");
+      setDoi("");
+      setUrl("");
+      setPeerReviewed(false);
+      setOpenAccess(false);
+      setAuthors([]);
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitted(false);
+        if (title.trim()) {
+          setDup(null);
+          mutation.mutate(false);
+        }
+      }}
+      className="space-y-4"
+    >
+      {submitted && <PendingBanner />}
+
+      {dup && (
+        <DuplicateMatchPrompt
+          kind="work"
+          candidates={dup.candidates}
+          busy={mutation.isPending}
+          onCreateAnyway={() => mutation.mutate(true)}
+          onDismiss={() => {
+            setDup(null);
+            mutation.reset();
+          }}
+        />
+      )}
+
+      <FormSection title="Basics">
+        <div>
+          <label className={labelCls}>Title *</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Abstract / summary</label>
+          <textarea value={abstract} onChange={(e) => setAbstract(e.target.value)} rows={3} className={inputCls} />
+        </div>
+      </FormSection>
+
+      <FormSection title="Publication details">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Type</label>
+            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
+              {ACADEMIC_TYPE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Language</label>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+              {(languages ?? [{ code: "en", name: "English", name_local: "English" }]).map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Year</label>
+            <input type="number" min={1800} max={2100} value={year} onChange={(e) => setYear(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Journal / venue</label>
+            <input value={containerTitle} onChange={(e) => setContainerTitle(e.target.value)} placeholder="Journal, proceedings, or edited volume name" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Publisher</label>
+            <input value={publisher} onChange={(e) => setPublisher(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Volume</label>
+            <input value={volume} onChange={(e) => setVolume(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Issue</label>
+            <input value={issue} onChange={(e) => setIssue(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Pages</label>
+            <input value={pages} onChange={(e) => setPages(e.target.value)} placeholder="e.g. 45-67" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>DOI</label>
+            <input value={doi} onChange={(e) => setDoi(e.target.value)} className={inputCls} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={labelCls}>URL</label>
+            <input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} />
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <label className="flex items-center gap-1.5 text-sm text-gray-600">
+            <input type="checkbox" checked={peerReviewed} onChange={(e) => setPeerReviewed(e.target.checked)} />
+            Peer-reviewed
+          </label>
+          <label className="flex items-center gap-1.5 text-sm text-gray-600">
+            <input type="checkbox" checked={openAccess} onChange={(e) => setOpenAccess(e.target.checked)} />
+            Open access
+          </label>
+        </div>
+      </FormSection>
+
+      <FormSection
+        title="Authors"
+        hint="Order is citation-significant — use the ▲▼ buttons to reorder. Every author shows as a byline on the article's card."
+      >
+        <AcademicAuthorsEditor rows={authors} onChange={setAuthors} onCreatePerson={onCreatePerson} />
+      </FormSection>
+
+      <FormSection title="Classification">
+        <div>
+          <label className={labelCls}>Genres</label>
+          <div className="flex flex-wrap gap-2">
+            {(allGenres ?? []).map((g: GenreItem) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() =>
+                  setGenreIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(g.id)) next.delete(g.id);
+                    else next.add(g.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  genreIds.has(g.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {g.genre_name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <TagChipPicker selected={tagIds} onChange={setTagIds} />
+      </FormSection>
+
+      <p className="text-xs text-gray-400">
+        Link the SF work(s) this article discusses from the edit page (Related works → “Discusses”).
+      </p>
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit academic article" />
+    </form>
+  );
+}
+
+// ── Coverage ──────────────────────────────────────────────────────────────────
+
+function CoverageForm() {
+  const { onCreatePerson } = useInlineCreators();
+  const { data: allGenres } = useQuery({ queryKey: ["all-genres"], queryFn: catalogue.allGenres });
+  const { data: languages } = useQuery({
+    queryKey: ["all-languages"],
+    queryFn: catalogue.allLanguages,
+  });
+
+  const [title, setTitle] = useState("");
+  const [language, setLanguage] = useState("en");
+  const [contentType, setContentType] = useState("newspaper_article");
+  const [year, setYear] = useState("");
+  const [summary, setSummary] = useState("");
+  const [outlet, setOutlet] = useState("");
+  const [outletType, setOutletType] = useState("");
+  const [url, setUrl] = useState("");
+  const [durationMinutes, setDurationMinutes] = useState("");
+  const [isPaywalled, setIsPaywalled] = useState(false);
+  const [contributors, setContributors] = useState<ContributorRow[]>([]);
+  const [bylines, setBylines] = useState<Record<number, string>>({});
+  const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<number>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
+
+  const [dup, setDup] = useState<DuplicateError | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: (allowDuplicate: boolean) => {
+      const y = year ? Number(year) : null;
+      return volunteer.submitCoverage(
+        {
+          title: title.trim(),
+          language,
+          publication_date: y ? `${y}-01-01` : null,
+          content_type: contentType,
+          contributors: contributorRowsToPayload(contributors),
+          credited_as: bylinePayload(contributorPeople(contributors), bylines),
+          summary: summary.trim() || null,
+          outlet: outlet.trim() || null,
+          outlet_type: outletType.trim() || null,
+          url: url.trim() || null,
+          duration_minutes: durationMinutes ? Number(durationMinutes) : null,
+          is_paywalled: isPaywalled,
+          genre_ids: [...genreIds],
+          tag_ids: [...tagIds],
+        },
+        allowDuplicate
+      );
+    },
+    onError: (err) => setDup(getDuplicateError(err)),
+    onSuccess: () => {
+      setDup(null);
+      setSubmitted(true);
+      setTitle("");
+      setYear("");
+      setSummary("");
+      setOutlet("");
+      setOutletType("");
+      setUrl("");
+      setDurationMinutes("");
+      setIsPaywalled(false);
+      setContributors([]);
+      setBylines({});
+      setGenreIds(new Set());
+      setTagIds(new Set());
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSubmitted(false);
+        if (title.trim()) {
+          setDup(null);
+          mutation.mutate(false);
+        }
+      }}
+      className="space-y-4"
+    >
+      {submitted && <PendingBanner />}
+
+      {dup && (
+        <DuplicateMatchPrompt
+          kind="work"
+          candidates={dup.candidates}
+          busy={mutation.isPending}
+          onCreateAnyway={() => mutation.mutate(true)}
+          onDismiss={() => {
+            setDup(null);
+            mutation.reset();
+          }}
+        />
+      )}
+
+      <FormSection title="Basics">
+        <div>
+          <label className={labelCls}>Title *</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Summary</label>
+          <textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={3} className={inputCls} />
+        </div>
+      </FormSection>
+
+      <FormSection title="Coverage details">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Type</label>
+            <select value={contentType} onChange={(e) => setContentType(e.target.value)} className={inputCls}>
+              {COVERAGE_TYPE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Language</label>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className={inputCls}>
+              {(languages ?? [{ code: "en", name: "English", name_local: "English" }]).map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.name}{l.name_local && l.name_local !== l.name ? ` (${l.name_local})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Year</label>
+            <input type="number" min={1800} max={2100} value={year} onChange={(e) => setYear(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Outlet</label>
+            <input value={outlet} onChange={(e) => setOutlet(e.target.value)} placeholder="Newspaper, channel, or site name" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Outlet type</label>
+            <input value={outletType} onChange={(e) => setOutletType(e.target.value)} placeholder="newspaper, tv, podcast…" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Duration (minutes, if audio/video)</label>
+            <input type="number" min={1} value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value)} className={inputCls} />
+          </div>
+          <div className="sm:col-span-3">
+            <label className={labelCls}>URL</label>
+            <input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} />
+          </div>
+        </div>
+        <label className="flex items-center gap-1.5 text-sm text-gray-600">
+          <input type="checkbox" checked={isPaywalled} onChange={(e) => setIsPaywalled(e.target.checked)} />
+          Paywalled
+        </label>
+      </FormSection>
+
+      <FormSection
+        title="Contributors"
+        hint="A contributor with role “Author” shows as a byline on the item's card. Interviewer/interviewee/host/subject/photographer don't."
+      >
+        <CoverageContributorsEditor
+          rows={contributors}
+          onChange={setContributors}
+          bylines={bylines}
+          onBylinesChange={setBylines}
+          onCreatePerson={onCreatePerson}
+        />
+      </FormSection>
+
+      <FormSection title="Classification">
+        <div>
+          <label className={labelCls}>Genres</label>
+          <div className="flex flex-wrap gap-2">
+            {(allGenres ?? []).map((g: GenreItem) => (
+              <button
+                key={g.id}
+                type="button"
+                onClick={() =>
+                  setGenreIds((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(g.id)) next.delete(g.id);
+                    else next.add(g.id);
+                    return next;
+                  })
+                }
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  genreIds.has(g.id)
+                    ? "bg-violet-700 text-white border-violet-700"
+                    : "bg-white border-gray-300 text-gray-600 hover:border-violet-400"
+                }`}
+              >
+                {g.genre_name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <TagChipPicker selected={tagIds} onChange={setTagIds} />
+      </FormSection>
+
+      <p className="text-xs text-gray-400">
+        Link the SF work(s) this item discusses from the edit page (Related works → “Discusses”).
+      </p>
+
+      <SubmitRow pending={mutation.isPending} error={mutation.isError && !dup} errorMessage={apiErrorMessage(mutation.error)} label="Submit coverage item" />
     </form>
   );
 }

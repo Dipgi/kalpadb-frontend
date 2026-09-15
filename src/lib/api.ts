@@ -195,6 +195,8 @@ export interface WorkDetail extends WorkSummary {
   story: StoryDetail | null;
   comic: ComicDetail | null;
   media: MediaWorkDetail | null;
+  academic: AcademicArticleDetail | null;
+  coverage: CoverageItemDetail | null;
   magazine_detail: MagazineDetail | null;
 }
 
@@ -327,6 +329,66 @@ export interface MediaWorkDetail {
   adaptations: { id: number; source_work: WorkSummary; adaptation_type: string; notes: string | null }[];
 }
 
+export interface AcademicAuthorEntry {
+  id: number;
+  stakeholder: PersonSummary;
+  author_order: number;
+  affiliation: string | null;
+  is_corresponding: boolean;
+  credited_as: string | null;
+}
+
+export interface AcademicArticleDetail {
+  id: number;
+  abstract: string | null;
+  keywords: string | null;
+  container_title: string | null;
+  publisher: string | null;
+  volume: string | null;
+  issue: string | null;
+  pages: string | null;
+  edition: string | null;
+  conference_name: string | null;
+  conference_location: string | null;
+  conference_date: string | null;
+  doi: string | null;
+  isbn: string | null;
+  issn: string | null;
+  arxiv_id: string | null;
+  url: string | null;
+  citation_key: string | null;
+  peer_reviewed: boolean | null;
+  open_access: boolean | null;
+  license: string | null;
+  citation_notes: string | null;
+  authors: AcademicAuthorEntry[];
+}
+
+export interface CoverageContributorEntry {
+  id: number;
+  stakeholder: PersonSummary;
+  role: string;
+  contributor_order: number | null;
+  credited_as: string | null;
+  notes: string | null;
+}
+
+export interface CoverageItemDetail {
+  id: number;
+  summary: string | null;
+  outlet: string | null;
+  outlet_type: string | null;
+  section: string | null;
+  url: string | null;
+  archive_url: string | null;
+  access_date: string | null;
+  duration_minutes: number | null;
+  byline: string | null;
+  is_paywalled: boolean | null;
+  coverage_notes: string | null;
+  contributors: CoverageContributorEntry[];
+}
+
 export type MagazineStatus = "active" | "ceased" | "hiatus" | "unknown";
 
 export interface MagazineEditorshipInput {
@@ -362,7 +424,8 @@ export interface WorkRelationshipInput {
     | "fix_up_of"
     | "retelling_of"
     | "inspired_by"
-    | "part_of_series";
+    | "part_of_series"
+    | "discusses";
   notes?: string | null;
 }
 
@@ -1668,6 +1731,91 @@ export interface MediaCreateIn {
 /** All fields optional — a present field replaces, an absent one is left unchanged. */
 export type MediaUpdateIn = Partial<MediaCreateIn>;
 
+export interface AcademicAuthorInput {
+  stakeholder_id: number;
+  /** 1, 2, 3 … citation order — set explicitly, never derived from row position. */
+  author_order: number;
+  affiliation?: string | null;
+  is_corresponding?: boolean;
+  /** Per-row byline (unlike coverage/media, no shared overlay dict is needed). */
+  credited_as?: string | null;
+}
+
+export interface AcademicCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  content_type: string;
+  image_urls?: string[] | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  /** Ordered author list — order is citation-significant. */
+  authors?: AcademicAuthorInput[];
+  abstract?: string | null;
+  keywords?: string | null;
+  container_title?: string | null;
+  publisher?: string | null;
+  volume?: string | null;
+  issue?: string | null;
+  pages?: string | null;
+  edition?: string | null;
+  conference_name?: string | null;
+  conference_location?: string | null;
+  conference_date?: string | null;
+  doi?: string | null;
+  isbn?: string | null;
+  issn?: string | null;
+  arxiv_id?: string | null;
+  url?: string | null;
+  citation_key?: string | null;
+  peer_reviewed?: boolean | null;
+  open_access?: boolean | null;
+  license?: string | null;
+  citation_notes?: string | null;
+  localised?: Record<string, Record<string, string>>;
+}
+
+export type AcademicUpdateIn = Partial<AcademicCreateIn>;
+
+export interface CoverageContributorInput {
+  stakeholder_id: number;
+  role: string;
+  contributor_order?: number | null;
+  notes?: string | null;
+}
+
+export interface CoverageCreateIn {
+  title: string;
+  description?: string | null;
+  language?: string | null;
+  original_language?: string | null;
+  publication_date?: string | null;
+  content_type: string;
+  image_urls?: string[] | null;
+  genre_ids?: number[];
+  tag_ids?: number[];
+  /** Contributors. Rows with role='author' double as the work-level authors. */
+  contributors?: CoverageContributorInput[];
+  /** {stakeholder_id: byline-as-credited} — applies to all of that person's roles. */
+  credited_as?: Record<number, string>;
+  summary?: string | null;
+  outlet?: string | null;
+  outlet_type?: string | null;
+  section?: string | null;
+  url?: string | null;
+  archive_url?: string | null;
+  access_date?: string | null;
+  duration_minutes?: number | null;
+  byline?: string | null;
+  is_paywalled?: boolean | null;
+  coverage_notes?: string | null;
+  localised?: Record<string, Record<string, string>>;
+}
+
+export type CoverageUpdateIn = Partial<CoverageCreateIn>;
+
 export interface MagazineCreateIn {
   title: string;
   description?: string | null;
@@ -1927,6 +2075,26 @@ export const volunteer = {
     }),
   updateMedia: (work_id: number, data: MediaUpdateIn, note?: string | null) =>
     request<EditSubmission>(`/works/media/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitAcademic: (data: AcademicCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/academic${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateAcademic: (work_id: number, data: AcademicUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/academic/${work_id}${noteQuery(note)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+  submitCoverage: (data: CoverageCreateIn, allowDuplicate = false) =>
+    request<EditSubmission>(`/works/coverage${allowDuplicate ? "?allow_duplicate=true" : ""}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  updateCoverage: (work_id: number, data: CoverageUpdateIn, note?: string | null) =>
+    request<EditSubmission>(`/works/coverage/${work_id}${noteQuery(note)}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),

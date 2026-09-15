@@ -46,6 +46,8 @@ import AdminEditBook from "./pages/admin/AdminEditBook";
 import AdminEditStory from "./pages/admin/AdminEditStory";
 import AdminEditComic from "./pages/admin/AdminEditComic";
 import AdminEditMedia from "./pages/admin/AdminEditMedia";
+import AdminEditAcademic from "./pages/admin/AdminEditAcademic";
+import AdminEditCoverage from "./pages/admin/AdminEditCoverage";
 import AdminEditMagazine from "./pages/admin/AdminEditMagazine";
 import AdminEditMagazineIssue from "./pages/admin/AdminEditMagazineIssue";
 import AdminEditPerson from "./pages/admin/AdminEditPerson";
@@ -159,6 +161,22 @@ export default function App() {
                   }
                 />
                 <Route
+                  path="/works/:id/edit-academic"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditAcademic />
+                    </div>
+                  }
+                />
+                <Route
+                  path="/works/:id/edit-coverage"
+                  element={
+                    <div className="max-w-3xl mx-auto px-4 py-8">
+                      <AdminEditCoverage />
+                    </div>
+                  }
+                />
+                <Route
                   path="/works/:id/edit-magazine"
                   element={
                     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -233,6 +251,8 @@ export default function App() {
                   <Route path="edit-story/:id" element={<AdminEditStory />} />
                   <Route path="edit-comic/:id" element={<AdminEditComic />} />
                   <Route path="edit-media/:id" element={<AdminEditMedia />} />
+                  <Route path="edit-academic/:id" element={<AdminEditAcademic />} />
+                  <Route path="edit-coverage/:id" element={<AdminEditCoverage />} />
                   <Route path="edit-magazine/:id" element={<AdminEditMagazine />} />
                   <Route path="edit-person/:id" element={<AdminEditPerson />} />
                   <Route path="edit-publisher/:id" element={<AdminEditPublisher />} />

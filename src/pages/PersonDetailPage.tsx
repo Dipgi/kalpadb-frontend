@@ -17,6 +17,8 @@ const WORK_CATEGORIES: { type: string; label: string }[] = [
   { type: "MAGAZINE", label: "Magazines" },
   { type: "COMIC", label: "Comics" },
   { type: "MEDIA", label: "Screen & Audio" },
+  { type: "ACADEMIC", label: "Academic Articles" },
+  { type: "COVERAGE", label: "Press Coverage" },
 ];
 
 export default function PersonDetailPage() {

@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "14 September 2026";
+const LAST_UPDATED = "15 September 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -309,16 +309,38 @@ export default function HelpPage() {
             <div className="mt-1.5 text-gray-500">
               <strong>What belongs here — and what doesn’t.</strong> Media works are SF that{" "}
               <em>is</em> the film/series/song/performance itself. A YouTube discussion, interview,
-              or panel <em>about</em> SF is press coverage, not a media work — please don’t
-              catalogue those (a separate coverage section is planned). A dubbed or translated
-              version is its own record, linked to the original as a translation; a remake is a
-              related work.
+              or panel <em>about</em> SF is <strong>Coverage</strong> (below), not a media work. A
+              dubbed or translated version is its own record, linked to the original as a
+              translation; a remake is a related work.
             </div>
+          </li>
+          <li>
+            <strong>Academic</strong> — scholarship <em>about</em> Indian SF: journal articles,
+            conference papers, book chapters, theses, preprints. Reference/citation metadata only
+            (no full text) — journal, volume, issue, pages, DOI, and an ordered author list (author
+            order matters for citation, unlike every other work type’s unordered author credits).
+            Add from Contribute’s <em>Academic</em> tab.
+          </li>
+          <li>
+            <strong>Coverage</strong> — press coverage &amp; interviews <em>about</em> Indian SF:
+            newspaper/press pieces, TV/radio segments, video/text/podcast interviews, blog posts,
+            obituaries. Also reference metadata only. A video interview with an author is Coverage,
+            not Media — Media is reserved for SF that <em>is</em> a screen/audio work. Contributors
+            carry a role (author, interviewer, interviewee, host, subject, photographer); only the
+            “author” role shows as the item’s byline. Add from Contribute’s <em>Coverage</em> tab.
+          </li>
+          <li>
+            Both Academic and Coverage items link to the SF work(s) they discuss via{" "}
+            <strong>Related works → “Discusses”</strong> on their edit page — the linked work’s own
+            page then shows it under “Discussed in”.
           </li>
         </ul>
         <p>
           On the <Link to="/browse" className="text-violet-700 hover:underline">Browse</Link> page
-          you can filter by type to see only books, only short works, and so on.
+          you can filter by type to see only books, only short works, and so on. Academic and
+          Coverage items are secondary material rather than primary works, so — like magazines —
+          they don’t appear in the default Browse listing. Find them via search, a work’s
+          “Discussed in” link, or a contributor’s profile page.
         </p>
       </Section>
 

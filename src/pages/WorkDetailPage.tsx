@@ -192,7 +192,15 @@ export default function WorkDetailPage() {
               ? role === "admin"
                 ? `/admin/edit-media/${work.id}`
                 : `/works/${work.id}/edit-media`
-              : null;
+              : work.type === "ACADEMIC"
+                ? role === "admin"
+                  ? `/admin/edit-academic/${work.id}`
+                  : `/works/${work.id}/edit-academic`
+                : work.type === "COVERAGE"
+                  ? role === "admin"
+                    ? `/admin/edit-coverage/${work.id}`
+                    : `/works/${work.id}/edit-coverage`
+                  : null;
 
   // Trailer/watch links render as prominent buttons near the poster; the
   // generic Links list below excludes them to avoid showing them twice.
@@ -585,6 +593,186 @@ export default function WorkDetailPage() {
                       </span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {work.academic && (
+          <>
+            {work.academic.authors.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Authors
+                </h3>
+                <ol className="text-sm text-gray-700 space-y-0.5 list-decimal list-inside">
+                  {[...work.academic.authors]
+                    .sort((a, b) => a.author_order - b.author_order)
+                    .map((a) => (
+                      <li key={a.id}>
+                        <PersonLink person={{ ...a.stakeholder, credited_as: a.credited_as }} />
+                        {a.affiliation && (
+                          <span className="text-gray-400"> — {a.affiliation}</span>
+                        )}
+                        {a.is_corresponding && (
+                          <span className="text-xs text-violet-600"> (corresponding)</span>
+                        )}
+                      </li>
+                    ))}
+                </ol>
+              </div>
+            )}
+            {(work.academic.container_title || work.academic.publisher) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Publication
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.academic.container_title && <p>{work.academic.container_title}</p>}
+                  {work.academic.publisher && <p>{work.academic.publisher}</p>}
+                  {(work.academic.volume || work.academic.issue || work.academic.pages) && (
+                    <p className="text-gray-500">
+                      {[
+                        work.academic.volume && `Vol. ${work.academic.volume}`,
+                        work.academic.issue && `Issue ${work.academic.issue}`,
+                        work.academic.pages && `pp. ${work.academic.pages}`,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            {(work.academic.doi || work.academic.url || work.academic.arxiv_id) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Citation
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.academic.doi && (
+                    <p>
+                      DOI:{" "}
+                      <a
+                        href={`https://doi.org/${work.academic.doi}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-violet-700 hover:underline"
+                      >
+                        {work.academic.doi}
+                      </a>
+                    </p>
+                  )}
+                  {work.academic.arxiv_id && <p>arXiv: {work.academic.arxiv_id}</p>}
+                  {work.academic.url && (
+                    <p>
+                      <a
+                        href={work.academic.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-violet-700 hover:underline"
+                      >
+                        View article
+                      </a>
+                    </p>
+                  )}
+                  {(work.academic.peer_reviewed || work.academic.open_access) && (
+                    <p className="text-gray-500">
+                      {[
+                        work.academic.peer_reviewed && "Peer-reviewed",
+                        work.academic.open_access && "Open access",
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {work.coverage && (
+          <>
+            {work.coverage.contributors.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Contributors
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {[
+                    ...work.coverage.contributors
+                      .reduce<Map<string, typeof work.coverage.contributors>>((groups, c) => {
+                        const list = groups.get(c.role) ?? [];
+                        list.push(c);
+                        groups.set(c.role, list);
+                        return groups;
+                      }, new Map())
+                      .entries(),
+                  ].map(([role, people]) => (
+                      <p key={role}>
+                        <span className="text-gray-400 capitalize">{role.replace(/_/g, " ")}: </span>
+                        <PersonList
+                          people={people.map((p) => ({ ...p.stakeholder, credited_as: p.credited_as }))}
+                        />
+                      </p>
+                    ))}
+                </div>
+              </div>
+            )}
+            {(work.coverage.outlet || work.coverage.outlet_type) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Outlet
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.coverage.outlet && <p>{work.coverage.outlet}</p>}
+                  {work.coverage.outlet_type && (
+                    <p className="text-gray-500 capitalize">
+                      {work.coverage.outlet_type.replace(/_/g, " ")}
+                      {work.coverage.section ? ` · ${work.coverage.section}` : ""}
+                    </p>
+                  )}
+                  {work.coverage.duration_minutes != null && (
+                    <p className="text-gray-500">{work.coverage.duration_minutes} min</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {(work.coverage.url || work.coverage.is_paywalled) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Source
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.coverage.url && (
+                    <p>
+                      <a
+                        href={work.coverage.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-violet-700 hover:underline"
+                      >
+                        View original
+                      </a>
+                      {work.coverage.is_paywalled && (
+                        <span className="text-xs text-gray-400"> (paywalled)</span>
+                      )}
+                    </p>
+                  )}
+                  {work.coverage.archive_url && (
+                    <p>
+                      <a
+                        href={work.coverage.archive_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-violet-700 hover:underline"
+                      >
+                        Archived copy
+                      </a>
+                    </p>
+                  )}
                 </div>
               </div>
             )}
