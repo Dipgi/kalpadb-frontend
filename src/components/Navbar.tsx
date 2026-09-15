@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
@@ -16,9 +16,14 @@ const BROWSE_LINKS = [
   { to: "/explore", label: "Explore" },
 ];
 
-function Chevron() {
+function Chevron({ className = "" }: { className?: string }) {
   return (
-    <svg className="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg
+      className={`w-3.5 h-3.5 opacity-60 transition-transform ${className}`}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
     </svg>
   );
@@ -56,8 +61,17 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  // Which desktop dropdown is open: "browse" | "account" | null
+  // Which dropdown/accordion section is open: "browse" | "account" | null.
+  // Shared between the desktop dropdown and the mobile menu's accordion
+  // sections — the two are never visible at once (responsive classes), so
+  // one state variable is enough for both.
   const [open, setOpen] = useState<null | "browse" | "account">(null);
+
+  // Collapse any open accordion section whenever the mobile menu itself
+  // closes, so it always reopens fresh rather than remembering last state.
+  useEffect(() => {
+    if (!menuOpen) setOpen(null);
+  }, [menuOpen]);
 
   function handleLogout() {
     setOpen(null);
@@ -278,29 +292,55 @@ export default function Navbar() {
       </div>
 
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-100 px-4 py-3 flex flex-col gap-3 text-sm text-gray-700 bg-white">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Browse</p>
-          {BROWSE_LINKS.map((l) => (
-            <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)} className="pl-2">
-              {l.label}
-            </Link>
-          ))}
-          <Link to="/search" onClick={() => setMenuOpen(false)} className="pl-2">Search</Link>
-          <Link to="/help" onClick={() => setMenuOpen(false)} className="pl-2">Help</Link>
+        <div className="md:hidden border-t border-gray-100 px-4 py-2 flex flex-col text-sm text-gray-700 bg-white">
+          {/* Browse — collapsed accordion, mirrors the desktop "Browse ▾" dropdown */}
+          <button
+            onClick={() => setOpen((o) => (o === "browse" ? null : "browse"))}
+            aria-expanded={open === "browse"}
+            className="flex items-center justify-between py-2.5 text-left"
+          >
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Browse</span>
+            <span className="flex items-center gap-1.5 text-gray-400">
+              <span className="text-xs">{BROWSE_LINKS.length}</span>
+              <Chevron className={open === "browse" ? "rotate-180" : ""} />
+            </span>
+          </button>
+          {open === "browse" && (
+            <div className="flex flex-col gap-2.5 pb-2">
+              {BROWSE_LINKS.map((l) => (
+                <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)} className="pl-2">
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+          )}
 
-          <div className="border-t border-gray-100 pt-3 flex flex-col gap-3">
+          <Link to="/search" onClick={() => setMenuOpen(false)} className="py-2.5 border-t border-gray-100">Search</Link>
+          <Link to="/help" onClick={() => setMenuOpen(false)} className="py-2.5 border-t border-gray-100">Help</Link>
+
+          <div className="border-t border-gray-100">
             {user ? (
               <>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-2">
-                  {user.username}
-                  {user.auto_approve && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold normal-case tracking-wide">
-                      Trusted volunteer
-                    </span>
-                  )}
-                </p>
+                {/* Account — collapsed accordion holding profile/admin links */}
+                <button
+                  onClick={() => setOpen((o) => (o === "account" ? null : "account"))}
+                  aria-expanded={open === "account"}
+                  className="w-full flex items-center justify-between py-2.5 text-left"
+                >
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-2">
+                    {user.username}
+                    {user.auto_approve && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-semibold normal-case tracking-wide">
+                        Trusted volunteer
+                      </span>
+                    )}
+                  </span>
+                  <Chevron className={open === "account" ? "rotate-180" : ""} />
+                </button>
+
+                {/* Pending-item pills stay visible even collapsed — they're signals, not navigation. */}
                 {(pendingEdits > 0 || pendingRequests > 0 || pendingMessages > 0) && (
-                  <div className="flex flex-wrap gap-2 pl-2">
+                  <div className="flex flex-wrap gap-2 pb-2">
                     {pendingEdits > 0 && (
                       <PendingPill to="/admin/queue" label="Edits" count={pendingEdits} onClick={() => setMenuOpen(false)} />
                     )}
@@ -322,24 +362,32 @@ export default function Navbar() {
                     )}
                   </div>
                 )}
-                <Link to="/contribute" onClick={() => setMenuOpen(false)} className="pl-2">Contribute</Link>
-                <Link to={`/users/${encodeURIComponent(user.username)}`} onClick={() => setMenuOpen(false)} className="pl-2">My Profile</Link>
-                <Link to="/account" onClick={() => setMenuOpen(false)} className="pl-2">Edit Profile</Link>
-                <Link to="/shelf" onClick={() => setMenuOpen(false)} className="pl-2">My Shelf</Link>
-                {messagesLink(() => setMenuOpen(false), true)}
-                {isContributor && (
-                  <Link to="/my-submissions" onClick={() => setMenuOpen(false)} className="pl-2">My Submissions</Link>
+
+                {open === "account" && (
+                  <div className="flex flex-col gap-2.5 pb-2">
+                    <Link to="/contribute" onClick={() => setMenuOpen(false)} className="pl-2">Contribute</Link>
+                    <Link to={`/users/${encodeURIComponent(user.username)}`} onClick={() => setMenuOpen(false)} className="pl-2">My Profile</Link>
+                    <Link to="/account" onClick={() => setMenuOpen(false)} className="pl-2">Edit Profile</Link>
+                    <Link to="/shelf" onClick={() => setMenuOpen(false)} className="pl-2">My Shelf</Link>
+                    {messagesLink(() => setMenuOpen(false), true)}
+                    {isContributor && (
+                      <Link to="/my-submissions" onClick={() => setMenuOpen(false)} className="pl-2">My Submissions</Link>
+                    )}
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setMenuOpen(false)} className="pl-2 text-violet-600 font-medium">Admin</Link>
+                    )}
+                  </div>
                 )}
-                {isAdmin && (
-                  <Link to="/admin" onClick={() => setMenuOpen(false)} className="pl-2 text-violet-600 font-medium">Admin</Link>
-                )}
-                <button onClick={handleLogout} className="text-left pl-2 text-gray-500">Sign out</button>
+
+                <button onClick={handleLogout} className="w-full text-left py-2.5 text-gray-500 border-t border-gray-100">
+                  Sign out
+                </button>
               </>
             ) : (
-              <>
-                <Link to="/login" onClick={() => setMenuOpen(false)} className="pl-2">Sign in</Link>
-                <Link to="/register" onClick={() => setMenuOpen(false)} className="pl-2">Join</Link>
-              </>
+              <div className="flex flex-col gap-2.5 py-2.5">
+                <Link to="/login" onClick={() => setMenuOpen(false)}>Sign in</Link>
+                <Link to="/register" onClick={() => setMenuOpen(false)}>Join</Link>
+              </div>
             )}
           </div>
         </div>
