@@ -8,6 +8,7 @@ const BROWSE_LINKS = [
   { to: "/browse", label: "Works" },
   { to: "/magazines", label: "Magazines" },
   { to: "/issues", label: "Issues" },
+  { to: "/coverage", label: "Scholarship & Coverage" },
   { to: "/series", label: "Series" },
   { to: "/persons", label: "People" },
   { to: "/publishers", label: "Publishers" },

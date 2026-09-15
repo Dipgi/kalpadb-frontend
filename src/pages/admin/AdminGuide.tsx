@@ -214,7 +214,9 @@ export default function AdminGuide() {
           articles, conference papers, book chapters, theses, preprints) and press coverage
           (newspaper pieces, TV/radio segments, video/text/podcast interviews, blog posts,
           obituaries). Reference/citation metadata only, no full text. Both are excluded from the
-          default Browse listing (like magazines) — reachable via search, a linked work’s
+          default Browse listing (like magazines) — browse them on their own{" "}
+          <Link to="/coverage" className="text-violet-700 hover:underline">Scholarship & Coverage</Link>{" "}
+          page (type/category/language dropdown filters), or find one via search, a linked work’s
           “Discussed in” section, or a contributor’s profile page.
         </p>
         <ul className="list-disc pl-5 space-y-1">

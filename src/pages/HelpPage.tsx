@@ -99,6 +99,12 @@ export default function HelpPage() {
             not a single work — so they aren’t mixed into the works browse.)
           </li>
           <li>
+            <Link to="/coverage" className="text-violet-700 hover:underline">Scholarship &amp; Coverage</Link> —
+            academic articles and press coverage/interviews <em>about</em> Indian SF, filterable by
+            type, category, and language. (Also its own section, for the same reason as Magazines —
+            secondary material about SF, not primary works.)
+          </li>
+          <li>
             <Link to="/news" className="text-violet-700 hover:underline">News</Link> — all site
             announcements and updates; the latest three also appear on the home page.
           </li>
@@ -339,8 +345,12 @@ export default function HelpPage() {
           On the <Link to="/browse" className="text-violet-700 hover:underline">Browse</Link> page
           you can filter by type to see only books, only short works, and so on. Academic and
           Coverage items are secondary material rather than primary works, so — like magazines —
-          they don’t appear in the default Browse listing. Find them via search, a work’s
-          “Discussed in” link, or a contributor’s profile page.
+          they don’t appear here; browse them instead on their own{" "}
+          <Link to="/coverage" className="text-violet-700 hover:underline">
+            Scholarship &amp; Coverage
+          </Link>{" "}
+          page, or find one via search, a work’s “Discussed in” link, or a contributor’s profile
+          page.
         </p>
       </Section>
 
