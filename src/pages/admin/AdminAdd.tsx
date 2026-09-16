@@ -1826,6 +1826,7 @@ function AcademicForm() {
   const [peerReviewed, setPeerReviewed] = useState(false);
   const [openAccess, setOpenAccess] = useState(false);
   const [authors, setAuthors] = useState<AuthorRow[]>([]);
+  const [imageUrl, setImageUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [createdId, setCreatedId] = useState<number | null>(null);
@@ -1842,6 +1843,7 @@ function AcademicForm() {
             language,
             publication_date: y ? `${y}-01-01` : null,
             content_type: contentType,
+            image_urls: imageUrl.trim() ? [imageUrl.trim()] : null,
             authors: authorRowsToPayload(authors),
             abstract: abstract.trim() || null,
             container_title: containerTitle.trim() || null,
@@ -1878,6 +1880,7 @@ function AcademicForm() {
       setPeerReviewed(false);
       setOpenAccess(false);
       setAuthors([]);
+      setImageUrl("");
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -2041,7 +2044,13 @@ function AcademicForm() {
         />
       </FormSection>
 
-      <FormSection title="Classification">
+      <FormSection title="Cover & classification">
+        <ImageUploadField
+          label="Cover image (optional)"
+          category="covers"
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? "")}
+        />
         <div>
           <label className={labelCls}>Genres</label>
           <div className="flex flex-wrap gap-2">
@@ -2113,6 +2122,7 @@ function CoverageForm() {
   const [isPaywalled, setIsPaywalled] = useState(false);
   const [contributors, setContributors] = useState<ContributorRow[]>([]);
   const [bylines, setBylines] = useState<Record<number, string>>({});
+  const [imageUrl, setImageUrl] = useState("");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set());
   const [tagIds, setTagIds] = useState<Set<number>>(new Set());
   const [createdId, setCreatedId] = useState<number | null>(null);
@@ -2129,6 +2139,7 @@ function CoverageForm() {
             language,
             publication_date: y ? `${y}-01-01` : null,
             content_type: contentType,
+            image_urls: imageUrl.trim() ? [imageUrl.trim()] : null,
             contributors: contributorRowsToPayload(contributors),
             credited_as: bylinePayload(contributorPeople(contributors), bylines),
             summary: summary.trim() || null,
@@ -2159,6 +2170,7 @@ function CoverageForm() {
       setIsPaywalled(false);
       setContributors([]);
       setBylines({});
+      setImageUrl("");
       setGenreIds(new Set());
       setTagIds(new Set());
     },
@@ -2309,7 +2321,13 @@ function CoverageForm() {
         />
       </FormSection>
 
-      <FormSection title="Classification">
+      <FormSection title="Cover & classification">
+        <ImageUploadField
+          label="Cover image (optional)"
+          category="covers"
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? "")}
+        />
         <div>
           <label className={labelCls}>Genres</label>
           <div className="flex flex-wrap gap-2">

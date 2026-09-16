@@ -5,6 +5,7 @@ import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/a
 import { useAuth } from "../../hooks/useAuth";
 import { bylinePayload } from "../../components/BylineFields";
 import ContributorGate from "../../components/ContributorGate";
+import ImageUploadField from "../../components/ImageUploadField";
 import EditNoteField from "../../components/EditNoteField";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import AwardsEditor from "../../components/AwardsEditor";
@@ -93,6 +94,7 @@ function EditForm({ work }: { work: WorkDetail }) {
     }
     return init;
   });
+  const [imageUrl, setImageUrl] = useState(work.image_urls?.[0] ?? "");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
   const [saved, setSaved] = useState(false);
@@ -118,6 +120,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           language,
           content_type: contentType,
           publication_date: y ? `${y}-01-01` : null,
+          image_urls: imageUrl.trim() ? [imageUrl.trim()] : [],
           contributors: contributorRowsToPayload(contributors),
           credited_as: bylinePayload(contributorPeople(contributors), bylines),
           summary: summary.trim() || null,
@@ -293,7 +296,13 @@ function EditForm({ work }: { work: WorkDetail }) {
         <WorkRelationshipsEditor work={work} />
       </FormSection>
 
-      <FormSection title="Classification">
+      <FormSection title="Cover & classification">
+        <ImageUploadField
+          label="Cover image (optional)"
+          category="covers"
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? "")}
+        />
         <div>
           <label className={labelCls}>Genres</label>
           <div className="flex flex-wrap gap-2">

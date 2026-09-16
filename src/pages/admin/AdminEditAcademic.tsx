@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { admin, catalogue, volunteer, works, type WorkDetail } from "../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import ContributorGate from "../../components/ContributorGate";
+import ImageUploadField from "../../components/ImageUploadField";
 import EditNoteField from "../../components/EditNoteField";
 import TranslationLinksEditor from "../../components/TranslationLinksEditor";
 import AwardsEditor from "../../components/AwardsEditor";
@@ -86,6 +87,7 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [authors, setAuthors] = useState<AuthorRow[]>(
     authorRowsFromExisting(academic?.authors ?? [])
   );
+  const [imageUrl, setImageUrl] = useState(work.image_urls?.[0] ?? "");
   const [genreIds, setGenreIds] = useState<Set<number>>(new Set(work.genres.map((g) => g.id)));
   const [tagIds, setTagIds] = useState<Set<number>>(new Set(work.tags.map((t) => t.id)));
   const [saved, setSaved] = useState(false);
@@ -111,6 +113,7 @@ function EditForm({ work }: { work: WorkDetail }) {
           language,
           content_type: contentType,
           publication_date: y ? `${y}-01-01` : null,
+          image_urls: imageUrl.trim() ? [imageUrl.trim()] : [],
           authors: authorRowsToPayload(authors),
           abstract: abstract.trim() || null,
           container_title: containerTitle.trim() || null,
@@ -301,7 +304,13 @@ function EditForm({ work }: { work: WorkDetail }) {
         <WorkRelationshipsEditor work={work} />
       </FormSection>
 
-      <FormSection title="Classification">
+      <FormSection title="Cover & classification">
+        <ImageUploadField
+          label="Cover image (optional)"
+          category="covers"
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? "")}
+        />
         <div>
           <label className={labelCls}>Genres</label>
           <div className="flex flex-wrap gap-2">
