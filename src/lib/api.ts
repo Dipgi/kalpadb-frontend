@@ -506,6 +506,8 @@ export interface StatsOut {
     total_stories?: number;
     total_comics?: number;
     total_media?: number;
+    total_academic?: number;
+    total_coverage?: number;
     total_magazines?: number;
     total_magazine_issues?: number;
     total_publishers?: number;

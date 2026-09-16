@@ -31,6 +31,8 @@ export default function AdminDashboard() {
     { label: "Short works", value: s.total_stories, to: "/browse?type=STORY" },
     { label: "Comics", value: s.total_comics, to: "/browse?type=COMIC" },
     { label: "Media", value: s.total_media, to: "/browse?type=MEDIA" },
+    { label: "Academic Articles", value: s.total_academic, to: "/coverage?type=ACADEMIC" },
+    { label: "Coverage Items", value: s.total_coverage, to: "/coverage?type=COVERAGE" },
     { label: "Magazine Issues", value: s.total_magazine_issues, to: "/issues" },
     { label: "Publishers", value: s.total_publishers, to: "/publishers" },
     { label: "Languages", value: s.total_languages, to: "/browse" },
@@ -82,7 +84,7 @@ export default function AdminDashboard() {
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {Array.from({ length: 7 }).map((_, i) => (
+          {Array.from({ length: STAT_CARDS.length }).map((_, i) => (
             <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse" />
           ))}
         </div>
