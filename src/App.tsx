@@ -63,6 +63,7 @@ import NewsDetailPage from "./pages/NewsDetailPage";
 import NewsListPage from "./pages/NewsListPage";
 import LicensePage from "./pages/LicensePage";
 import CitePage from "./pages/CitePage";
+import PrivacyPage from "./pages/PrivacyPage";
 import HelpPage from "./pages/HelpPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
@@ -230,6 +231,7 @@ export default function App() {
                 <Route path="/news/:slug" element={<NewsDetailPage />} />
                 <Route path="/license" element={<LicensePage />} />
                 <Route path="/cite" element={<CitePage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/help" element={<HelpPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
@@ -283,6 +285,8 @@ export default function App() {
                 <Link to="/license" className="hover:text-violet-700">License</Link>
                 <span aria-hidden>·</span>
                 <Link to="/cite" className="hover:text-violet-700">Cite</Link>
+                <span aria-hidden>·</span>
+                <Link to="/privacy" className="hover:text-violet-700">Privacy</Link>
                 <span aria-hidden>·</span>
                 <span>&copy; 2026 Dip Ghosh · KalpaDB&trade;</span>
               </div>

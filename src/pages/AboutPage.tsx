@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { useSeo } from "../hooks/useSeo";
 
+// Keep updated as the catalogue's scope or the volunteer roster changes.
+const LAST_UPDATED = "19 September 2026";
+
 // Current volunteer nicknames. Curated credits — update when the volunteer
 // roster changes (the project's own `kalpadb` account is intentionally omitted).
 const VOLUNTEERS = [
@@ -11,6 +14,7 @@ const VOLUNTEERS = [
   "debdos",
   "pratikbasu_",
   "sengupta_pradip",
+  "PriyankaMitra",
 ];
 
 export default function AboutPage() {
@@ -25,15 +29,17 @@ export default function AboutPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-2">About KalpaDB</h1>
       <p className="text-sm text-gray-500 mb-8">
         A community-built catalogue of Indian science fiction, fantasy, and speculative fiction.
+        Last updated {LAST_UPDATED}.
       </p>
 
       <section className="mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">What we do</h2>
         <p className="text-sm text-gray-600 leading-relaxed">
           KalpaDB documents the people, publishers, and works behind Indian speculative
-          fiction — books, anthologies, magazines, and the writers, translators, and artists who
-          make them. Our goal is a reliable, openly licensed reference for readers, researchers,
-          and fans. The dataset is released under{" "}
+          fiction — books, short works, comics, magazines, and film/TV/audio media, plus the
+          scholarship and press coverage written about them — along with the writers,
+          translators, artists, and editors who make them. Our goal is a reliable, openly
+          licensed reference for readers, researchers, and fans. The dataset is released under{" "}
           <a
             href="https://creativecommons.org/licenses/by-sa/4.0/"
             target="_blank"

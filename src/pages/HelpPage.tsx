@@ -5,7 +5,7 @@ import { useSeo } from "../hooks/useSeo";
  * Contributor / visitor help & FAQ for the whole site.
  * Keep this updated as user-facing features are added or changed.
  */
-const LAST_UPDATED = "15 September 2026";
+const LAST_UPDATED = "19 September 2026";
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -97,6 +97,11 @@ export default function HelpPage() {
             browse magazine titles; open one to see its issues in date order, and each issue’s
             contents. (Magazines have their own section because a magazine is a publication venue,
             not a single work — so they aren’t mixed into the works browse.)
+          </li>
+          <li>
+            <Link to="/issues" className="text-violet-700 hover:underline">Issues</Link> — every
+            magazine issue across every title in one filterable list, if you'd rather browse issues
+            directly than drill in magazine-by-magazine.
           </li>
           <li>
             <Link to="/coverage" className="text-violet-700 hover:underline">Scholarship &amp; Coverage</Link> —
@@ -322,18 +327,19 @@ export default function HelpPage() {
           </li>
           <li>
             <strong>Academic</strong> — scholarship <em>about</em> Indian SF: journal articles,
-            conference papers, book chapters, theses, preprints. Reference/citation metadata only
-            (no full text) — journal, volume, issue, pages, DOI, and an ordered author list (author
-            order matters for citation, unlike every other work type’s unordered author credits).
-            Add from Contribute’s <em>Academic</em> tab.
+            conference papers, book chapters, theses, preprints. Reference/citation metadata (no
+            full text) — journal, volume, issue, pages, DOI, an ordered author list (author order
+            matters for citation, unlike every other work type’s unordered author credits), and an
+            optional cover image. Add from Contribute’s <em>Academic</em> tab.
           </li>
           <li>
             <strong>Coverage</strong> — press coverage &amp; interviews <em>about</em> Indian SF:
             newspaper/press pieces, TV/radio segments, video/text/podcast interviews, blog posts,
-            obituaries. Also reference metadata only. A video interview with an author is Coverage,
-            not Media — Media is reserved for SF that <em>is</em> a screen/audio work. Contributors
-            carry a role (author, interviewer, interviewee, host, subject, photographer); only the
-            “author” role shows as the item’s byline. Add from Contribute’s <em>Coverage</em> tab.
+            obituaries. Also reference metadata, plus an optional cover image. A video interview
+            with an author is Coverage, not Media — Media is reserved for SF that <em>is</em> a
+            screen/audio work. Contributors carry a role (author, interviewer, interviewee, host,
+            subject, photographer); only the “author” role shows as the item’s byline. Add from
+            Contribute’s <em>Coverage</em> tab.
           </li>
           <li>
             Both Academic and Coverage items link to the SF work(s) they discuss via{" "}

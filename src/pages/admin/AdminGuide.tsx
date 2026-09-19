@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
  * Admin guide — special admin-only actions and how they behave.
  * Keep this updated as admin features are added or changed.
  */
-const LAST_UPDATED = "15 September 2026";
+const LAST_UPDATED = "19 September 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -32,9 +32,10 @@ export default function AdminGuide() {
       <Section title="Dashboard & stats">
         <p>
           The <Link to="/admin" className="text-violet-700 hover:underline">Dashboard</Link> shows
-          catalogue counts and pending-work cards (volunteer requests, edit queue). Counts are
-          pre-computed; use <strong>Refresh Stats</strong> to recompute them on demand. The stat
-          cards link to the relevant pages.
+          catalogue counts (including dedicated Academic Articles and Coverage Items cards) and
+          pending-work cards (volunteer requests, edit queue). Counts are pre-computed; use{" "}
+          <strong>Refresh Stats</strong> to recompute them on demand. The stat cards link to the
+          relevant pages.
         </p>
       </Section>
 
@@ -213,7 +214,8 @@ export default function AdminGuide() {
           secondary material <em>about</em> Indian SF, not primary works — scholarship (journal
           articles, conference papers, book chapters, theses, preprints) and press coverage
           (newspaper pieces, TV/radio segments, video/text/podcast interviews, blog posts,
-          obituaries). Reference/citation metadata only, no full text. Both are excluded from the
+          obituaries). Reference/citation metadata, no full text, plus an optional cover image on
+          each. Both are excluded from the
           default Browse listing (like magazines) — browse them on their own{" "}
           <Link to="/coverage" className="text-violet-700 hover:underline">Scholarship & Coverage</Link>{" "}
           page (type/category/language dropdown filters), or find one via search, a linked work’s

@@ -144,7 +144,12 @@ export default function RegisterPage() {
               <Link to="/license" target="_blank" className="text-violet-700 hover:underline">
                 CC BY-SA 4.0
               </Link>{" "}
-              and that KalpaDB may use, adapt, and relicense it as part of the database.
+              and that KalpaDB may use, adapt, and relicense it as part of the database. I've read
+              the{" "}
+              <Link to="/privacy" target="_blank" className="text-violet-700 hover:underline">
+                Privacy Policy
+              </Link>
+              .
             </span>
           </label>
 

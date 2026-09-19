@@ -33,6 +33,7 @@ const STATIC_ROUTES = [
   ["/help", "0.3"],
   ["/license", "0.3"],
   ["/cite", "0.3"],
+  ["/privacy", "0.3"],
 ];
 
 /** GET JSON with a timeout and one retry — tolerant of Render cold starts. */
