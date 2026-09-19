@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { stats, works, news } from "../lib/api";
 import { useSeo } from "../hooks/useSeo";
 import WorkCard from "../components/WorkCard";
+import logoFull from "../assets/logo-full.png";
 
 export default function HomePage() {
   useSeo({ path: "/" });
@@ -32,9 +33,17 @@ export default function HomePage() {
     <div className="max-w-6xl mx-auto px-4 py-10">
       {/* Hero */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-3">
+        <img
+          src={logoFull}
+          alt="KalpaDB"
+          className="mx-auto h-40 md:h-48 w-auto mb-4"
+        />
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">
           Indian Speculative Fiction Database
         </h1>
+        <p className="text-lg md:text-xl font-medium text-violet-700 mb-3">
+          Decolonizing imagination, one entry at a time.
+        </p>
         <p className="text-gray-500 text-lg max-w-xl mx-auto">
           A community-curated catalogue of speculative fiction — science fiction, fantasy,
           horror and more — across Indian languages and media.

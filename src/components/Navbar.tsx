@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { admin, messages } from "../lib/api";
+import logoIcon from "../assets/logo-icon.png";
 
 const BROWSE_LINKS = [
   { to: "/browse", label: "Works" },
@@ -136,8 +137,9 @@ export default function Navbar() {
         <Link
           to="/"
           onClick={() => setOpen(null)}
-          className="text-xl font-bold text-violet-700 tracking-tight"
+          className="flex items-center gap-2 text-xl font-bold text-violet-700 tracking-tight"
         >
+          <img src={logoIcon} alt="" className="h-8 w-8 object-contain" />
           KalpaDB
         </Link>
 
