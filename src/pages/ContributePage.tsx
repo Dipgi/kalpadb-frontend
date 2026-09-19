@@ -1722,13 +1722,24 @@ function AcademicForm() {
   const [contentType, setContentType] = useState("journal_article");
   const [year, setYear] = useState("");
   const [abstract, setAbstract] = useState("");
+  const [keywords, setKeywords] = useState("");
   const [containerTitle, setContainerTitle] = useState("");
   const [publisher, setPublisher] = useState("");
   const [volume, setVolume] = useState("");
   const [issue, setIssue] = useState("");
   const [pages, setPages] = useState("");
+  const [edition, setEdition] = useState("");
+  const [conferenceName, setConferenceName] = useState("");
+  const [conferenceLocation, setConferenceLocation] = useState("");
+  const [conferenceDate, setConferenceDate] = useState("");
   const [doi, setDoi] = useState("");
+  const [isbn, setIsbn] = useState("");
+  const [issn, setIssn] = useState("");
+  const [arxivId, setArxivId] = useState("");
   const [url, setUrl] = useState("");
+  const [citationKey, setCitationKey] = useState("");
+  const [license, setLicense] = useState("");
+  const [citationNotes, setCitationNotes] = useState("");
   const [peerReviewed, setPeerReviewed] = useState(false);
   const [openAccess, setOpenAccess] = useState(false);
   const [authors, setAuthors] = useState<AuthorRow[]>([]);
@@ -1751,11 +1762,22 @@ function AcademicForm() {
           image_urls: imageUrl.trim() ? [imageUrl.trim()] : null,
           authors: authorRowsToPayload(authors),
           abstract: abstract.trim() || null,
+          keywords: keywords.trim() || null,
           container_title: containerTitle.trim() || null,
           publisher: publisher.trim() || null,
           volume: volume.trim() || null,
           issue: issue.trim() || null,
           pages: pages.trim() || null,
+          edition: edition.trim() || null,
+          conference_name: conferenceName.trim() || null,
+          conference_location: conferenceLocation.trim() || null,
+          conference_date: conferenceDate || null,
+          isbn: isbn.trim() || null,
+          issn: issn.trim() || null,
+          arxiv_id: arxivId.trim() || null,
+          citation_key: citationKey.trim() || null,
+          license: license.trim() || null,
+          citation_notes: citationNotes.trim() || null,
           doi: doi.trim() || null,
           url: url.trim() || null,
           peer_reviewed: peerReviewed,
@@ -1773,13 +1795,24 @@ function AcademicForm() {
       setTitle("");
       setYear("");
       setAbstract("");
+      setKeywords("");
       setContainerTitle("");
       setPublisher("");
       setVolume("");
       setIssue("");
       setPages("");
+      setEdition("");
+      setConferenceName("");
+      setConferenceLocation("");
+      setConferenceDate("");
       setDoi("");
+      setIsbn("");
+      setIssn("");
+      setArxivId("");
       setUrl("");
+      setCitationKey("");
+      setLicense("");
+      setCitationNotes("");
       setPeerReviewed(false);
       setOpenAccess(false);
       setAuthors([]);
@@ -1824,6 +1857,10 @@ function AcademicForm() {
         <div>
           <label className={labelCls}>Abstract / summary</label>
           <textarea value={abstract} onChange={(e) => setAbstract(e.target.value)} rows={3} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Keywords</label>
+          <input value={keywords} onChange={(e) => setKeywords(e.target.value)} placeholder="Comma-separated, e.g. cyberpunk, translation, Bengali SF" className={inputCls} />
         </div>
       </FormSection>
 
@@ -1874,12 +1911,36 @@ function AcademicForm() {
             <input value={pages} onChange={(e) => setPages(e.target.value)} placeholder="e.g. 45-67" className={inputCls} />
           </div>
           <div>
+            <label className={labelCls}>Edition</label>
+            <input value={edition} onChange={(e) => setEdition(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>ISBN</label>
+            <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>ISSN</label>
+            <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
+          </div>
+          <div>
             <label className={labelCls}>DOI</label>
             <input value={doi} onChange={(e) => setDoi(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>arXiv ID</label>
+            <input value={arxivId} onChange={(e) => setArxivId(e.target.value)} className={inputCls} />
           </div>
           <div className="sm:col-span-2">
             <label className={labelCls}>URL</label>
             <input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Citation key</label>
+            <input value={citationKey} onChange={(e) => setCitationKey(e.target.value)} placeholder="e.g. Ray1975" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>License</label>
+            <input value={license} onChange={(e) => setLicense(e.target.value)} placeholder="e.g. CC BY 4.0" className={inputCls} />
           </div>
         </div>
         <div className="flex gap-4">
@@ -1891,6 +1952,27 @@ function AcademicForm() {
             <input type="checkbox" checked={openAccess} onChange={(e) => setOpenAccess(e.target.checked)} />
             Open access
           </label>
+        </div>
+        <div>
+          <label className={labelCls}>Citation notes</label>
+          <textarea value={citationNotes} onChange={(e) => setCitationNotes(e.target.value)} rows={2} className={inputCls} />
+        </div>
+      </FormSection>
+
+      <FormSection title="Conference (if applicable)" hint="Only relevant for a conference paper — leave blank otherwise.">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Conference name</label>
+            <input value={conferenceName} onChange={(e) => setConferenceName(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Location</label>
+            <input value={conferenceLocation} onChange={(e) => setConferenceLocation(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Date</label>
+            <input type="date" value={conferenceDate} onChange={(e) => setConferenceDate(e.target.value)} className={inputCls} />
+          </div>
         </div>
       </FormSection>
 
@@ -1963,9 +2045,14 @@ function CoverageForm() {
   const [summary, setSummary] = useState("");
   const [outlet, setOutlet] = useState("");
   const [outletType, setOutletType] = useState("");
+  const [section, setSection] = useState("");
   const [url, setUrl] = useState("");
+  const [archiveUrl, setArchiveUrl] = useState("");
+  const [accessDate, setAccessDate] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("");
+  const [byline, setByline] = useState("");
   const [isPaywalled, setIsPaywalled] = useState(false);
+  const [coverageNotes, setCoverageNotes] = useState("");
   const [contributors, setContributors] = useState<ContributorRow[]>([]);
   const [bylines, setBylines] = useState<Record<number, string>>({});
   const [imageUrl, setImageUrl] = useState("");
@@ -1990,9 +2077,14 @@ function CoverageForm() {
           summary: summary.trim() || null,
           outlet: outlet.trim() || null,
           outlet_type: outletType.trim() || null,
+          section: section.trim() || null,
           url: url.trim() || null,
+          archive_url: archiveUrl.trim() || null,
+          access_date: accessDate || null,
           duration_minutes: durationMinutes ? Number(durationMinutes) : null,
+          byline: byline.trim() || null,
           is_paywalled: isPaywalled,
+          coverage_notes: coverageNotes.trim() || null,
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         },
@@ -2008,9 +2100,14 @@ function CoverageForm() {
       setSummary("");
       setOutlet("");
       setOutletType("");
+      setSection("");
       setUrl("");
+      setArchiveUrl("");
+      setAccessDate("");
       setDurationMinutes("");
+      setByline("");
       setIsPaywalled(false);
+      setCoverageNotes("");
       setContributors([]);
       setBylines({});
       setImageUrl("");
@@ -2092,18 +2189,38 @@ function CoverageForm() {
             <input value={outletType} onChange={(e) => setOutletType(e.target.value)} placeholder="newspaper, tv, podcast…" className={inputCls} />
           </div>
           <div>
+            <label className={labelCls}>Section</label>
+            <input value={section} onChange={(e) => setSection(e.target.value)} placeholder="e.g. Books, Culture, Op-ed" className={inputCls} />
+          </div>
+          <div>
             <label className={labelCls}>Duration (minutes, if audio/video)</label>
             <input type="number" min={1} value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value)} className={inputCls} />
           </div>
-          <div className="sm:col-span-3">
+          <div>
+            <label className={labelCls}>Byline (as printed)</label>
+            <input value={byline} onChange={(e) => setByline(e.target.value)} placeholder="Only if not worth a full contributor credit" className={inputCls} />
+          </div>
+          <div className="sm:col-span-2">
             <label className={labelCls}>URL</label>
             <input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Archive URL</label>
+            <input value={archiveUrl} onChange={(e) => setArchiveUrl(e.target.value)} placeholder="e.g. web.archive.org link" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Access date</label>
+            <input type="date" value={accessDate} onChange={(e) => setAccessDate(e.target.value)} className={inputCls} />
           </div>
         </div>
         <label className="flex items-center gap-1.5 text-sm text-gray-600">
           <input type="checkbox" checked={isPaywalled} onChange={(e) => setIsPaywalled(e.target.checked)} />
           Paywalled
         </label>
+        <div>
+          <label className={labelCls}>Notes</label>
+          <textarea value={coverageNotes} onChange={(e) => setCoverageNotes(e.target.value)} rows={2} className={inputCls} />
+        </div>
       </FormSection>
 
       <FormSection

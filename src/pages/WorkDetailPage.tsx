@@ -114,7 +114,7 @@ export default function WorkDetailPage() {
 
   useSeo({
     title: work ? [work.title, work.authors.map((a) => a.name).join(", ")].filter(Boolean).join(" — ") : undefined,
-    description: work?.description,
+    description: work?.description || work?.academic?.abstract || work?.coverage?.summary,
   });
 
   if (isLoading) {
@@ -144,6 +144,13 @@ export default function WorkDetailPage() {
     work.image_urls?.[0] ??
     work.book?.formats?.[0]?.cover_image_url ??
     null;
+
+  // Academic/coverage items keep their descriptive text in a type-specific
+  // field (abstract/summary) rather than the generic work.description, since
+  // their create forms don't expose a separate description field — fall back
+  // to it so the text still shows in the same prominent spot every other
+  // work type's description does.
+  const description = work.description || work.academic?.abstract || work.coverage?.summary || null;
 
   const publicationYear = work.book?.publication_year
     ?? (work.publication_date ? work.publication_date.slice(0, 4) : null);
@@ -341,8 +348,8 @@ export default function WorkDetailPage() {
             </div>
           )}
 
-          {work.description && (
-            <p className="text-gray-600 text-sm leading-relaxed mb-4 whitespace-pre-line">{work.description}</p>
+          {description && (
+            <p className="text-gray-600 text-sm leading-relaxed mb-4 whitespace-pre-line">{description}</p>
           )}
 
           {me && (
@@ -623,6 +630,23 @@ export default function WorkDetailPage() {
                 </ol>
               </div>
             )}
+            {work.academic.keywords && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Keywords
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {work.academic.keywords.split(",").map((k) => k.trim()).filter(Boolean).map((k) => (
+                    <span
+                      key={k}
+                      className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+                    >
+                      {k}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
             {(work.academic.container_title || work.academic.publisher) && (
               <div>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
@@ -631,9 +655,10 @@ export default function WorkDetailPage() {
                 <div className="text-sm text-gray-700 space-y-1">
                   {work.academic.container_title && <p>{work.academic.container_title}</p>}
                   {work.academic.publisher && <p>{work.academic.publisher}</p>}
-                  {(work.academic.volume || work.academic.issue || work.academic.pages) && (
+                  {(work.academic.volume || work.academic.issue || work.academic.pages || work.academic.edition) && (
                     <p className="text-gray-500">
                       {[
+                        work.academic.edition && `${work.academic.edition} ed.`,
                         work.academic.volume && `Vol. ${work.academic.volume}`,
                         work.academic.issue && `Issue ${work.academic.issue}`,
                         work.academic.pages && `pp. ${work.academic.pages}`,
@@ -642,10 +667,44 @@ export default function WorkDetailPage() {
                         .join(", ")}
                     </p>
                   )}
+                  {(work.academic.isbn || work.academic.issn) && (
+                    <p className="text-gray-500">
+                      {[
+                        work.academic.isbn && `ISBN ${work.academic.isbn}`,
+                        work.academic.issn && `ISSN ${work.academic.issn}`,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
-            {(work.academic.doi || work.academic.url || work.academic.arxiv_id) && (
+            {(work.academic.conference_name || work.academic.conference_location || work.academic.conference_date) && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Conference
+                </h3>
+                <div className="text-sm text-gray-700 space-y-1">
+                  {work.academic.conference_name && <p>{work.academic.conference_name}</p>}
+                  {(work.academic.conference_location || work.academic.conference_date) && (
+                    <p className="text-gray-500">
+                      {[work.academic.conference_location, work.academic.conference_date]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            {(work.academic.doi ||
+              work.academic.url ||
+              work.academic.arxiv_id ||
+              work.academic.citation_key ||
+              work.academic.license ||
+              work.academic.citation_notes ||
+              work.academic.peer_reviewed ||
+              work.academic.open_access) && (
               <div>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
                   Citation
@@ -677,6 +736,8 @@ export default function WorkDetailPage() {
                       </a>
                     </p>
                   )}
+                  {work.academic.citation_key && <p>Citation key: {work.academic.citation_key}</p>}
+                  {work.academic.license && <p>License: {work.academic.license}</p>}
                   {(work.academic.peer_reviewed || work.academic.open_access) && (
                     <p className="text-gray-500">
                       {[
@@ -686,6 +747,9 @@ export default function WorkDetailPage() {
                         .filter(Boolean)
                         .join(" · ")}
                     </p>
+                  )}
+                  {work.academic.citation_notes && (
+                    <p className="text-gray-500 whitespace-pre-line">{work.academic.citation_notes}</p>
                   )}
                 </div>
               </div>
@@ -740,7 +804,18 @@ export default function WorkDetailPage() {
                 </div>
               </div>
             )}
-            {(work.coverage.url || work.coverage.is_paywalled) && (
+            {work.coverage.byline && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Byline
+                </h3>
+                <p className="text-sm text-gray-700">{work.coverage.byline}</p>
+              </div>
+            )}
+            {(work.coverage.url ||
+              work.coverage.archive_url ||
+              work.coverage.is_paywalled ||
+              work.coverage.access_date) && (
               <div>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
                   Source
@@ -773,7 +848,20 @@ export default function WorkDetailPage() {
                       </a>
                     </p>
                   )}
+                  {work.coverage.access_date && (
+                    <p className="text-gray-500">Accessed {work.coverage.access_date}</p>
+                  )}
                 </div>
+              </div>
+            )}
+            {work.coverage.coverage_notes && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                  Notes
+                </h3>
+                <p className="text-sm text-gray-700 whitespace-pre-line">
+                  {work.coverage.coverage_notes}
+                </p>
               </div>
             )}
           </>

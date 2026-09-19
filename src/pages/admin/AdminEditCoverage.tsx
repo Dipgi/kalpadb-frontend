@@ -79,11 +79,16 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [summary, setSummary] = useState(coverage?.summary ?? "");
   const [outlet, setOutlet] = useState(coverage?.outlet ?? "");
   const [outletType, setOutletType] = useState(coverage?.outlet_type ?? "");
+  const [section, setSection] = useState(coverage?.section ?? "");
   const [url, setUrl] = useState(coverage?.url ?? "");
+  const [archiveUrl, setArchiveUrl] = useState(coverage?.archive_url ?? "");
+  const [accessDate, setAccessDate] = useState(coverage?.access_date ?? "");
   const [durationMinutes, setDurationMinutes] = useState(
     coverage?.duration_minutes?.toString() ?? ""
   );
+  const [byline, setByline] = useState(coverage?.byline ?? "");
   const [isPaywalled, setIsPaywalled] = useState(!!coverage?.is_paywalled);
+  const [coverageNotes, setCoverageNotes] = useState(coverage?.coverage_notes ?? "");
   const [contributors, setContributors] = useState<ContributorRow[]>(
     contributorRowsFromExisting(coverage?.contributors ?? [])
   );
@@ -126,9 +131,14 @@ function EditForm({ work }: { work: WorkDetail }) {
           summary: summary.trim() || null,
           outlet: outlet.trim() || null,
           outlet_type: outletType.trim() || null,
+          section: section.trim() || null,
           url: url.trim() || null,
+          archive_url: archiveUrl.trim() || null,
+          access_date: accessDate || null,
           duration_minutes: durationMinutes ? Number(durationMinutes) : null,
+          byline: byline.trim() || null,
           is_paywalled: isPaywalled,
+          coverage_notes: coverageNotes.trim() || null,
           genre_ids: [...genreIds],
           tag_ids: [...tagIds],
         },
@@ -244,6 +254,15 @@ function EditForm({ work }: { work: WorkDetail }) {
             />
           </div>
           <div>
+            <label className={labelCls}>Section</label>
+            <input
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              placeholder="e.g. Books, Culture, Op-ed"
+              className={inputCls}
+            />
+          </div>
+          <div>
             <label className={labelCls}>Duration (minutes, if audio/video)</label>
             <input
               type="number"
@@ -253,9 +272,36 @@ function EditForm({ work }: { work: WorkDetail }) {
               className={inputCls}
             />
           </div>
-          <div className="sm:col-span-3">
+          <div>
+            <label className={labelCls}>Byline (as printed)</label>
+            <input
+              value={byline}
+              onChange={(e) => setByline(e.target.value)}
+              placeholder="Only if not worth a full contributor credit"
+              className={inputCls}
+            />
+          </div>
+          <div className="sm:col-span-2">
             <label className={labelCls}>URL</label>
             <input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Archive URL</label>
+            <input
+              value={archiveUrl}
+              onChange={(e) => setArchiveUrl(e.target.value)}
+              placeholder="e.g. web.archive.org link"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Access date</label>
+            <input
+              type="date"
+              value={accessDate}
+              onChange={(e) => setAccessDate(e.target.value)}
+              className={inputCls}
+            />
           </div>
         </div>
         <label className="flex items-center gap-1.5 text-sm text-gray-600">
@@ -266,6 +312,15 @@ function EditForm({ work }: { work: WorkDetail }) {
           />
           Paywalled
         </label>
+        <div>
+          <label className={labelCls}>Notes</label>
+          <textarea
+            value={coverageNotes}
+            onChange={(e) => setCoverageNotes(e.target.value)}
+            rows={2}
+            className={inputCls}
+          />
+        </div>
       </FormSection>
 
       <FormSection

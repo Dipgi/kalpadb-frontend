@@ -75,13 +75,24 @@ function EditForm({ work }: { work: WorkDetail }) {
   const [contentType, setContentType] = useState(work.content_type ?? "journal_article");
   const [year, setYear] = useState(work.publication_date ? work.publication_date.slice(0, 4) : "");
   const [abstract, setAbstract] = useState(academic?.abstract ?? "");
+  const [keywords, setKeywords] = useState(academic?.keywords ?? "");
   const [containerTitle, setContainerTitle] = useState(academic?.container_title ?? "");
   const [publisher, setPublisher] = useState(academic?.publisher ?? "");
   const [volume, setVolume] = useState(academic?.volume ?? "");
   const [issue, setIssue] = useState(academic?.issue ?? "");
   const [pages, setPages] = useState(academic?.pages ?? "");
+  const [edition, setEdition] = useState(academic?.edition ?? "");
+  const [conferenceName, setConferenceName] = useState(academic?.conference_name ?? "");
+  const [conferenceLocation, setConferenceLocation] = useState(academic?.conference_location ?? "");
+  const [conferenceDate, setConferenceDate] = useState(academic?.conference_date ?? "");
   const [doi, setDoi] = useState(academic?.doi ?? "");
+  const [isbn, setIsbn] = useState(academic?.isbn ?? "");
+  const [issn, setIssn] = useState(academic?.issn ?? "");
+  const [arxivId, setArxivId] = useState(academic?.arxiv_id ?? "");
   const [url, setUrl] = useState(academic?.url ?? "");
+  const [citationKey, setCitationKey] = useState(academic?.citation_key ?? "");
+  const [license, setLicense] = useState(academic?.license ?? "");
+  const [citationNotes, setCitationNotes] = useState(academic?.citation_notes ?? "");
   const [peerReviewed, setPeerReviewed] = useState(!!academic?.peer_reviewed);
   const [openAccess, setOpenAccess] = useState(!!academic?.open_access);
   const [authors, setAuthors] = useState<AuthorRow[]>(
@@ -116,11 +127,22 @@ function EditForm({ work }: { work: WorkDetail }) {
           image_urls: imageUrl.trim() ? [imageUrl.trim()] : [],
           authors: authorRowsToPayload(authors),
           abstract: abstract.trim() || null,
+          keywords: keywords.trim() || null,
           container_title: containerTitle.trim() || null,
           publisher: publisher.trim() || null,
           volume: volume.trim() || null,
           issue: issue.trim() || null,
           pages: pages.trim() || null,
+          edition: edition.trim() || null,
+          conference_name: conferenceName.trim() || null,
+          conference_location: conferenceLocation.trim() || null,
+          conference_date: conferenceDate || null,
+          isbn: isbn.trim() || null,
+          issn: issn.trim() || null,
+          arxiv_id: arxivId.trim() || null,
+          citation_key: citationKey.trim() || null,
+          license: license.trim() || null,
+          citation_notes: citationNotes.trim() || null,
           doi: doi.trim() || null,
           url: url.trim() || null,
           peer_reviewed: peerReviewed,
@@ -191,6 +213,15 @@ function EditForm({ work }: { work: WorkDetail }) {
             className={inputCls}
           />
         </div>
+        <div>
+          <label className={labelCls}>Keywords</label>
+          <input
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            placeholder="Comma-separated, e.g. cyberpunk, translation, Bengali SF"
+            className={inputCls}
+          />
+        </div>
       </FormSection>
 
       <FormSection title="Publication details">
@@ -251,12 +282,36 @@ function EditForm({ work }: { work: WorkDetail }) {
             <input value={pages} onChange={(e) => setPages(e.target.value)} className={inputCls} />
           </div>
           <div>
+            <label className={labelCls}>Edition</label>
+            <input value={edition} onChange={(e) => setEdition(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>ISBN</label>
+            <input value={isbn} onChange={(e) => setIsbn(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>ISSN</label>
+            <input value={issn} onChange={(e) => setIssn(e.target.value)} className={inputCls} />
+          </div>
+          <div>
             <label className={labelCls}>DOI</label>
             <input value={doi} onChange={(e) => setDoi(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>arXiv ID</label>
+            <input value={arxivId} onChange={(e) => setArxivId(e.target.value)} className={inputCls} />
           </div>
           <div className="sm:col-span-2">
             <label className={labelCls}>URL</label>
             <input value={url} onChange={(e) => setUrl(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Citation key</label>
+            <input value={citationKey} onChange={(e) => setCitationKey(e.target.value)} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>License</label>
+            <input value={license} onChange={(e) => setLicense(e.target.value)} className={inputCls} />
           </div>
         </div>
         <div className="flex gap-4">
@@ -276,6 +331,48 @@ function EditForm({ work }: { work: WorkDetail }) {
             />
             Open access
           </label>
+        </div>
+        <div>
+          <label className={labelCls}>Citation notes</label>
+          <textarea
+            value={citationNotes}
+            onChange={(e) => setCitationNotes(e.target.value)}
+            rows={2}
+            className={inputCls}
+          />
+        </div>
+      </FormSection>
+
+      <FormSection
+        title="Conference (if applicable)"
+        hint="Only relevant for a conference paper — leave blank otherwise."
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelCls}>Conference name</label>
+            <input
+              value={conferenceName}
+              onChange={(e) => setConferenceName(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Location</label>
+            <input
+              value={conferenceLocation}
+              onChange={(e) => setConferenceLocation(e.target.value)}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Date</label>
+            <input
+              type="date"
+              value={conferenceDate}
+              onChange={(e) => setConferenceDate(e.target.value)}
+              className={inputCls}
+            />
+          </div>
         </div>
       </FormSection>
 
