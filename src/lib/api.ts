@@ -583,6 +583,11 @@ export interface SearchResult {
   works: WorkSummary[];
   persons: PersonSummary[];
   publishers: PublisherSummary[];
+  // Per-category totals — works/persons/publishers are paginated
+  // independently server-side, so `total` alone can't drive pagination.
+  works_total: number;
+  persons_total: number;
+  publishers_total: number;
 }
 
 export interface UserOut {

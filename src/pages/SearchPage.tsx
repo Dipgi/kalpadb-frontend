@@ -6,6 +6,8 @@ import WorkCard from "../components/WorkCard";
 import MagazineCard from "../components/MagazineCard";
 import { useSeo } from "../hooks/useSeo";
 
+const PAGE_SIZE = 25;
+
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
@@ -34,6 +36,51 @@ export default function SearchPage() {
   const hasMagazines = magazines.length > 0;
   const hasPersons = (result?.persons?.length ?? 0) > 0;
   const hasPublishers = (result?.publishers?.length ?? 0) > 0;
+
+  // works/persons/publishers are each paginated independently server-side
+  // under the same `page`, so how many pages exist depends on whichever
+  // category has the most results.
+  const maxPage = result
+    ? Math.max(
+        1,
+        Math.ceil(result.works_total / PAGE_SIZE),
+        Math.ceil(result.persons_total / PAGE_SIZE),
+        Math.ceil(result.publishers_total / PAGE_SIZE),
+      )
+    : 1;
+  const hasPrev = page > 1;
+  const hasNext = page < maxPage;
+
+  function goToPage(p: number) {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", String(p));
+      return next;
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  const pagination = maxPage > 1 && (
+    <div className="flex items-center justify-center gap-4">
+      <button
+        onClick={() => goToPage(page - 1)}
+        disabled={!hasPrev}
+        className="px-4 py-2 rounded-md text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        ← Previous
+      </button>
+      <span className="text-sm text-gray-500">
+        Page {page} of {maxPage}
+      </span>
+      <button
+        onClick={() => goToPage(page + 1)}
+        disabled={!hasNext}
+        className="px-4 py-2 rounded-md text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        Next →
+      </button>
+    </div>
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -68,7 +115,13 @@ export default function SearchPage() {
           <p className="text-gray-400 text-center py-16">No results for "{q}".</p>
         ) : (
           <div className="space-y-10">
-            <p className="text-sm text-gray-400">{result.total} results for "{q}"</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-gray-400">
+                {result.total} results for "{q}"
+                {maxPage > 1 && ` — page ${page} of ${maxPage}`}
+              </p>
+              {pagination}
+            </div>
 
             {hasWorks && (
               <div>
@@ -149,6 +202,8 @@ export default function SearchPage() {
                 </div>
               </div>
             )}
+
+            {maxPage > 1 && <div className="pt-4">{pagination}</div>}
           </div>
         )
       ) : (
