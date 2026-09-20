@@ -1408,6 +1408,30 @@ export default function WorkDetailPage() {
           ) : null;
         })()}
 
+        {(work.discussed_people.length > 0 || work.discussed_publishers.length > 0) && (
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Discusses</h3>
+            <ul className="text-sm space-y-1">
+              {work.discussed_people.map((r) => (
+                <li key={`person-${r.id}`}>
+                  <Link to={`/persons/${r.person.id}`} className="text-violet-700 hover:underline">
+                    {r.person.name}
+                  </Link>
+                  {r.notes && <span className="text-gray-400 ml-1 text-xs">— {r.notes}</span>}
+                </li>
+              ))}
+              {work.discussed_publishers.map((r) => (
+                <li key={`publisher-${r.id}`}>
+                  <Link to={`/publishers/${r.publisher.id}`} className="text-violet-700 hover:underline">
+                    {r.publisher.name}
+                  </Link>
+                  {r.notes && <span className="text-gray-400 ml-1 text-xs">— {r.notes}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {otherLinks.length > 0 && (
           <div>
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Links</h3>
