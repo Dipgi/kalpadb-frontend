@@ -84,6 +84,12 @@ export default function ImageUploadField({ value, onChange, category, label = "I
           type="url"
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
+          onKeyDown={(e) => {
+            // This field is nested inside a larger <form> on every edit page; an
+            // unguarded Enter would submit that outer form instead of re-hosting
+            // the pasted URL (see WorkRelationshipsEditor for the same class of bug).
+            if (e.key === "Enter") e.preventDefault();
+          }}
           placeholder="paste image URL"
           disabled={busy}
           className="flex-1 min-w-[160px] border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:opacity-50"

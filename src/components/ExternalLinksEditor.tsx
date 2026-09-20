@@ -186,6 +186,9 @@ function LinkForm({
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.preventDefault();
+            }}
             placeholder="https://…"
             className={inputCls}
           />
@@ -196,6 +199,9 @@ function LinkForm({
         <input
           value={label}
           onChange={(e) => setLabel(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
           placeholder="e.g. Tamil Wikipedia, Publisher page"
           className={inputCls}
         />

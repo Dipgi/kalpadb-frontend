@@ -319,6 +319,9 @@ function AwardForm({
               <input
                 value={newTypeName}
                 onChange={(e) => setNewTypeName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.preventDefault();
+                }}
                 placeholder="+ new award name"
                 className="flex-1 border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-violet-400"
               />
@@ -354,6 +357,9 @@ function AwardForm({
               <input
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.preventDefault();
+                }}
                 placeholder="+ new category name"
                 className="flex-1 border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-violet-400"
               />
@@ -380,6 +386,9 @@ function AwardForm({
             type="number"
             value={year}
             onChange={(e) => setYear(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.preventDefault();
+            }}
             placeholder={String(CURRENT_YEAR)}
             min={1800}
             max={2100}
@@ -401,6 +410,9 @@ function AwardForm({
           <input
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.preventDefault();
+            }}
             placeholder="e.g. joint award"
             className={inputCls}
           />

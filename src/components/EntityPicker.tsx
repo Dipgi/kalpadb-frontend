@@ -111,6 +111,12 @@ export default function EntityPicker({
           setQ(e.target.value);
           if (dupCandidates) setDupCandidates(null);
         }}
+        onKeyDown={(e) => {
+          // Selection happens by clicking a result below, never by Enter — and this
+          // picker is usually nested inside a larger <form>, where an unguarded Enter
+          // would submit that outer form instead (see WorkRelationshipsEditor).
+          if (e.key === "Enter") e.preventDefault();
+        }}
         placeholder={placeholder}
         className={inputCls}
       />

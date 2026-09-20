@@ -160,6 +160,9 @@ export default function TranslationLinksEditor({
             setQ(e.target.value);
             setSubmittedNote(false);
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
           placeholder="Search a work to link as a translation/original…"
           className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
         />

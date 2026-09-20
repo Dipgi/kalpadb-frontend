@@ -120,6 +120,9 @@ export default function WorkRelationshipsEditor({ work }: { work: WorkDetail }) 
             <input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
               placeholder="e.g. set 200 years later"
               className="w-full border border-gray-200 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />

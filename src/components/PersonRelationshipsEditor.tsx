@@ -134,6 +134,9 @@ export default function PersonRelationshipsEditor({ personId }: { personId: numb
             <input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
               placeholder="e.g. co-wrote under this name 1978–1985"
               className="w-full border border-gray-200 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
