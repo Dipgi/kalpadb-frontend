@@ -159,6 +159,12 @@ export interface WorkDetail extends WorkSummary {
     notes?: string | null;
     work: WorkSummary;
   }[];
+  /** People this item discusses — ACADEMIC/COVERAGE only in practice (author
+   * profile, interview, obituary), empty for every other work type. */
+  discussed_people: { id: number; notes?: string | null; person: PersonSummary }[];
+  /** Publishers this item discusses — ACADEMIC/COVERAGE only in practice
+   * (press history, imprint retrospective). */
+  discussed_publishers: { id: number; notes?: string | null; publisher: PublisherSummary }[];
   /** Media works that adapt this work (film/series/audio versions). */
   adapted_by: {
     id: number;
@@ -426,6 +432,18 @@ export interface WorkRelationshipInput {
     | "inspired_by"
     | "part_of_series"
     | "discusses";
+  notes?: string | null;
+}
+
+/** An ACADEMIC/COVERAGE item discussing a person, not (only) a work. */
+export interface WorkDiscussesPersonInput {
+  other_person_id: number;
+  notes?: string | null;
+}
+
+/** An ACADEMIC/COVERAGE item discussing a publisher, not (only) a work. */
+export interface WorkDiscussesPublisherInput {
+  other_publisher_id: number;
   notes?: string | null;
 }
 
@@ -1463,6 +1481,10 @@ export const admin = {
       request(`/works/relationships/${relId}`, { method: "DELETE" }),
     deletePerson: (relId: number) =>
       request(`/persons/relationships/${relId}`, { method: "DELETE" }),
+    deleteDiscussesPerson: (relId: number) =>
+      request(`/works/discusses/persons/${relId}`, { method: "DELETE" }),
+    deleteDiscussesPublisher: (relId: number) =>
+      request(`/works/discusses/publishers/${relId}`, { method: "DELETE" }),
   },
 
   reviews: {
@@ -2157,6 +2179,16 @@ export const volunteer = {
     }),
   addWorkRelationship: (workId: number, data: WorkRelationshipInput) =>
     request<EditSubmission>(`/works/${workId}/relationships`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addWorkDiscussesPerson: (workId: number, data: WorkDiscussesPersonInput) =>
+    request<EditSubmission>(`/works/${workId}/discusses/persons`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addWorkDiscussesPublisher: (workId: number, data: WorkDiscussesPublisherInput) =>
+    request<EditSubmission>(`/works/${workId}/discusses/publishers`, {
       method: "POST",
       body: JSON.stringify(data),
     }),
