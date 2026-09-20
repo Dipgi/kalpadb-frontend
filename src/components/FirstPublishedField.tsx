@@ -162,7 +162,7 @@ export default function FirstPublishedField({
               <select
                 value={sel}
                 onChange={(e) => setSel(e.target.value)}
-                className="flex-1 border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="flex-1 min-w-0 border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               >
                 <option value="">Select an issue…</option>
                 {(issues ?? []).map((i) => (
@@ -187,7 +187,7 @@ export default function FirstPublishedField({
                   setSel("");
                 }}
                 disabled={!sel}
-                className="text-xs px-3 py-2 rounded-md bg-violet-700 text-white disabled:opacity-40 hover:bg-violet-800"
+                className="shrink-0 text-xs px-3 py-2 rounded-md bg-violet-700 text-white disabled:opacity-40 hover:bg-violet-800"
               >
                 Set
               </button>
