@@ -38,7 +38,7 @@ export default function EditDiff({ entry }: { entry: EditLogEntry }) {
 
   const fields = Object.entries(entry.diff!);
   return (
-    <div className="overflow-hidden rounded border border-gray-100">
+    <div className="overflow-x-auto rounded border border-gray-100">
       <table className="w-full text-xs">
         <thead>
           <tr className="bg-gray-50 text-gray-400 text-left">
